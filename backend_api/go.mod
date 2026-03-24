@@ -1,4 +1,4 @@
-module github.com/mfthfarid/TokoFarda-Prediksi/backend_api
+module github.com/mfthfarid/TokoPrediksi/backend_api
 
 go 1.25.1
 

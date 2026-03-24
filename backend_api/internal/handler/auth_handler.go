@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/service"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
