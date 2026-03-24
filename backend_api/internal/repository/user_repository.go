@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/config"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/config"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
 )
 
 type UserRepository struct{}

@@ -18,15 +18,15 @@ package main
 import (
 	// "backend/config"
 	// "backend/routes"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/config"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/routes"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/config"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/routes"
 
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	// "github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
+	// "github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
 )
 
 func main() {

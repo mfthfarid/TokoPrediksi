@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/config"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/config"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

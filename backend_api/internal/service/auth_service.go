@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/repository"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/repository"
 
 	"os"
 

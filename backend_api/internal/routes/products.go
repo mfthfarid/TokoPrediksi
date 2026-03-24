@@ -4,8 +4,8 @@ package routes
 import (
 	// "backend/config"
 	// "backend/models"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/config"
-	"github.com/mfthfarid/TokoFarda-Prediksi/backend_api/internal/models"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/config"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/models"
 
 	"net/http"
 	"strconv"
