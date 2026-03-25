@@ -1,4 +1,4 @@
-package com.mobile_app
+package com.tokoprediksi
 
 import android.app.Application
 import com.facebook.react.PackageList
