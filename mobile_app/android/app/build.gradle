@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.mobile_app"
+    namespace "com.tokoprediksi"
     defaultConfig {
-        applicationId "com.mobile_app"
+        applicationId "com.tokoprediksi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
