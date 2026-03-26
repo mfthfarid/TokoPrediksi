@@ -2,7 +2,6 @@
 import { StyleSheet } from 'react-native';
 
 export const BarangStyles = StyleSheet.create({
-  // ============ Container Styles ============
   wrapper: {
     flex: 1,
     backgroundColor: '#f0f4f8',
@@ -11,8 +10,6 @@ export const BarangStyles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
-
-  // ============ Header Styles ============
   header: {
     backgroundColor: '#35b5ff',
     paddingHorizontal: 16,
@@ -50,8 +47,6 @@ export const BarangStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  // ============ Statistics Cards ============
   statsContainer: {
     marginTop: 8,
   },
@@ -85,8 +80,6 @@ export const BarangStyles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-
-  // ============ Search Bar ============
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -111,8 +104,6 @@ export const BarangStyles = StyleSheet.create({
     color: '#212121',
     padding: 0,
   },
-
-  // ============ Filter Buttons ============
   filterContainer: {
     marginBottom: 16,
   },
@@ -142,8 +133,6 @@ export const BarangStyles = StyleSheet.create({
   filterButtonTextActive: {
     color: '#fff',
   },
-
-  // ============ Loading & Error Styles ============
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -175,13 +164,9 @@ export const BarangStyles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-
-  // ============ List Container ============
   listContainer: {
     paddingBottom: 100,
   },
-
-  // ============ Barang Item Styles ============
   barangItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -235,8 +220,6 @@ export const BarangStyles = StyleSheet.create({
     color: '#212121',
     marginBottom: 6,
   },
-
-  // ============ Category Badge ============
   categoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -253,8 +236,6 @@ export const BarangStyles = StyleSheet.create({
     fontWeight: '600',
     color: '#35b5ff',
   },
-
-  // ============ Price Container ============
   priceContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -285,8 +266,6 @@ export const BarangStyles = StyleSheet.create({
     fontWeight: '700',
     color: '#4caf50',
   },
-
-  // ============ Stock Container ============
   stockContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -320,8 +299,6 @@ export const BarangStyles = StyleSheet.create({
     fontWeight: '600',
     fontStyle: 'italic',
   },
-
-  // ============ Action Buttons ============
   itemRight: {
     justifyContent: 'center',
     gap: 8,
@@ -338,8 +315,6 @@ export const BarangStyles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#ffebee',
   },
-
-  // ============ Floating Action Button ============
   fab: {
     position: 'absolute',
     bottom: 24,
@@ -356,8 +331,6 @@ export const BarangStyles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-
-  // ============ Empty State Styles ============
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
