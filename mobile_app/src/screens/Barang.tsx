@@ -16,20 +16,18 @@ import { useProducts } from '../hooks/useProducts';
 const Barang = () => {
   const { products, loading, error } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all'); // all, low-stock, high-price
+  const [selectedFilter, setSelectedFilter] = useState('all');
 
-  // Calculate statistics
   const totalItems = products.length;
   const lowStockItems = products.filter(p => p.stok < 10).length;
   const totalValue = products.reduce((sum, p) => {
     const price =
       typeof p.harga === 'number'
         ? p.harga
-        : parseInt(p.harga.replace(/\D/g, ''));
+        : parseInt(p.harga.replace(/\D/g, ''), 10);
     return sum + price * p.stok;
   }, 0);
 
-  // Filter products
   const filteredProducts = products.filter(item => {
     const matchSearch = item.nama
       .toLowerCase()
@@ -41,8 +39,8 @@ const Barang = () => {
       const price =
         typeof item.harga === 'number'
           ? item.harga
-          : parseInt(item.harga.replace(/\D/g, ''));
-      return matchSearch && price > 500;
+          : parseInt(item.harga.replace(/\D/g, ''), 10);
+      return matchSearch && price > 50000;
     }
     return matchSearch;
   });
@@ -53,7 +51,7 @@ const Barang = () => {
       {
         text: 'Hapus',
         style: 'destructive',
-        onPress: () => console.log('Delete'),
+        onPress: () => console.log('Item deleted'),
       },
     ]);
   };
@@ -79,7 +77,6 @@ const Barang = () => {
 
   return (
     <View style={BarangStyles.wrapper}>
-      {/* Header */}
       <View style={BarangStyles.header}>
         <View style={BarangStyles.headerTop}>
           <View>
@@ -91,7 +88,6 @@ const Barang = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Statistics Cards */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -112,7 +108,7 @@ const Barang = () => {
           <View style={[BarangStyles.statCard, BarangStyles.statCardSuccess]}>
             <Icon name="cash-multiple" size={24} color="#4caf50" />
             <Text style={BarangStyles.statValue}>
-              {(totalValue / 1000).toFixed(0)}K
+              Rp {(totalValue / 1000).toFixed(0)}K
             </Text>
             <Text style={BarangStyles.statLabel}>Nilai Total</Text>
           </View>
@@ -123,7 +119,6 @@ const Barang = () => {
         style={BarangStyles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Search Bar */}
         <View style={BarangStyles.searchContainer}>
           <Icon
             name="magnify"
@@ -139,13 +134,15 @@ const Barang = () => {
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <Icon name="close-circle" size={20} color="#999" />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Filter Buttons */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -216,20 +213,20 @@ const Barang = () => {
           </TouchableOpacity>
         </ScrollView>
 
-        {/* Daftar Barang */}
         <View style={BarangStyles.listContainer}>
-          {filteredProducts.map((item, index) => {
+          {filteredProducts.map(item => {
             const price =
               typeof item.harga === 'number'
                 ? item.harga
-                : parseInt(item.harga.replace(/\D/g, ''));
+                : parseInt(item.harga.replace(/\D/g, ''), 10);
             const isLowStock = item.stok < 10;
+            const category = item.nama.toLowerCase().includes('minum')
+              ? 'Minuman'
+              : 'Makanan';
 
             return (
               <View key={item.id} style={BarangStyles.barangItem}>
-                {/* Left Content */}
                 <View style={BarangStyles.itemLeft}>
-                  {/* Icon with Badge */}
                   <View style={BarangStyles.itemIconContainer}>
                     <View style={BarangStyles.itemIcon}>
                       <Icon name="package-variant" size={28} color="#35b5ff" />
@@ -241,19 +238,14 @@ const Barang = () => {
                     )}
                   </View>
 
-                  {/* Info */}
                   <View style={BarangStyles.itemContent}>
                     <Text style={BarangStyles.itemName}>{item.nama}</Text>
 
-                    {/* Category Badge */}
                     <View style={BarangStyles.categoryBadge}>
                       <Icon name="tag" size={12} color="#35b5ff" />
-                      <Text style={BarangStyles.categoryText}>
-                        {index % 2 === 0 ? 'Makanan' : 'Minuman'}
-                      </Text>
+                      <Text style={BarangStyles.categoryText}>{category}</Text>
                     </View>
 
-                    {/* Price & Margin */}
                     <View style={BarangStyles.priceContainer}>
                       <View>
                         <Text style={BarangStyles.priceLabel}>Harga Jual</Text>
@@ -267,7 +259,6 @@ const Barang = () => {
                       </View>
                     </View>
 
-                    {/* Stok Info */}
                     <View style={BarangStyles.stockContainer}>
                       <View
                         style={[
@@ -301,11 +292,11 @@ const Barang = () => {
                   </View>
                 </View>
 
-                {/* Right Actions */}
                 <View style={BarangStyles.itemRight}>
                   <TouchableOpacity
                     style={BarangStyles.quickActionButton}
                     onPress={() => console.log('Edit', item.nama)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Icon name="pencil" size={20} color="#35b5ff" />
                   </TouchableOpacity>
@@ -316,6 +307,7 @@ const Barang = () => {
                       BarangStyles.deleteButton,
                     ]}
                     onPress={() => handleDeleteItem(item.nama)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Icon name="delete" size={20} color="#f44336" />
                   </TouchableOpacity>
@@ -325,7 +317,6 @@ const Barang = () => {
           })}
         </View>
 
-        {/* Empty State */}
         {filteredProducts.length === 0 && (
           <View style={BarangStyles.emptyState}>
             <Icon name="package-variant-closed" size={64} color="#ccc" />
@@ -341,8 +332,11 @@ const Barang = () => {
         )}
       </ScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity style={BarangStyles.fab} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={BarangStyles.fab}
+        activeOpacity={0.8}
+        onPress={() => console.log('Add new item')}
+      >
         <Icon name="plus" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
