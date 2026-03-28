@@ -1,6 +1,6 @@
 // mobile/components/MainLayout.tsx
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import Header from './Header';
 import TabNavigator from './TabNavigator';
 import Dashboard from '../screens/Dashboard';
@@ -13,7 +13,6 @@ import { MainLayoutProps } from '../types/types';
 const MainLayout: React.FC<MainLayoutProps> = ({ activeTab: initialTab }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
-  // ✅ Fungsi yang menggabungkan title, subtitle, dan konten
   const getTabData = () => {
     switch (activeTab) {
       case 'Dashboard':
@@ -50,7 +49,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ activeTab: initialTab }) => {
         return {
           title: 'Aplikasi',
           subtitle: 'Toko Kelontong',
-          content: <Text>Halaman tidak ditemukan</Text>,
+          content: <></>,
         };
     }
   };
@@ -60,10 +59,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ activeTab: initialTab }) => {
   return (
     <View style={styles.container}>
       <Header title={title} subtitle={subtitle} />
-      <ScrollView style={styles.content}>
-        {/* Render konten sesuai tab */}
-        {content}
-      </ScrollView>
+      <ScrollView style={styles.content}>{content}</ScrollView>
       <TabNavigator activeTab={activeTab} setActiveTab={setActiveTab} />
     </View>
   );
