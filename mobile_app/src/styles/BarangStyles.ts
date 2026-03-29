@@ -1,67 +1,85 @@
 // mobile/styles/BarangStyles.ts
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 export const BarangStyles = StyleSheet.create({
+  // ============ Global Styles ============
   wrapper: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#f8fafc',
   },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+    paddingTop: 8,
   },
+
+  // ============ Header Styles ============
   header: {
     backgroundColor: '#35b5ff',
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   headerTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#e3f2fd',
   },
-  scanButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  addButton: {
+    width,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  statsContainer: {
-    marginTop: 8,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginRight: 12,
-    minWidth: 120,
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+  },
+  scanButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // ============ Stats Styles ============
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  compactStatCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+    gap: 4,
   },
   statCardWarning: {
     backgroundColor: '#fff3e0',
@@ -69,285 +87,261 @@ export const BarangStyles = StyleSheet.create({
   statCardSuccess: {
     backgroundColor: '#e8f5e9',
   },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  compactStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
     color: '#212121',
-    marginTop: 8,
   },
-  statLabel: {
-    fontSize: 12,
+  compactStatLabel: {
+    fontSize: 10,
     color: '#666',
-    marginTop: 4,
   },
+
+  // ============ Search Styles ============
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: '#212121',
-    padding: 0,
-  },
-  filterContainer: {
-    marginBottom: 16,
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    marginRight: 8,
-    gap: 6,
+    marginTop: 12,
+    marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
-  filterButtonActive: {
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#212121',
+    padding: 0,
+  },
+
+  // ============ Filter Styles ============
+  filterContainer: {
+    marginBottom: 12,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginRight: 8,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  filterChipActive: {
     backgroundColor: '#35b5ff',
   },
-  filterButtonText: {
-    fontSize: 14,
+  filterChipText: {
+    fontSize: 12,
     fontWeight: '600',
     color: '#666',
   },
-  filterButtonTextActive: {
+  filterChipTextActive: {
     color: '#fff',
   },
+
+  // ============ Loading & Error Styles ============
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#f8fafc',
+    padding: 24,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#f8fafc',
     padding: 24,
   },
   errorText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#f44336',
     marginTop: 16,
     textAlign: 'center',
   },
   errorMessage: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#999',
     marginTop: 8,
     textAlign: 'center',
+    lineHeight: 16,
   },
+  retryButton: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#35b5ff',
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // ============ Product List Styles ============
   listContainer: {
-    paddingBottom: 100,
+    paddingBottom: 20, // Kurangi padding bawah karena tidak ada FAB
   },
-  barangItem: {
+  productCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     backgroundColor: '#fff',
-    marginBottom: 12,
-    borderRadius: 16,
-    padding: 16,
+    marginBottom: 10,
+    borderRadius: 12,
+    padding: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#35b5ff',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  itemLeft: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  itemIconContainer: {
+  productIconContainer: {
     position: 'relative',
     marginRight: 12,
   },
-  itemIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+  productIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
     backgroundColor: '#e3f2fd',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  lowStockBadge: {
+  lowStockIndicator: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: '#ff9800',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#fff',
   },
-  itemContent: {
+  productInfo: {
     flex: 1,
+    justifyContent: 'center',
   },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#212121',
-    marginBottom: 6,
-  },
-  categoryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    backgroundColor: '#e3f2fd',
-    borderRadius: 6,
-    gap: 4,
-    marginBottom: 8,
-  },
-  categoryText: {
-    fontSize: 11,
+  productName: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#35b5ff',
+    color: '#212121',
+    marginBottom: 4,
   },
-  priceContainer: {
+  productDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 4,
   },
-  priceLabel: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 2,
-  },
-  itemPrice: {
-    fontSize: 16,
+  productPrice: {
+    fontSize: 13,
     color: '#35b5ff',
     fontWeight: '700',
   },
-  profitBadge: {
+  categoryTag: {
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  categoryText: {
+    fontSize: 10,
+    color: '#35b5ff',
+    fontWeight: '600',
+  },
+  stockInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  stockBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: '#e8f5e9',
     borderRadius: 6,
     gap: 3,
   },
-  profitText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#4caf50',
-  },
-  stockContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stokBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    gap: 4,
-  },
-  stokNormal: {
+  stockNormal: {
     backgroundColor: '#e8f5e9',
   },
-  stokLow: {
+  stockLow: {
     backgroundColor: '#fff3e0',
   },
-  stokText: {
-    fontSize: 12,
-    fontWeight: '700',
+  stockText: {
+    fontSize: 11,
+    fontWeight: '600',
     color: '#4caf50',
   },
-  stokTextLow: {
+  stockTextLow: {
     color: '#ff9800',
   },
-  warningText: {
+  lowStockWarning: {
     fontSize: 10,
     color: '#ff9800',
-    fontWeight: '600',
     fontStyle: 'italic',
   },
-  itemRight: {
+  actionButtons: {
+    flexDirection: 'column',
     justifyContent: 'center',
     gap: 8,
     marginLeft: 8,
   },
-  quickActionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#e3f2fd',
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#f1f5f9',
     justifyContent: 'center',
     alignItems: 'center',
   },
   deleteButton: {
-    backgroundColor: '#ffebee',
+    backgroundColor: '#fee2e2',
   },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#35b5ff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#35b5ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
-  },
+
+  // ============ Empty State ============
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 24,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#999',
-    marginTop: 16,
+    marginTop: 12,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#bbb',
-    marginTop: 8,
+    marginTop: 4,
     textAlign: 'center',
   },
 });
