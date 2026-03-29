@@ -72,10 +72,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 10,
-    paddingBottom: 70,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    // paddingTop: 10,
+    // paddingBottom: 70,
+    // paddingHorizontal: 16,
+    // paddingVertical: 10,
   },
 });
 
