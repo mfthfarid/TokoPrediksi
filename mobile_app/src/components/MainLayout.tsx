@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import Header from './Header';
-import TabNavigator from './TabNavigator';
+// import TabNavigator from './TabNavigator';
+import TabNavigator from '../navigation/TabNavigator';
 import Dashboard from '../screens/Dashboard';
 import Barang from '../screens/Barang';
 import Transaksi from '../screens/Transaksi';

@@ -17,7 +17,7 @@ api.interceptors.request.use(
     console.log(
       'API Request:',
       config.method?.toUpperCase(),
-      config.baseURL + config.url,
+      config.baseURL ? config.baseURL + config.url : null,
     );
     return config;
   },
