@@ -81,10 +81,7 @@ const Barang = () => {
         <Icon name="wifi-off" size={48} color="#f44336" />
         <Text style={BarangStyles.errorText}>Gagal Memuat Data</Text>
         <Text style={BarangStyles.errorMessage}>{error}</Text>
-        <TouchableOpacity
-          style={BarangStyles.retryButton}
-          onPress={() => window.location.reload()}
-        >
+        <TouchableOpacity style={BarangStyles.retryButton} onPress={onRefresh}>
           <Text style={BarangStyles.retryButtonText}>Coba Lagi</Text>
         </TouchableOpacity>
       </View>

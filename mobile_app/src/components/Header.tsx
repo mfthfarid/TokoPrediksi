@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* Bagian Judul */}
         <View style={styles.titleSection}>
           <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          {/* {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>} */}
         </View>
 
         {/* Tombol Notifikasi dengan Badge */}
@@ -69,23 +69,25 @@ const styles = StyleSheet.create({
   },
 
   titleSection: {
-    // flex: 1,
-    // marginRight: 12,
-    // marginLeft: 8,
+    width: '60%',
+    backgroundColor: '#fff',
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   title: {
-    color: '#fff',
+    color: '#000',
     fontSize: 20,
     fontWeight: '700',
-    letterSpacing: 0.5,
   },
 
   subtitle: {
-    color: '#FFE8DC',
-    fontSize: 13,
-    marginTop: 4,
-    fontWeight: '500',
+    color: '#555',
+    fontSize: 12,
+    marginTop: 2,
   },
 
   notificationButton: {
