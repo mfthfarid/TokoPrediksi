@@ -5,10 +5,10 @@ import Header from './Header';
 // import TabNavigator from './TabNavigator';
 import TabNavigator from '../navigation/TabNavigator';
 import Dashboard from '../screens/Dashboard';
-import Barang from '../screens/Barang';
+import Barang from '../screens/Barang/Barang';
 import Transaksi from '../screens/Transaksi';
 import Prediksi from '../screens/Prediksi';
-import Pengaturan from '../screens/Pengaturan';
+import Pengaturan from '../screens/Pengaturan/Pengaturan';
 import { MainLayoutProps } from '../types/types';
 
 const MainLayout: React.FC<MainLayoutProps> = ({ activeTab: initialTab }) => {
