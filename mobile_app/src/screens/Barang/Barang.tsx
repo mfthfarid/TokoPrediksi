@@ -11,8 +11,8 @@ import {
   RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { BarangStyles } from '../styles/BarangStyles';
-import { useProducts } from '../hooks/useProducts';
+import { BarangStyles } from './BarangStyles';
+import { useProducts } from '../../hooks/useProducts';
 
 const Barang = () => {
   const { products, loading, error } = useProducts();
