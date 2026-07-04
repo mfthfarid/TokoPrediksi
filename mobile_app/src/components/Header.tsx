@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../types/types';
+import { Images } from '../assets';
 
 const Header: React.FC<HeaderProps> = ({
   title,
@@ -16,11 +17,7 @@ const Header: React.FC<HeaderProps> = ({
     <View style={styles.headerContainer}>
       <View style={styles.headerContent}>
         {/* Logo */}
-        <Image
-          source={require('../assets/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={Images.logo} style={styles.logo} resizeMode="contain" />
 
         {/* Bagian Judul */}
         <View style={styles.titleSection}>
