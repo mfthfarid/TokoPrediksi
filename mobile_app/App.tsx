@@ -586,17 +586,20 @@
 
 // mobile/App.tsx
 import React from 'react';
-import { View, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import MainLayout from './src/components/MainLayout';
+import RootNavigator from './src/navigation';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <View style={{ flex: 1 }}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <MainLayout activeTab="Dashboard" />
-      </View>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+
+      <RootNavigator />
     </SafeAreaProvider>
   );
 }

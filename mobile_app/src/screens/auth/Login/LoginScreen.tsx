@@ -80,6 +80,11 @@ const LoginScreen = () => {
                 true: Colors.primary,
               }}
             />
+            {/* <Checkbox
+              status={remember ? 'checked' : 'unchecked'}
+              onPress={() => setRemember(!remember)}
+            /> */}
+
             <Text style={styles.rememberText}>Ingat Saya</Text>
           </View>
 

@@ -1,13 +1,13 @@
 // mobile/components/MainLayout.tsx
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import Header from './Header';
+import Header from './common/Header';
 // import TabNavigator from './TabNavigator';
 import TabNavigator from '../navigation/TabNavigator';
-import Dashboard from '../screens/Dashboard';
+import Dashboard from '../screens/Dashboard/Dashboard';
 import Barang from '../screens/Barang/Barang';
-import Transaksi from '../screens/Transaksi';
-import Prediksi from '../screens/Prediksi';
+import Transaksi from '../screens/Transaksi/Transaksi';
+import Prediksi from '../screens/Prediksi/Prediksi';
 import Pengaturan from '../screens/Pengaturan/Pengaturan';
 import { MainLayoutProps } from '../types/types';
 
