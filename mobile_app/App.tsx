@@ -584,22 +584,17 @@
 //   },
 // });
 
-// mobile/App.tsx
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import RootNavigator from './src/navigation';
+import { RootStack } from './src/navigation';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
-
-      <RootNavigator />
+      <NavigationContainer>
+        <RootStack />
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }
