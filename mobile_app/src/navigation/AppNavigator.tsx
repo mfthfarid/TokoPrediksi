@@ -2,8 +2,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Dashboard from '../screens/Dashboard';
-import Notifikasi from '../screens/Notifikasi';
+import Dashboard from '../screens/Dashboard/Dashboard';
+import Notifikasi from '../screens/Notifikasi/Notifikasi';
 import { RootStackParamList } from '../types/types';
 
 const Stack = createStackNavigator<RootStackParamList>();

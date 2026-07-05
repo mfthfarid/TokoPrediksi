@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { HeaderProps } from '../types/types';
-import { Images } from '../assets';
+import { HeaderProps } from '../../types/types';
+import { Images } from '../../assets';
 
 const Header: React.FC<HeaderProps> = ({
   title,

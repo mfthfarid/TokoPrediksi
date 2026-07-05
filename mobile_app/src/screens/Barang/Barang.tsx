@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { BarangStyles } from './BarangStyles';
 import { useProducts } from '../../hooks/useProducts';
+import ScreenLayout from '../../layouts/ScreenLayout';
 
 const Barang = () => {
   const { products, loading, error } = useProducts();
@@ -89,6 +90,14 @@ const Barang = () => {
   }
 
   return (
+    //  <ScreenLayout
+    //       title="Barang"
+    //       subtitle="Kelola Data Barang"
+    //       scrollable={false}
+    //     >
+
+    //     </ScreenLayout>
+
     <View style={BarangStyles.wrapper}>
       {/* Header Stats */}
       <View style={BarangStyles.header}>
