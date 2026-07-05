@@ -4,11 +4,11 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import Header from './common/Header';
 // import TabNavigator from './TabNavigator';
 import TabNavigator from '../navigation/TabNavigator';
-import Dashboard from '../screens/Dashboard/Dashboard';
-import Barang from '../screens/Barang/Barang';
-import Transaksi from '../screens/Transaksi/Transaksi';
-import Prediksi from '../screens/Prediksi/Prediksi';
-import Pengaturan from '../screens/Pengaturan/Pengaturan';
+import Dashboard from '../screens/dashboard/DashboardScreen';
+import Barang from '../screens/barang/BarangScreen';
+import Transaksi from '../screens/transaksi/TransaksiScreen';
+import Prediksi from '../screens/prediksi/PrediksiScreen';
+import Pengaturan from '../screens/pengaturan/PengaturanScreen';
 import { MainLayoutProps } from '../types/types';
 
 const MainLayout: React.FC<MainLayoutProps> = ({ activeTab: initialTab }) => {

@@ -1,7 +1,7 @@
 // mobile/services/api.ts
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.0.2:8080'; // Gunakan IP yang sama seperti sebelumnya
+const API_BASE_URL = 'http://10.10.1.105:8080'; // Gunakan IP yang sama seperti sebelumnya
 
 const api = axios.create({
   baseURL: API_BASE_URL,

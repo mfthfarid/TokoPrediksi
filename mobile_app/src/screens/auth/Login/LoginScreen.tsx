@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -9,14 +8,15 @@ import {
   View,
   Switch,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Checkbox } from 'react-native-paper';
 import { Mail, Lock } from 'lucide-react-native';
-import styles from './styles';
-import { Images } from '../../../assets';
-import { Colors } from '../../../styles';
 import TextField from '../../../components/ui/TextField';
 import PasswordField from '../../../components/ui/PasswordField';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
+import styles from './styles';
+import { Images } from '../../../assets';
+import { Colors } from '../../../styles';
 
 // nanti kita ganti menjadi Images.logo
 // const logo = require('../../../assets/images/logo.png');
