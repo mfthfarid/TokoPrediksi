@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD:
-      MYSQL_DATABASE: toko_farda_prediksi
+      MYSQL_DATABASE: toko_prediksi
     ports:
       - "3306:3306"
 
@@ -17,7 +17,7 @@ services:
       DB_HOST: db
       DB_USER: root
       DB_PASS:
-      DB_NAME: toko_farda_prediksi
+      DB_NAME: toko_prediksi
       JWT_SECRET: verystrongsecret32charslong!!
     depends_on:
       - db

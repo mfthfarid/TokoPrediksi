@@ -6,7 +6,7 @@ type ProductRepository struct{}
 
 func (r *ProductRepository) FindAll() ([]Product, error) {
 	var products []Product
-	if err := config.DB.Find(&products).Error; err != nil {
+	if err := config.DB.Preload("Kategori").Find(&products).Error; err != nil {
 		return nil, err
 	}
 	return products, nil
