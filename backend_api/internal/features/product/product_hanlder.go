@@ -48,7 +48,7 @@ func (h *ProductHandler) AddProduct(c *gin.Context) {
 		return
 	}
 
-	p, err := h.service.Create(input.Name, input.Price, input.Stock)
+	p, err := h.service.Create(input)   // <-- kirim seluruh input, bukan 3 parameter terpisah
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambah produk"})
 		return
