@@ -22,8 +22,15 @@ func (s *ProductService) GetByID(id uint) (*Product, error) {
 	return p, nil
 }
 
-func (s *ProductService) Create(name string, price, stock uint) (*Product, error) {
-	p := &Product{Name: name, Price: price, Stock: stock}
+func (s *ProductService) Create(input CreateProductInput) (*Product, error) {
+	p := &Product{
+		Kode:               input.Kode,
+		Name:               input.Name,
+		Price:              input.Price,
+		Stock:              input.Stock,
+		IDKategori:         input.IDKategori,
+		TanggalKadaluwarsa: input.TanggalKadaluwarsa,
+	}
 	if err := s.repo.Create(p); err != nil {
 		return nil, err
 	}
@@ -36,7 +43,9 @@ func (s *ProductService) Update(id uint, input UpdateProductInput) (*Product, er
 		return nil, errors.New("produk tidak ditemukan")
 	}
 
-	// hanya update field yang benar-benar dikirim (tidak nil)
+	if input.Kode != nil {
+		p.Kode = *input.Kode
+	}
 	if input.Name != nil {
 		p.Name = *input.Name
 	}
@@ -45,6 +54,12 @@ func (s *ProductService) Update(id uint, input UpdateProductInput) (*Product, er
 	}
 	if input.Stock != nil {
 		p.Stock = *input.Stock
+	}
+	if input.IDKategori != nil {
+		p.IDKategori = input.IDKategori
+	}
+	if input.TanggalKadaluwarsa != nil {
+		p.TanggalKadaluwarsa = input.TanggalKadaluwarsa
 	}
 
 	if err := s.repo.Update(p); err != nil {
