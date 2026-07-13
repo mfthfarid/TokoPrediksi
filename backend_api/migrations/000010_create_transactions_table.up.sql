@@ -1,0 +1,10 @@
+CREATE TABLE transactions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    transaction_date DATE NOT NULL,
+    total_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    discount_type ENUM('nominal', 'percentage') NULL,
+    discount_value INT UNSIGNED NULL DEFAULT 0,
+    final_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
