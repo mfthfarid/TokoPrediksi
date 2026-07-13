@@ -1,9 +1,8 @@
 package product
 
 import (
-	"time"
-
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/category"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
 )
 
 type Product struct {
@@ -14,5 +13,5 @@ type Product struct {
 	Stock              uint               `json:"stock"`
 	IDKategori         *uint              `json:"id_kategori"`
 	Kategori           *category.Category `json:"kategori" gorm:"foreignKey:IDKategori"`
-	TanggalKadaluwarsa *time.Time         `json:"tanggal_kadaluwarsa"`
+	TanggalKadaluwarsa *customtype.Date   `json:"tanggal_kadaluwarsa"`
 }
