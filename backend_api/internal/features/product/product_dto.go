@@ -1,21 +1,22 @@
 package product
 
-import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
+import "github.com/shopspring/decimal"
+
+type CreateProductUnitInput struct {
+	UnitID           uint            `json:"unit_id" binding:"required"`
+	Barcode          *string         `json:"barcode" binding:"omitempty"`
+	ConversionToBase decimal.Decimal `json:"conversion_to_base"`
+	SellPrice        *uint           `json:"sell_price" binding:"omitempty"`
+	IsBaseUnit       bool            `json:"is_base_unit"`
+}
 
 type CreateProductInput struct {
-	Kode               string           `json:"kode" binding:"required"`
-	Name               string           `json:"name" binding:"required,min=3,max=100"`
-	Price              uint             `json:"price" binding:"required,gt=0"`
-	Stock              uint             `json:"stock" binding:"gte=0"`
-	IDKategori         *uint            `json:"id_kategori" binding:"omitempty"`
-	TanggalKadaluwarsa *customtype.Date `json:"tanggal_kadaluwarsa"`
+	Name       string                   `json:"name" binding:"required,min=3,max=100"`
+	IDKategori *uint                    `json:"id_kategori" binding:"omitempty"`
+	Units      []CreateProductUnitInput `json:"units" binding:"required,min=1,dive"`
 }
 
 type UpdateProductInput struct {
-	Kode               *string          `json:"kode" binding:"omitempty"`
-	Name               *string          `json:"name" binding:"omitempty,min=3,max=100"`
-	Price              *uint            `json:"price" binding:"omitempty,gt=0"`
-	Stock              *uint            `json:"stock" binding:"omitempty,gte=0"`
-	IDKategori         *uint            `json:"id_kategori" binding:"omitempty"`
-	TanggalKadaluwarsa *customtype.Date `json:"tanggal_kadaluwarsa"`
+	Name       *string `json:"name" binding:"omitempty,min=3,max=100"`
+	IDKategori *uint   `json:"id_kategori" binding:"omitempty"`
 }

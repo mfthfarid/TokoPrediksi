@@ -31,7 +31,6 @@ func (h *ProductHandler) GetProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
-
 	p, err := h.service.GetByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -42,15 +41,14 @@ func (h *ProductHandler) GetProduct(c *gin.Context) {
 
 func (h *ProductHandler) AddProduct(c *gin.Context) {
 	var input CreateProductInput
-
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": validator.FormatValidationError(err)})
 		return
 	}
 
-	p, err := h.service.Create(input)   // <-- kirim seluruh input, bukan 3 parameter terpisah
+	p, err := h.service.Create(input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambah produk"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, p)
@@ -75,4 +73,14 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, p)
+}
+
+func (h *ProductHandler) ScanBarcode(c *gin.Context) {
+	barcode := c.Param("barcode")
+	pu, err := h.service.FindByBarcode(barcode)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, pu)
 }
