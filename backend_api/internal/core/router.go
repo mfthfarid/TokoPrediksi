@@ -5,6 +5,7 @@ import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/auth"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/category"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/product"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/unit"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,7 @@ func SetupRouter() *gin.Engine {
 	{
 		category.RegisterRoutes(protected.Group("/categories"))
 		product.RegisterRoutes(protected.Group("/products"))
+		unit.RegisterRoutes(protected.Group("/units"))
 		// prediksi.RegisterRoutes(protected.Group("/prediksi"))
 	}
 
