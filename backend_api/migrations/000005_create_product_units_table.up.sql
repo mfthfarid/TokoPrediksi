@@ -3,7 +3,7 @@ CREATE TABLE product_units (
     product_id BIGINT UNSIGNED NOT NULL,
     unit_id BIGINT UNSIGNED NOT NULL,
     barcode VARCHAR(50) NULL UNIQUE,
-    conversion_to_base INT UNSIGNED NOT NULL,
+    conversion_to_base DECIMAL(10,2) UNSIGNED NOT NULL,
     sell_price INT UNSIGNED NULL,
     is_base_unit BOOLEAN NOT NULL DEFAULT FALSE,
 

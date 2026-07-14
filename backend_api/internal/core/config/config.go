@@ -10,6 +10,7 @@ import (
 )
 
 var DB *gorm.DB
+// type GormDB = gorm.DB
 
 func ConnectDB() {
 	err := godotenv.Load()

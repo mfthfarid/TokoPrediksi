@@ -6,7 +6,12 @@ type ProductRepository struct{}
 
 func (r *ProductRepository) FindAll() ([]Product, error) {
 	var products []Product
-	if err := config.DB.Preload("Kategori").Find(&products).Error; err != nil {
+	err := config.DB.
+		Preload("Kategori").
+		Preload("Units").
+		Preload("Units.Unit").
+		Find(&products).Error
+	if err != nil {
 		return nil, err
 	}
 	return products, nil
@@ -14,7 +19,12 @@ func (r *ProductRepository) FindAll() ([]Product, error) {
 
 func (r *ProductRepository) FindByID(id uint) (*Product, error) {
 	var p Product
-	if err := config.DB.First(&p, id).Error; err != nil {
+	err := config.DB.
+		Preload("Kategori").
+		Preload("Units").
+		Preload("Units.Unit").
+		First(&p, id).Error
+	if err != nil {
 		return nil, err
 	}
 	return &p, nil
@@ -26,4 +36,16 @@ func (r *ProductRepository) Create(p *Product) error {
 
 func (r *ProductRepository) Update(p *Product) error {
 	return config.DB.Save(p).Error
+}
+
+func (r *ProductRepository) FindByBarcode(barcode string) (*ProductUnit, error) {
+	var pu ProductUnit
+	err := config.DB.
+		Preload("Unit").
+		Where("barcode = ?", barcode).
+		First(&pu).Error
+	if err != nil {
+		return nil, err
+	}
+	return &pu, nil
 }
