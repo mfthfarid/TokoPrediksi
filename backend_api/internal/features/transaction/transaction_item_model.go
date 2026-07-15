@@ -5,7 +5,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-
 type TransactionItem struct {
 	ID            uint                `json:"id" gorm:"primaryKey"`
 	TransactionID uint                `json:"transaction_id" gorm:"not null"`
