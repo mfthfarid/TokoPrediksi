@@ -16,6 +16,7 @@ func NewProductUnitHandler() *ProductUnitHandler {
 	return &ProductUnitHandler{service: NewProductUnitService()}
 }
 
+// Get
 func (h *ProductUnitHandler) GetUnitsByProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -30,6 +31,7 @@ func (h *ProductUnitHandler) GetUnitsByProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, units)
 }
 
+// Add
 func (h *ProductUnitHandler) AddUnit(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -51,6 +53,7 @@ func (h *ProductUnitHandler) AddUnit(c *gin.Context) {
 	c.JSON(http.StatusCreated, pu)
 }
 
+// Update Unit
 func (h *ProductUnitHandler) UpdateUnit(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("unitId"))
 	if err != nil {
@@ -72,6 +75,7 @@ func (h *ProductUnitHandler) UpdateUnit(c *gin.Context) {
 	c.JSON(http.StatusOK, pu)
 }
 
+// Update Price
 func (h *ProductUnitHandler) UpdatePrice(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("unitId"))
 	if err != nil {
@@ -85,8 +89,14 @@ func (h *ProductUnitHandler) UpdatePrice(c *gin.Context) {
 		return
 	}
 
-	// TODO: ganti nil dengan user_id dari JWT claims setelah AuthMiddleware menyimpannya ke context
-	pu, err := h.service.UpdatePrice(uint(id), input, nil)
+	var changedBy *uint
+	if val, exists := c.Get("user_id"); exists {
+		if uid, ok := val.(uint); ok {
+			changedBy = &uid
+		}
+	}
+
+	pu, err := h.service.UpdatePrice(uint(id), input, changedBy)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -94,6 +104,7 @@ func (h *ProductUnitHandler) UpdatePrice(c *gin.Context) {
 	c.JSON(http.StatusOK, pu)
 }
 
+// Get Price History
 func (h *ProductUnitHandler) GetPriceHistory(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("unitId"))
 	if err != nil {
@@ -109,6 +120,7 @@ func (h *ProductUnitHandler) GetPriceHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, history)
 }
 
+// Delete
 func (h *ProductUnitHandler) DeleteUnit(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("unitId"))
 	if err != nil {

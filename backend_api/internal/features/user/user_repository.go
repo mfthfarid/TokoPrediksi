@@ -1,8 +1,6 @@
 package user
 
-import (
-	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
-)
+import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 
 type UserRepository struct{}
 
@@ -14,6 +12,18 @@ func (r *UserRepository) FindByEmail(email string) (*User, error) {
 	return &u, nil
 }
 
+func (r *UserRepository) FindByID(id uint) (*User, error) {
+	var u User
+	if err := config.DB.First(&u, id).Error; err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
 func (r *UserRepository) Create(u *User) error {
 	return config.DB.Create(u).Error
+}
+
+func (r *UserRepository) Update(u *User) error {
+	return config.DB.Save(u).Error
 }
