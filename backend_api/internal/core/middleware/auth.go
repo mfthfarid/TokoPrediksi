@@ -33,6 +33,19 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			return
+		}
+
+		userIDFloat, ok := claims["user_id"].(float64) // JWT selalu decode angka jadi float64
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token tidak memiliki user_id"})
+			return
+		}
+
+		c.Set("user_id", uint(userIDFloat))
 		c.Next()
 	}
 }

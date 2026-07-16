@@ -10,6 +10,7 @@ import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/supplier"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/transaction"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/unit"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,6 +36,7 @@ func SetupRouter() *gin.Engine {
 		supplier.RegisterRoutes(protected.Group("/suppliers"))
 		purchase.RegisterRoutes(protected.Group("/purchases"))
 		transaction.RegisterRoutes(protected.Group("/transactions"))
+		user.RegisterRoutes(protected.Group("/users"))
 	}
 
 	return r
