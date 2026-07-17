@@ -5,14 +5,13 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// type RegisterInput struct { ... }  // masih dikomentar sesuai kesepakatan awal
+type ForgotPasswordInput struct {
+	Email string `json:"email" binding:"required,email"`
+}
 
-// type ForgotPasswordInput struct {
-// 	Email string `json:"email" binding:"required,email"`
-// }
-//
-// type ResetPasswordInput struct {
-// 	Token           string `json:"token" binding:"required"`
-// 	Password        string `json:"password" binding:"required,min=6"`
-// 	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
-// }
+type ResetPasswordInput struct {
+	Email           string `json:"email" binding:"required,email"`
+	Otp             string `json:"otp" binding:"required,len=6"`
+	NewPassword     string `json:"new_password" binding:"required,min=6"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=NewPassword"`
+}
