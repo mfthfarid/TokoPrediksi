@@ -7,9 +7,9 @@ func RegisterRoutes(r *gin.Engine) {
 
 	g := r.Group("/auth")
 	{
-		// Sengaja dinonaktifkan dulu — user (owner) didaftarkan langsung lewat database.
-		// Aktifkan kembali kalau nanti dibutuhkan fitur pendaftaran mandiri.
-		// g.POST("/register", handler.Register)
+		// g.POST("/register", handler.Register) //
 		g.POST("/login", handler.Login)
+		g.POST("/forgot-password", handler.ForgotPassword)
+		g.POST("/reset-password", handler.ResetPassword)
 	}
 }
