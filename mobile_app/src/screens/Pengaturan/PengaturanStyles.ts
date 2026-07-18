@@ -1,12 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 export const PengaturanStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    // paddingTop: 10,
-    paddingBottom: 70, // Memberi ruang untuk TabNavigator
-  },
   settingsSection: {
     marginTop: 12,
     backgroundColor: '#fff',

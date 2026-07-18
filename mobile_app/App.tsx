@@ -589,15 +589,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootStack } from './src/navigation';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <NavigationContainer>
-          <RootStack />
-        </NavigationContainer>
-      </AuthProvider>
-    </SafeAreaProvider>
+    <KeyboardProvider>
+      <SafeAreaProvider>
+        <SystemBars style="light" />
+        <AuthProvider>
+          <NavigationContainer>
+            <RootStack />
+          </NavigationContainer>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </KeyboardProvider>
   );
 }
