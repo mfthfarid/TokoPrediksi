@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  Text,
-  View,
-} from 'react-native';
+import { ScrollView, Image, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './AuthLayoutStyles';
 import { Images } from '../assets';
@@ -25,10 +19,7 @@ export default function AuthLayout({
   showLogo = true,
 }: AuthLayoutProps) {
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"

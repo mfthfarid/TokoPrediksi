@@ -1,7 +1,6 @@
-// mobile/components/Header.tsx
-// mobile/components/Header.tsx
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
 import { Images } from '../../assets';
@@ -12,9 +11,10 @@ const Header: React.FC<HeaderProps> = ({
   onNotificationPress,
 }) => {
   const [notificationCount] = useState(3);
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerContainer, { paddingTop: insets.top + 0 }]}>
       <View style={styles.headerContent}>
         {/* Logo */}
         <Image source={Images.logo} style={styles.logo} resizeMode="contain" />
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: '#35b5ffff',
     paddingHorizontal: 16,
-    paddingTop: 30,
+    // paddingTop sekarang diberikan dinamis lewat insets.top di atas
     paddingBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

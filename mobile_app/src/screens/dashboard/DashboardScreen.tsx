@@ -1,8 +1,11 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { useDoubleBackExit } from '../../hooks/useDoubleBackExit';
 import ScreenLayout from '../../layouts/ScreenLayout';
 
 const Dashboard = () => {
+  useDoubleBackExit();
+
   return (
     <ScreenLayout
       title="Dashboard"
