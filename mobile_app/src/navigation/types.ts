@@ -6,6 +6,7 @@ export type RootStackParamList = {
 
 export type AuthStackParamList = {
   Login: undefined;
+  ForgotPassword: undefined;
 };
 
 export type BottomTabParamList = {
@@ -18,10 +19,15 @@ export type BottomTabParamList = {
 
 export type DashboardStackParamList = {
   Dashboard: undefined;
+  Notifikasi: undefined;
 };
 
 export type BarangStackParamList = {
   Barang: undefined;
+  // Tambahkan di sini saat screen-nya sudah dibuat:
+  // TambahBarang: undefined;
+  // DetailBarang: { id: number };
+  // EditBarang: { id: number };
 };
 
 export type TransaksiStackParamList = {

@@ -2,48 +2,42 @@ import { StyleSheet } from 'react-native';
 import { Colors, Spacing } from '../../../styles';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
+  forgotLink: {
+    alignSelf: 'flex-end',
+    marginBottom: Spacing.md,
   },
 
-  content: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
+  forgotLinkText: {
+    color: Colors.primary,
+    fontSize: 13,
+    fontWeight: '600',
   },
 
-  logo: {
-    width: 130,
-    height: 130,
-    alignSelf: 'center',
-    marginBottom: Spacing.xl,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Colors.text,
+  errorText: {
+    color: '#dc2626', // ganti ke Colors.error kalau sudah ada di colors.ts
+    fontSize: 13,
     textAlign: 'center',
+    marginBottom: Spacing.md,
   },
 
-  subtitle: {
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.xl,
-    textAlign: 'center',
-    color: Colors.textSecondary,
-    fontSize: 15,
-  },
-
-  rememberContainer: {
+  actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    gap: 12,
   },
 
-  rememberText: {
-    marginLeft: 8,
-    color: Colors.text,
+  loginButtonWrapper: {
+    flex: 1,
+  },
+
+  fingerprintButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

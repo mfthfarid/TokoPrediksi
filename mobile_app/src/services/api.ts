@@ -1,49 +1,63 @@
-// mobile/services/api.ts
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { getToken, removeToken } from './tokenStorage';
 
-const API_BASE_URL = 'http://10.10.1.105:8080'; // Gunakan IP yang sama seperti sebelumnya
+const API_BASE_URL = 'http://192.168.18.11:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // Tambahkan timeout 15 detik
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor untuk logging (opsional, untuk debugging)
+// --- Request interceptor: nempelin Bearer token + logging saat dev ---
 api.interceptors.request.use(
-  config => {
-    console.log(
-      'API Request:',
-      config.method?.toUpperCase(),
-      config.baseURL ? config.baseURL + config.url : null,
-    );
+  async (config: InternalAxiosRequestConfig) => {
+    const token = await getToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (__DEV__) {
+      console.log(
+        'API Request:',
+        config.method?.toUpperCase(),
+        config.baseURL ? config.baseURL + config.url : null,
+      );
+    }
     return config;
   },
   error => {
-    console.error('Request Error:', error);
+    if (__DEV__) console.error('Request Error:', error);
     return Promise.reject(error);
   },
 );
+
+// --- Response interceptor: logging saat dev + auto-handle token expired (401) ---
+type UnauthorizedHandler = () => void;
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+export const setUnauthorizedHandler = (handler: UnauthorizedHandler) => {
+  onUnauthorized = handler;
+};
 
 api.interceptors.response.use(
   response => {
-    console.log('API Response:', response.status, response.data);
+    if (__DEV__) {
+      console.log('API Response:', response.status, response.data);
+    }
     return response;
   },
-  error => {
-    console.error('Response Error:', error.response?.status, error.message);
+  async (error: AxiosError) => {
+    if (__DEV__) {
+      console.error('Response Error:', error.response?.status, error.message);
+    }
+    if (error.response?.status === 401) {
+      await removeToken();
+      onUnauthorized?.();
+    }
     return Promise.reject(error);
   },
 );
-
-export const getProducts = () => api.get('/products');
-export const getProductById = (id: number) => api.get(`/products/${id}`);
-export const addProduct = (data: {
-  name: string;
-  price: number;
-  stock: number;
-}) => api.post('/products', data);
 
 export default api;
