@@ -31,4 +31,22 @@ export const PengaturanStyles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
   },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 20,
+    marginBottom: 12,
+    paddingVertical: 14,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  logoutText: {
+    color: '#dc2626',
+    fontSize: 14,
+    fontWeight: '600',
+  },
 });
