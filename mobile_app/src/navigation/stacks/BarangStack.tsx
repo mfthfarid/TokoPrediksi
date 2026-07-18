@@ -1,31 +1,19 @@
-// const Stack = createNativeStackNavigator();
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import BarangScreen from '../../screens/barang/BarangScreen';
+import { BarangStackParamList } from '../types';
 
-// export default function BarangStack() {
-//   return (
-//     <Stack.Navigator
-//       screenOptions={{
-//         headerShown: false,
-//       }}
-//     >
-//       <Stack.Screen
-//         name="BarangList"
-//         component={BarangScreen}
-//       />
+const Stack = createNativeStackNavigator<BarangStackParamList>();
 
-//       <Stack.Screen
-//         name="TambahBarang"
-//         component={TambahBarangScreen}
-//       />
-
-//       <Stack.Screen
-//         name="DetailBarang"
-//         component={DetailBarangScreen}
-//       />
-
-//       <Stack.Screen
-//         name="EditBarang"
-//         component={EditBarangScreen}
-//       />
-//     </Stack.Navigator>
-//   );
-// }
+export default function BarangStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Barang" component={BarangScreen} />
+      {/* TODO: tambahkan saat screen-nya sudah dibuat, dan tambahkan
+          route-nya juga di BarangStackParamList (navigation/types.ts):
+      <Stack.Screen name="TambahBarang" component={TambahBarangScreen} />
+      <Stack.Screen name="DetailBarang" component={DetailBarangScreen} />
+      <Stack.Screen name="EditBarang" component={EditBarangScreen} /> */}
+    </Stack.Navigator>
+  );
+}

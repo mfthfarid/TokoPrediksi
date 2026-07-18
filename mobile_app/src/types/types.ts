@@ -43,34 +43,17 @@ export type SettingItem = {
 };
 
 // ================================
-// Layout & Component Types
+// Component Types
 // ================================
-export interface MainLayoutProps {
-  // title?: string;
-  // subtitle?: string;
-  activeTab: string;
-}
-
 export interface HeaderProps {
   title: string;
   subtitle?: string;
   onNotificationPress?: () => void;
 }
 
-export interface TabNavigatorProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
-
-// ================================
-// Navigation Types
-// ================================
-export type RootStackParamList = {
-  Dashboard: undefined;
-  Inventory: undefined;
-  Transaksi: undefined;
-  Prediksi: undefined;
-  Pengaturan: undefined;
-  Notifikasi: undefined;
-  // Tambahkan layar lain di sini
-};
+// Catatan: MainLayoutProps & TabNavigatorProps dihapus (2026) —
+// digantikan React Navigation Bottom Tabs, lihat src/navigation/.
+//
+// Catatan: RootStackParamList dihapus dari sini —
+// param list navigasi sekarang HANYA hidup di src/navigation/types.ts,
+// supaya tidak ada dua "sumber kebenaran" untuk hal yang sama.
