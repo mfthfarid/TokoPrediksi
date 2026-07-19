@@ -1,347 +1,218 @@
-// mobile/styles/BarangStyles.ts
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Colors, Spacing } from '../../styles';
 
-const { width } = Dimensions.get('window');
-
-export const BarangStyles = StyleSheet.create({
-  // ============ Global Styles ============
-  wrapper: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 12,
-    paddingTop: 8,
-  },
-
-  // ============ Header Styles ============
-  header: {
-    backgroundColor: '#35b5ff',
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 16,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 2,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#e3f2fd',
-  },
-  addButton: {
-    width,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  scanButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // ============ Stats Styles ============
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  compactStatCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
-    gap: 4,
-  },
-  statCardWarning: {
-    backgroundColor: '#fff3e0',
-  },
-  statCardSuccess: {
-    backgroundColor: '#e8f5e9',
-  },
-  compactStatValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#212121',
-  },
-  compactStatLabel: {
-    fontSize: 10,
-    color: '#666',
-  },
-
-  // ============ Search Styles ============
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginTop: 12,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#212121',
-    padding: 0,
-  },
-
-  // ============ Filter Styles ============
-  filterContainer: {
-    marginBottom: 12,
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    marginRight: 8,
-    gap: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
-    elevation: 1,
-  },
-  filterChipActive: {
-    backgroundColor: '#35b5ff',
-  },
-  filterChipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
-  },
-  filterChipTextActive: {
-    color: '#fff',
-  },
-
-  // ============ Loading & Error Styles ============
-  loadingContainer: {
+const styles = StyleSheet.create({
+  centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    padding: 24,
+    paddingHorizontal: Spacing.xl,
+    backgroundColor: Colors.background,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#666',
+    marginTop: Spacing.md,
+    color: Colors.textSecondary,
   },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    padding: 24,
-  },
-  errorText: {
+  errorTitle: {
+    marginTop: Spacing.md,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#f44336',
-    marginTop: 16,
-    textAlign: 'center',
+    fontWeight: '700',
+    color: Colors.text,
   },
   errorMessage: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 8,
+    marginTop: Spacing.sm,
+    fontSize: 13,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 16,
   },
   retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#35b5ff',
+    marginTop: Spacing.lg,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    backgroundColor: Colors.primary,
     borderRadius: 8,
   },
   retryButtonText: {
     color: '#fff',
-    fontSize: 14,
     fontWeight: '600',
   },
 
-  // ============ Product List Styles ============
-  listContainer: {
-    paddingBottom: 20, // Kurangi padding bawah karena tidak ada FAB
-  },
-  productCard: {
+  // Search + Tambah
+  searchRow: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    marginBottom: 10,
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  productIconContainer: {
-    position: 'relative',
-    marginRight: 12,
-  },
-  productIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: '#e3f2fd',
-    justifyContent: 'center',
     alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.md,
   },
-  lowStockIndicator: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#ff9800',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  productInfo: {
+  searchContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 44,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.text,
+    padding: 0,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#4caf50',
+    height: 44,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+
+  // Filter kategori
+  categoryList: {
+    flexGrow: 0,
+    marginBottom: Spacing.md,
+  },
+  categoryListContent: {
+    gap: 8,
+  },
+  categoryChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  categoryChipActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  categoryChipText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '600',
+  },
+  categoryChipTextActive: {
+    color: '#fff',
+  },
+
+  // Grid produk
+  productList: {
+    flex: 1,
+  },
+  listContent: {
+    paddingBottom: 20,
+  },
+  row: {
+    justifyContent: 'space-between',
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  imagePlaceholder: {
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 8,
   },
   productName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#212121',
-    marginBottom: 4,
-  },
-  productDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.text,
   },
   productPrice: {
     fontSize: 13,
-    color: '#35b5ff',
-    fontWeight: '700',
-  },
-  categoryTag: {
-    backgroundColor: '#e3f2fd',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  categoryText: {
-    fontSize: 10,
-    color: '#35b5ff',
     fontWeight: '600',
+    color: Colors.primary,
+    marginTop: 2,
   },
-  stockInfo: {
+  cardFooterRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 6,
+    marginTop: 6,
   },
   stockBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: '#e8f5e9',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
-    gap: 3,
+    borderRadius: 999,
   },
-  stockNormal: {
-    backgroundColor: '#e8f5e9',
-  },
-  stockLow: {
+  stockBadgeLow: {
     backgroundColor: '#fff3e0',
   },
-  stockText: {
-    fontSize: 11,
-    fontWeight: '600',
+  stockBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
     color: '#4caf50',
   },
-  stockTextLow: {
+  stockBadgeTextLow: {
     color: '#ff9800',
   },
-  lowStockWarning: {
+  categoryLabel: {
     fontSize: 10,
-    color: '#ff9800',
-    fontStyle: 'italic',
+    color: Colors.textSecondary,
+    maxWidth: '50%',
   },
-  actionButtons: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    gap: 8,
-    marginLeft: 8,
+  cardActions: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 8,
   },
-  actionButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#f1f5f9',
+  editButton: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingVertical: 6,
   },
   deleteButton: {
-    backgroundColor: '#fee2e2',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#f44336',
+    borderRadius: 8,
+    paddingVertical: 6,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
   },
 
-  // ============ Empty State ============
+  // Empty state
   emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 12,
-    color: '#bbb',
-    marginTop: 4,
-    textAlign: 'center',
+    marginTop: Spacing.sm,
+    color: Colors.textSecondary,
+    fontSize: 13,
   },
 });
+
+export default styles;

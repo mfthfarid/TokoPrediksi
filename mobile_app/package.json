@@ -21,6 +21,7 @@
     "react": "19.1.1",
     "react-native": "0.82.1",
     "react-native-biometrics": "^3.0.1",
+    "react-native-camera-kit": "^18.0.0",
     "react-native-edge-to-edge": "^1.8.1",
     "react-native-gesture-handler": "^2.32.0",
     "react-native-keyboard-controller": "^1.22.1",
