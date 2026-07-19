@@ -6,7 +6,8 @@ import { PengaturanStyles } from './PengaturanStyles';
 import { useAuth } from '../../contexts/AuthContext';
 
 const PengaturanScreen = () => {
-  const { isBiometricEnabled, enableBiometric, disableBiometric } = useAuth();
+  const { isBiometricEnabled, enableBiometric, disableBiometric, logout } =
+    useAuth();
   const [toggling, setToggling] = useState(false);
 
   const handleToggleBiometric = async (value: boolean) => {
@@ -26,6 +27,17 @@ const PengaturanScreen = () => {
     } finally {
       setToggling(false);
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Keluar Aplikasi',
+      'Apakah kamu yakin ingin keluar? Kamu perlu login ulang untuk masuk lagi.',
+      [
+        { text: 'Batal', style: 'cancel' },
+        { text: 'Keluar', style: 'destructive', onPress: () => logout() },
+      ],
+    );
   };
 
   return (
@@ -79,6 +91,16 @@ const PengaturanScreen = () => {
           <Text style={PengaturanStyles.settingVersion}>v1.0.0</Text>
         </View>
       </View>
+
+      {/* Tombol Keluar */}
+      <TouchableOpacity
+        style={PengaturanStyles.logoutButton}
+        onPress={handleLogout}
+        activeOpacity={0.7}
+      >
+        <Icon name="logout" size={20} color="#dc2626" />
+        <Text style={PengaturanStyles.logoutText}>Keluar</Text>
+      </TouchableOpacity>
     </ScreenLayout>
   );
 };

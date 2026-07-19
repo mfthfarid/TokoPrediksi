@@ -1,8 +1,3 @@
-// mobile/types/types.ts
-
-// ================================
-// Data Types (untuk API, state, dll)
-// ================================
 export type Stat = {
   label: string;
   value: string;
@@ -20,6 +15,8 @@ export type InventoryItem = {
   nama: string;
   stok: number;
   harga: string;
+  hargaAngka: number;
+  kategori: string;
   status: 'normal' | 'low';
 };
 
