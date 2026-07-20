@@ -24,6 +24,7 @@ api.interceptors.request.use(
         config.method?.toUpperCase(),
         config.baseURL ? config.baseURL + config.url : null,
       );
+      console.log('Request Body:', config.data);
     }
     return config;
   },
@@ -51,6 +52,10 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     if (__DEV__) {
       console.error('Response Error:', error.response?.status, error.message);
+      console.error(
+        'Response Error Detail:',
+        JSON.stringify(error.response?.data, null, 2),
+      );
     }
     if (error.response?.status === 401) {
       await removeToken();

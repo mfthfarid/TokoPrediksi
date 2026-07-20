@@ -1,8 +1,5 @@
 import api from './api';
 
-// ================================
-// Bentuk data ASLI dari backend (response)
-// ================================
 export interface ProductUnitApi {
   id: number;
   product_id: number;
@@ -29,13 +26,11 @@ export interface ProductApi {
   units: ProductUnitApi[];
 }
 
-// ================================
 // Bentuk data untuk dikirim (request)
-// ================================
 export interface ProductUnitInput {
   unit_id: number;
   conversion_to_base: string;
-  sell_price?: string; // opsional - bisa diisi belakangan lewat EditBarang
+  sell_price?: number;
   barcode?: string;
   is_base_unit: boolean;
 }
@@ -46,9 +41,7 @@ export interface CreateProductInput {
   units: ProductUnitInput[];
 }
 
-// ================================
 // Endpoint
-// ================================
 export const getProducts = () => api.get<ProductApi[]>('/api/products');
 
 export const getProductById = (id: number) =>
