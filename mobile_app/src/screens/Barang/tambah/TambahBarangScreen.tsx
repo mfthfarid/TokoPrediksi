@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
@@ -18,6 +17,7 @@ import {
   Plus,
   Trash2,
   Camera as CameraIcon,
+  Info,
 } from 'lucide-react-native';
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import TextField from '../../../components/ui/TextField';
@@ -64,7 +64,6 @@ const TambahBarangScreen = () => {
 
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [costPrice, setCostPrice] = useState(''); // Harga Modal - informasi saja
   const [unitRows, setUnitRows] = useState<UnitRow[]>([createEmptyRow(true)]);
   const [submitting, setSubmitting] = useState(false);
   const [scanningRowKey, setScanningRowKey] = useState<string | null>(null);
@@ -134,7 +133,7 @@ const TambahBarangScreen = () => {
       }
       const target = rows.find(r => r.key === key);
       const remaining = rows.filter(r => r.key !== key);
-      // Kalau yang dihapus itu satuan dasar, jadikan baris pertama sisanya sebagai dasar
+
       if (target?.isBaseUnit && remaining.length > 0) {
         remaining[0] = {
           ...remaining[0],
@@ -155,26 +154,6 @@ const TambahBarangScreen = () => {
       })),
     );
   };
-
-  const baseUnitRow = unitRows.find(r => r.isBaseUnit);
-  const baseUnitName =
-    unitOptions.find(o => o.value === baseUnitRow?.unitId)?.label ??
-    'Satuan Dasar';
-
-  // 👇 PERBAIKANNYA DI SINI: Deklarasi fungsi ditambahkan kembali
-  const calculateMargin = (row: UnitRow): string | null => {
-    const cost = parseFloat(costPrice);
-    const price = parseFloat(row.sellPrice);
-    const conversion = parseFloat(row.conversionToBase);
-
-    if (!cost || !price || !conversion) return null;
-
-    const expectedCost = cost * conversion;
-    const margin = ((price - expectedCost) / expectedCost) * 100;
-    const sign = margin >= 0 ? '+' : '';
-    return `Margin ${sign}${margin.toFixed(1)}%`;
-  };
-  // 👆 BATAS PERBAIKAN
 
   const validate = (): string | null => {
     if (!name.trim()) return 'Nama barang wajib diisi';
@@ -210,7 +189,7 @@ const TambahBarangScreen = () => {
         units: unitRows.map(row => ({
           unit_id: row.unitId as number,
           conversion_to_base: row.conversionToBase,
-          sell_price: row.sellPrice || undefined,
+          sell_price: row.sellPrice ? Number(row.sellPrice) : undefined,
           barcode: row.barcode || undefined,
           is_base_unit: row.isBaseUnit,
         })),
@@ -228,6 +207,11 @@ const TambahBarangScreen = () => {
     }
   };
 
+  // Helper untuk mendapatkan nama satuan di row yang sedang dirender
+  const getUnitName = (unitId: number | null) => {
+    return unitOptions.find(o => o.value === unitId)?.label || 'Satuan';
+  };
+
   if (loadingOptions) {
     return (
       <View style={styles.centerContainer}>
@@ -238,29 +222,49 @@ const TambahBarangScreen = () => {
 
   return (
     <ScreenLayout title="Tambah Barang" subtitle="Isi data barang baru">
-      <TextField
-        label="Nama Barang"
-        placeholder="Ketikan nama barang"
-        value={name}
-        onChangeText={setName}
-        leftIcon={<Package size={20} color={Colors.textSecondary} />}
-      />
+      {/* card informasi */}
+      <View style={styles.infoCard}>
+        <View style={styles.infoCardHeader}>
+          <Info size={18} color={Colors.primary} />
+          <Text style={styles.infoCardTitle}>Panduan Pengisian</Text>
+        </View>
+        <View style={styles.infoCardList}>
+          <Text style={styles.infoCardItem}>
+            • <Text style={styles.boldText}>Harga Modal:</Text> Ditentukan
+            otomatis dari transaksi pembelian/restok, tidak diisi di sini.
+          </Text>
+          <Text style={styles.infoCardItem}>
+            • <Text style={styles.boldText}>Harga Jual:</Text> Boleh dikosongkan
+            dulu jika barang baru, dapat diubah nanti di menu Edit Barang.
+          </Text>
+          <Text style={styles.infoCardItem}>
+            • <Text style={styles.boldText}>Satuan Dasar:</Text> Gunakan satuan
+            penjualan terendah (contoh: Pcs, Bungkus).
+          </Text>
+          <Text style={styles.infoCardItem}>
+            • <Text style={styles.boldText}>Barcode:</Text> Boleh dikosongkan
+            jika produk tidak memiliki kode barang.
+          </Text>
+        </View>
+      </View>
 
-      <SelectField
-        label="Kategori Barang"
-        placeholder="Pilih Kategori"
-        value={categoryId}
-        options={categoryOptions}
-        onSelect={value => setCategoryId(Number(value))}
-        leftIcon={<Tag size={18} color={Colors.textSecondary} />}
-      />
-
-      <CurrencyField
-        label="Harga Modal (opsional)"
-        placeholder="Kosongkan kalau belum tahu"
-        value={costPrice}
-        onChangeValue={setCostPrice}
-      />
+      <View style={styles.basicInfoCard}>
+        <TextField
+          label="Nama Barang"
+          placeholder="Ketikan nama barang"
+          value={name}
+          onChangeText={setName}
+          leftIcon={<Package size={20} color={Colors.textSecondary} />}
+        />
+        <SelectField
+          label="Kategori Barang"
+          placeholder="Pilih Kategori"
+          value={categoryId}
+          options={categoryOptions}
+          onSelect={value => setCategoryId(Number(value))}
+          leftIcon={<Tag size={18} color={Colors.textSecondary} />}
+        />
+      </View>
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Satuan & Harga Jual</Text>
@@ -271,7 +275,8 @@ const TambahBarangScreen = () => {
       </View>
 
       {unitRows.map((row, index) => {
-        const margin = calculateMargin(row);
+        const currentUnitName = getUnitName(row.unitId);
+
         return (
           <View key={row.key} style={styles.unitCard}>
             <View style={styles.unitCardHeader}>
@@ -312,10 +317,10 @@ const TambahBarangScreen = () => {
                 <TextField
                   label={
                     row.isBaseUnit
-                      ? 'Satuan Dasar (=1)'
-                      : `Jumlah ${baseUnitName}`
+                      ? 'Satuan Dasar'
+                      : `Isi Dalam 1 ${currentUnitName}`
                   }
-                  placeholder={row.isBaseUnit ? '1' : 'mis. 11'}
+                  placeholder={row.isBaseUnit ? '1' : 'Contoh: 12'}
                   value={row.conversionToBase}
                   onChangeText={v =>
                     updateRow(row.key, { conversionToBase: v })
@@ -326,7 +331,7 @@ const TambahBarangScreen = () => {
               </View>
               <View style={styles.rowInlineItem}>
                 <CurrencyField
-                  label="Harga Jual (opsional)"
+                  label="Harga Jual"
                   placeholder="0"
                   value={row.sellPrice}
                   onChangeValue={v => updateRow(row.key, { sellPrice: v })}
@@ -337,8 +342,8 @@ const TambahBarangScreen = () => {
             <View style={styles.barcodeRow}>
               <View style={styles.barcodeInput}>
                 <TextField
-                  label="Barcode (opsional)"
-                  placeholder="Kosongkan kalau tidak ada"
+                  label="Barcode"
+                  placeholder="Scan / Ketik Barcode"
                   value={row.barcode}
                   onChangeText={v => updateRow(row.key, { barcode: v })}
                   leftIcon={<Barcode size={18} color={Colors.textSecondary} />}
@@ -351,8 +356,6 @@ const TambahBarangScreen = () => {
                 <CameraIcon size={18} color={Colors.primary} />
               </TouchableOpacity>
             </View>
-
-            {margin && <Text style={styles.marginText}>{margin}</Text>}
           </View>
         );
       })}
