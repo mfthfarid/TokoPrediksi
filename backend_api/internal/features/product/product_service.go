@@ -76,6 +76,19 @@ func (s *ProductService) Create(input CreateProductInput) (*Product, error) {
 	return s.repo.FindByID(created.ID)
 }
 
+func (s *ProductService) UpdatePhoto(id uint, photoURL string) (*Product, error) {
+	p, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, errors.New("produk tidak ditemukan")
+	}
+
+	p.PhotoURL = &photoURL
+	if err := s.repo.Update(p); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
 func (s *ProductService) Update(id uint, input UpdateProductInput) (*Product, error) {
 	p, err := s.repo.FindByID(id)
 	if err != nil {

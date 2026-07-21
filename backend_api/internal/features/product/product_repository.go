@@ -14,6 +14,10 @@ func (r *ProductRepository) FindAll() ([]Product, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for i := range products {
+		products[i].PopulatePhotoURLs()
+	}
 	return products, nil
 }
 
@@ -27,6 +31,8 @@ func (r *ProductRepository) FindByID(id uint) (*Product, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	p.PopulatePhotoURLs()
 	return &p, nil
 }
 
