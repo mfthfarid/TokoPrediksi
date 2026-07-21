@@ -20,6 +20,7 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
+	// r.Static("/uploads", "./uploads")
 
 	auth.RegisterRoutes(r)
 

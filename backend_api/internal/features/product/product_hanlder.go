@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/cloudinary"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/validator"
 )
 
@@ -52,6 +53,46 @@ func (h *ProductHandler) AddProduct(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, p)
+}
+
+// Upload Foto
+func (h *ProductHandler) UploadPhoto(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	fileHeader, err := c.FormFile("photo")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File foto tidak ditemukan"})
+		return
+	}
+
+	if err := validator.ValidateImageFile(fileHeader); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuka file"})
+		return
+	}
+	defer file.Close()
+
+	photoURL, err := cloudinary.UploadImage(file, "tokoprediksi/products")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengupload foto ke cloud"})
+		return
+	}
+
+	p, err := h.service.UpdatePhoto(uint(id), photoURL)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, p)
 }
 
 func (h *ProductHandler) UpdateProduct(c *gin.Context) {
