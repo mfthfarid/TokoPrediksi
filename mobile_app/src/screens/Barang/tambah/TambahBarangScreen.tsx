@@ -25,11 +25,16 @@ import CurrencyField from '../../../components/ui/CurrencyField/CurrencyField';
 import SelectField, { SelectOption } from '../../../components/ui/SelectField';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
 import BarcodeScannerModal from '../../../components/common/BarcodeScannerModal';
+import PhotoPicker from '../../../components/common/PhotoPicker';
 import { Colors } from '../../../styles';
 import { getCategories } from '../../../services/categoryService';
 import { getUnits } from '../../../services/unitService';
-import { addProduct } from '../../../services/productService';
+import {
+  addProduct,
+  uploadProductPhoto,
+} from '../../../services/productService';
 import { BarangStackParamList } from '../../../navigation/types';
+import { useToast } from '../../../contexts/ToastContext';
 import styles from './styles';
 
 type NavigationProp = NativeStackNavigationProp<
@@ -57,6 +62,7 @@ const createEmptyRow = (isBaseUnit = false): UnitRow => ({
 
 const TambahBarangScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const toast = useToast();
 
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
@@ -64,6 +70,7 @@ const TambahBarangScreen = () => {
 
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [unitRows, setUnitRows] = useState<UnitRow[]>([createEmptyRow(true)]);
   const [submitting, setSubmitting] = useState(false);
   const [scanningRowKey, setScanningRowKey] = useState<string | null>(null);
@@ -183,7 +190,7 @@ const TambahBarangScreen = () => {
 
     setSubmitting(true);
     try {
-      await addProduct({
+      const response = await addProduct({
         name: name.trim(),
         id_kategori: categoryId as number,
         units: unitRows.map(row => ({
@@ -195,9 +202,23 @@ const TambahBarangScreen = () => {
         })),
       });
 
-      Alert.alert('Berhasil', 'Barang baru berhasil ditambahkan.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      const newProductId = response.data.id;
+
+      // Upload foto terpisah, SETELAH produk punya id.
+      // Kalau gagal, produk tetap tersimpan - jangan bikin user
+      // mengira seluruh proses gagal.
+      if (photoUri) {
+        try {
+          await uploadProductPhoto(newProductId, photoUri);
+        } catch (photoError) {
+          toast.error('Barang tersimpan, tapi foto gagal diupload');
+          navigation.goBack();
+          return;
+        }
+      }
+
+      toast.success('Barang baru berhasil ditambahkan');
+      navigation.goBack();
     } catch (error: any) {
       const message =
         error.response?.data?.message || 'Gagal menambahkan barang.';
@@ -249,6 +270,8 @@ const TambahBarangScreen = () => {
       </View>
 
       <View style={styles.basicInfoCard}>
+        <PhotoPicker value={photoUri} onChange={setPhotoUri} />
+
         <TextField
           label="Nama Barang"
           placeholder="Ketikan nama barang"

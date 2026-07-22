@@ -587,10 +587,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { RootStack } from './src/navigation';
-import { AuthProvider } from './src/contexts/AuthContext';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { RootStack } from './src/navigation';
+import { AuthProvider } from './src/contexts/AuthContext';
+import { ToastProvider } from './src/contexts/ToastContext';
 
 export default function App() {
   return (
@@ -598,9 +599,11 @@ export default function App() {
       <SafeAreaProvider>
         <SystemBars style="light" />
         <AuthProvider>
-          <NavigationContainer>
-            <RootStack />
-          </NavigationContainer>
+          <ToastProvider>
+            <NavigationContainer>
+              <RootStack />
+            </NavigationContainer>
+          </ToastProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </KeyboardProvider>

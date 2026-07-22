@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Header from '../components/common/Header';
 
 interface ScreenLayoutProps {
@@ -38,14 +39,22 @@ export default function ScreenLayout({
   );
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor }]}
+      behavior="padding"
+    >
       {showHeader && <Header title={title} subtitle={subtitle} />}
       {scrollable ? (
-        <ScrollView showsVerticalScrollIndicator={false}>{Content}</ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {Content}
+        </ScrollView>
       ) : (
         Content
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -10,7 +10,7 @@ func TransformURL(originalURL, transformation string) string {
 }
 
 func ThumbnailURL(originalURL string) string {
-	return TransformURL(originalURL, "w_150,h_150,c_fill,q_auto,f_auto")
+	return TransformURL(originalURL, "w_150,h_150,c_pad,b_rgb:f5f5f5,q_auto,f_auto")
 }
 
 func DetailURL(originalURL string) string {

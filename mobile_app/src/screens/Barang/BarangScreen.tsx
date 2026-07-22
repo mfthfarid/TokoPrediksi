@@ -11,6 +11,7 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FastImage from 'react-native-fast-image';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { useProducts } from '../../hooks/useProducts';
 import { InventoryItem } from '../../types/types';
@@ -175,7 +176,15 @@ const BarangScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.imagePlaceholder}>
-              <Icon name="image-outline" size={28} color="#bbb" />
+              {item.photoThumbnailUrl ? (
+                <FastImage
+                  source={{ uri: item.photoThumbnailUrl }}
+                  style={styles.productImage}
+                  resizeMode={FastImage.resizeMode.contain}
+                />
+              ) : (
+                <Icon name="image-outline" size={28} color="#bbb" />
+              )}
             </View>
 
             <Text style={styles.productName} numberOfLines={1}>

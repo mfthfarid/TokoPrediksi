@@ -132,6 +132,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
   },
   productName: {
     fontSize: 13,
