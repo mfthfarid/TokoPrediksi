@@ -8,12 +8,10 @@ const formatRupiah = (value: number): string =>
   `Rp ${value.toLocaleString('id-ID')}`;
 
 const mapProductToInventoryItem = (product: ProductApi): InventoryItem => {
-  // Ambil satuan dasar (is_base_unit) sebagai harga acuan yang ditampilkan
-  // di list. Kalau karena suatu hal tidak ada yang ditandai base unit,
-  // fallback ke unit pertama supaya tetap ada sesuatu yang ditampilkan.
   const baseUnit = product.units.find(u => u.is_base_unit) ?? product.units[0];
 
   const stock = parseFloat(product.stock) || 0;
+  const hargaAngka = baseUnit?.sell_price ?? 0;
 
   return {
     id: product.id,
@@ -21,8 +19,11 @@ const mapProductToInventoryItem = (product: ProductApi): InventoryItem => {
     stok: stock,
     harga:
       baseUnit?.sell_price != null
-        ? `${formatRupiah(baseUnit.sell_price)} / ${baseUnit.unit.name}`
+        ? `${formatRupiah(hargaAngka)} / ${baseUnit.unit.name}`
         : 'Harga belum diatur',
+    hargaAngka,
+    kategori: product.kategori.name,
+    photoThumbnailUrl: product.photo_thumbnail_url ?? null,
     status: stock < LOW_STOCK_THRESHOLD ? 'low' : 'normal',
   };
 };

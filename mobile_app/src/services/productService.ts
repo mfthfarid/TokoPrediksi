@@ -1,5 +1,8 @@
 import api from './api';
 
+// ================================
+// Bentuk data ASLI dari backend (response)
+// ================================
 export interface ProductUnitApi {
   id: number;
   product_id: number;
@@ -24,13 +27,17 @@ export interface ProductApi {
     name: string;
   };
   units: ProductUnitApi[];
+  photo_thumbnail_url?: string | null;
+  photo_detail_url?: string | null;
 }
 
+// ================================
 // Bentuk data untuk dikirim (request)
+// ================================
 export interface ProductUnitInput {
   unit_id: number;
   conversion_to_base: string;
-  sell_price?: number;
+  sell_price?: number; // number, bukan string - beda dari conversion_to_base
   barcode?: string;
   is_base_unit: boolean;
 }
@@ -41,14 +48,16 @@ export interface CreateProductInput {
   units: ProductUnitInput[];
 }
 
+// ================================
 // Endpoint
+// ================================
 export const getProducts = () => api.get<ProductApi[]>('/api/products');
 
 export const getProductById = (id: number) =>
   api.get<ProductApi>(`/api/products/${id}`);
 
 export const addProduct = (data: CreateProductInput) =>
-  api.post('/api/products', data);
+  api.post<ProductApi>('/api/products', data);
 
 export const updateProduct = (id: number, data: Partial<CreateProductInput>) =>
   api.put(`/api/products/${id}`, data);
@@ -58,3 +67,17 @@ export const getProductByBarcode = (barcode: string) =>
 
 export const getProductUnits = (id: number) =>
   api.get<ProductUnitApi[]>(`/api/products/${id}/units`);
+
+// fileUri: path lokal hasil PhotoPicker (sudah dikompres)
+export const uploadProductPhoto = (id: number, fileUri: string) => {
+  const formData = new FormData();
+  formData.append('photo', {
+    uri: fileUri,
+    type: 'image/jpeg',
+    name: `product_${id}.jpg`,
+  } as any);
+
+  return api.post<ProductApi>(`/api/products/${id}/photo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};

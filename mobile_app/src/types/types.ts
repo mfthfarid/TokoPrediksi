@@ -14,9 +14,10 @@ export type InventoryItem = {
   id: number;
   nama: string;
   stok: number;
-  harga: string;
-  hargaAngka: number;
+  harga: string; // teks siap tampil, mis. "Rp 1.000 / Pcs"
+  hargaAngka: number; // angka murni (harga unit dasar) buat kalkulasi
   kategori: string;
+  photoThumbnailUrl: string | null;
   status: 'normal' | 'low';
 };
 
