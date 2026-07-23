@@ -1,7 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { getToken, removeToken } from './tokenStorage';
 
-const API_BASE_URL = 'http://192.168.18.11:8080';
+// export const API_BASE_URL = __DEV__
+//   ? 'http://localhost:8080'
+//   : 'http://192.168.18.11:8080';
+export const API_BASE_URL = 'http://192.168.18.11:8080';
+// export const API_BASE_URL = 'http://localhost:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -24,7 +28,6 @@ api.interceptors.request.use(
         config.method?.toUpperCase(),
         config.baseURL ? config.baseURL + config.url : null,
       );
-      console.log('Request Body:', config.data);
     }
     return config;
   },
@@ -52,6 +55,7 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     if (__DEV__) {
       console.error('Response Error:', error.response?.status, error.message);
+      // Detail alasan penolakan dari backend (validasi, dsb) - hapus lagi nanti
       console.error(
         'Response Error Detail:',
         JSON.stringify(error.response?.data, null, 2),

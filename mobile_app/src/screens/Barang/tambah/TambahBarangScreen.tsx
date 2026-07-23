@@ -210,7 +210,11 @@ const TambahBarangScreen = () => {
       if (photoUri) {
         try {
           await uploadProductPhoto(newProductId, photoUri);
-        } catch (photoError) {
+        } catch (photoError: any) {
+          console.error(
+            'Upload Photo Error:',
+            photoError?.message || photoError,
+          );
           toast.error('Barang tersimpan, tapi foto gagal diupload');
           navigation.goBack();
           return;

@@ -51,6 +51,7 @@ const PhotoPicker = ({ value, onChange }: PhotoPickerProps) => {
         maxWidth: 1280,
       });
       onChange(compressedUri);
+      // onChange(asset.uri);
     } catch (error) {
       Alert.alert('Gagal', 'Gagal memproses foto, coba lagi.');
     } finally {

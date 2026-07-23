@@ -42,7 +42,7 @@ const ToastView = ({ message, type, duration, onHide }: ToastViewProps) => {
     const timer = setTimeout(() => {
       Animated.timing(translateY, {
         toValue: -80,
-        duration: 200,
+        duration: 1000,
         useNativeDriver: true,
       }).start(() => onHide());
     }, duration);
