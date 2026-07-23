@@ -43,6 +43,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLocked, setIsLocked] = useState(false);
   const [isBiometricEnabled, setIsBiometricEnabledState] = useState(false);
   const appState = useRef(AppState.currentState);
+  const backgroundedAtRef = useRef<number | null>(null);
+
+  // Jeda sebelum app dianggap "ditinggal" dan perlu dikunci ulang.
+  // Mencegah re-lock instan gara-gara buka kamera/galeri, dialog izin,
+  // atau notifikasi shade ke-tarik sebentar - itu semua teknisnya
+  // juga bikin app ke-background sesaat, padahal user tidak beneran pergi.
+  const LOCK_GRACE_PERIOD_MS = 2 * 60 * 1000; // 2 menit
 
   // Bootstrap: cek token & preferensi biometric saat app pertama kali dibuka
   useEffect(() => {
@@ -59,18 +66,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     bootstrap();
   }, []);
 
-  // Kunci ulang app setiap kali kembali dari background (kalau biometric aktif)
+  // Kunci ulang app kalau ditinggal LEBIH DARI grace period (kalau biometric aktif)
   useEffect(() => {
     const subscription = AppState.addEventListener(
       'change',
       (nextState: AppStateStatus) => {
+        const goingToBackground =
+          appState.current === 'active' &&
+          nextState.match(/inactive|background/);
         const cameToForeground =
           appState.current.match(/inactive|background/) &&
           nextState === 'active';
 
-        if (cameToForeground && isAuthenticated && isBiometricEnabled) {
-          setIsLocked(true);
+        if (goingToBackground) {
+          backgroundedAtRef.current = Date.now();
         }
+
+        if (cameToForeground && isAuthenticated && isBiometricEnabled) {
+          const elapsed = backgroundedAtRef.current
+            ? Date.now() - backgroundedAtRef.current
+            : 0;
+
+          if (elapsed > LOCK_GRACE_PERIOD_MS) {
+            setIsLocked(true);
+          }
+          backgroundedAtRef.current = null;
+        }
+
         appState.current = nextState;
       },
     );

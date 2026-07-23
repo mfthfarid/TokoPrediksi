@@ -27,6 +27,7 @@ export interface ProductApi {
     name: string;
   };
   units: ProductUnitApi[];
+  photo_url?: string | null;
   photo_thumbnail_url?: string | null;
   photo_detail_url?: string | null;
 }
@@ -77,7 +78,11 @@ export const uploadProductPhoto = (id: number, fileUri: string) => {
     name: `product_${id}.jpg`,
   } as any);
 
+  // PENTING: jangan set 'Content-Type': 'multipart/form-data' manual di sini.
+  // Tanpa parameter boundary, request bisa gagal terkirim (Network Error).
+  // transformRequest passthrough supaya axios tidak coba proses ulang
+  // FormData jadi JSON (karena instance api.ts defaultnya application/json).
   return api.post<ProductApi>(`/api/products/${id}/photo`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    transformRequest: data => data,
   });
 };
