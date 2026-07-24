@@ -4,8 +4,9 @@ import { getToken, removeToken } from './tokenStorage';
 // export const API_BASE_URL = __DEV__
 //   ? 'http://localhost:8080'
 //   : 'http://192.168.18.11:8080';
-export const API_BASE_URL = 'http://192.168.18.11:8080';
-// export const API_BASE_URL = 'http://localhost:8080';
+// export const API_BASE_URL = 'http://192.168.18.11:8080';
+// export const API_BASE_URL = 'https://emerald-visible-nuttiness.ngrok-free.dev';
+export const API_BASE_URL = 'http://localhost:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

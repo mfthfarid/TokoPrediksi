@@ -1,5 +1,6 @@
 import api, { API_BASE_URL } from './api';
 import { getToken } from './tokenStorage';
+import RNBlobUtil from 'react-native-blob-util';
 
 // ================================
 // Bentuk data ASLI dari backend (response)
@@ -78,66 +79,53 @@ export const getProductUnits = (id: number) =>
 // fetch() React Native TIDAK punya timeout bawaan (beda dari axios yang
 // sudah kita set 15000ms) - tanpa ini, kalau koneksi nyangkut, request bisa
 // nunggu SELAMANYA (persis gejala "loading tidak selesai-selesai").
-const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('Waktu upload foto habis, coba lagi.'));
-    }, ms);
-
-    promise.then(
-      result => {
-        clearTimeout(timer);
-        resolve(result);
-      },
-      error => {
-        clearTimeout(timer);
-        reject(error);
-      },
-    );
-  });
-};
-
 export const uploadProductPhoto = async (
   id: number,
   fileUri: string,
 ): Promise<ProductApi> => {
   const token = await getToken();
-
-  const formData = new FormData();
-  formData.append('photo', {
-    uri: fileUri,
-    type: 'image/jpeg',
-    name: `product_${id}.jpg`,
-  } as any);
+  // RNBlobUtil.wrap butuh path tanpa prefix 'file://'
+  const localPath = fileUri.replace('file://', '');
 
   if (__DEV__) {
     console.log(
-      'Uploading photo to',
+      'Uploading photo (blob-util) to',
       `${API_BASE_URL}/api/products/${id}/photo`,
     );
   }
 
-  const response = await withTimeout(
-    fetch(`${API_BASE_URL}/api/products/${id}/photo`, {
-      method: 'POST',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        Accept: 'application/json',
-        // Sengaja TIDAK set Content-Type - fetch otomatis generate
-        // 'multipart/form-data; boundary=...' yang benar sendiri.
+  const response = await RNBlobUtil.config({ timeout: 30000 }).fetch(
+    'POST',
+    `${API_BASE_URL}/api/products/${id}/photo`,
+    {
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'multipart/form-data',
+    },
+    [
+      {
+        name: 'photo',
+        filename: `product_${id}.jpg`,
+        type: 'image/jpeg',
+        data: RNBlobUtil.wrap(localPath),
       },
-      body: formData,
-    }),
-    30000, // 30 detik, lebih longgar dari axios karena file lebih besar
+    ],
   );
 
+  const status = response.info().status;
+
   if (__DEV__) {
-    console.log('Upload photo response status:', response.status);
+    console.log('Upload photo response status:', status);
   }
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Upload gagal (status ${response.status})`);
+  if (status < 200 || status >= 300) {
+    // response.text() returns a Promise<string>, await it safely
+    let errText = '';
+    try {
+      errText = await response.text();
+    } catch (e) {
+      // ignore
+    }
+    throw new Error(errText || `Upload gagal (status ${status})`);
   }
 
   return response.json();
