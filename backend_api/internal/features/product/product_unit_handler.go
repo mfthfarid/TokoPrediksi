@@ -134,3 +134,18 @@ func (h *ProductUnitHandler) DeleteUnit(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Satuan berhasil dihapus"})
 }
+
+func (h *ProductUnitHandler) GetPriceInfo(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("unitId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	info, err := h.service.GetPriceInfo(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, info)
+}

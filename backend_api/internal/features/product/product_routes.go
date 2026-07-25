@@ -12,11 +12,12 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	rg.PUT("/:id", handler.UpdateProduct)
 	rg.POST("/:id/photo", handler.UploadPhoto)
 	rg.GET("/scan/:barcode", handler.ScanBarcode)
-
+	
 	rg.GET("/:id/units", unitHandler.GetUnitsByProduct)
 	rg.POST("/:id/units", unitHandler.AddUnit)
 	rg.PUT("/:id/units/:unitId", unitHandler.UpdateUnit)
 	rg.DELETE("/:id/units/:unitId", unitHandler.DeleteUnit)
 	rg.PUT("/:id/units/:unitId/price", unitHandler.UpdatePrice)
+	rg.GET("/:id/units/:unitId/price-info", unitHandler.GetPriceInfo)
 	rg.GET("/:id/units/:unitId/price-history", unitHandler.GetPriceHistory)
 }
