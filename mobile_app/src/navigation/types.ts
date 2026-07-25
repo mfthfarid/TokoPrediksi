@@ -25,9 +25,7 @@ export type DashboardStackParamList = {
 export type BarangStackParamList = {
   Barang: undefined;
   TambahBarang: undefined;
-  // Tambahkan di sini saat screen-nya sudah dibuat:
-  // DetailBarang: { id: number };
-  // EditBarang: { id: number };
+  DetailBarang: { id: number };
 };
 
 export type TransaksiStackParamList = {

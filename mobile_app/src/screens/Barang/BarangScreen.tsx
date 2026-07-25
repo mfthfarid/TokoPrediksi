@@ -62,8 +62,7 @@ const BarangScreen = () => {
   };
 
   const handleEdit = (item: InventoryItem) => {
-    // TODO: navigation.navigate('EditBarang', { id: item.id })
-    Alert.alert('Segera Hadir', 'Fitur edit barang masih dalam pengembangan.');
+    navigation.navigate('DetailBarang', { id: item.id });
   };
 
   const handleDelete = (item: InventoryItem) => {
@@ -174,7 +173,11 @@ const BarangScreen = () => {
         refreshing={refreshing}
         onRefresh={handleRefresh}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('DetailBarang', { id: item.id })}
+          >
             <View style={styles.imagePlaceholder}>
               {item.photoThumbnailUrl ? (
                 <FastImage
@@ -229,7 +232,7 @@ const BarangScreen = () => {
                 <Text style={styles.actionButtonText}>Hapus</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>
