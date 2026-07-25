@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -114,4 +115,31 @@ func (s *ProductService) FindByBarcode(barcode string) (*ProductUnit, error) {
 		return nil, errors.New("barang dengan barcode ini tidak ditemukan")
 	}
 	return pu, nil
+}
+
+func (s *ProductUnitService) GetPriceInfo(unitID uint) (*PriceInfoResponse, error) {
+	pu, err := s.repo.FindByID(unitID)
+	if err != nil {
+		return nil, errors.New("satuan produk tidak ditemukan")
+	}
+
+	productRepo := &ProductRepository{}
+	costPerBase, err := productRepo.GetLatestCostPerBase(pu.ProductID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PriceInfoResponse{
+		UnitName:         pu.Unit.Name,
+		CostPerBase:       costPerBase,
+		CurrentSellPrice:  pu.SellPrice,
+	}
+
+	if costPerBase != nil {
+		costDecimal := decimal.NewFromInt(int64(*costPerBase)).Mul(pu.ConversionToBase).Round(0)
+		costPerUnit := uint(costDecimal.IntPart())
+		response.CostPerUnit = &costPerUnit
+	}
+
+	return response, nil
 }
