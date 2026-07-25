@@ -62,8 +62,39 @@ export const getProductById = (id: number) =>
 export const addProduct = (data: CreateProductInput) =>
   api.post<ProductApi>('/api/products', data);
 
-export const updateProduct = (id: number, data: Partial<CreateProductInput>) =>
-  api.put(`/api/products/${id}`, data);
+export interface UpdateProductInput {
+  name: string;
+  id_kategori: number;
+}
+
+// PUT /api/products/:id CUMA untuk field produk (name, id_kategori).
+// Satuan (units) wajib dikelola lewat endpoint terpisah di bawah.
+export const updateProduct = (id: number, data: UpdateProductInput) =>
+  api.put<ProductApi>(`/api/products/${id}`, data);
+
+export const addUnit = (productId: number, data: ProductUnitInput) =>
+  api.post<ProductUnitApi>(`/api/products/${productId}/units`, data);
+
+export const updateUnit = (
+  productId: number,
+  unitId: number,
+  data: Partial<ProductUnitInput>,
+) =>
+  api.put<ProductUnitApi>(`/api/products/${productId}/units/${unitId}`, data);
+
+export const deleteUnit = (productId: number, unitId: number) =>
+  api.delete(`/api/products/${productId}/units/${unitId}`);
+
+// Endpoint TERPISAH khusus harga (kemungkinan buat nyatet price_history).
+// Bentuk body ini masih tebakan - perlu diverifikasi pas testing.
+export const updateUnitPrice = (
+  productId: number,
+  unitId: number,
+  sellPrice: number,
+) =>
+  api.put<ProductUnitApi>(`/api/products/${productId}/units/${unitId}/price`, {
+    sell_price: sellPrice,
+  });
 
 export const getProductByBarcode = (barcode: string) =>
   api.get<ProductApi>(`/api/products/scan/${barcode}`);
@@ -118,7 +149,6 @@ export const uploadProductPhoto = async (
   }
 
   if (status < 200 || status >= 300) {
-    // response.text() returns a Promise<string>, await it safely
     let errText = '';
     try {
       errText = await response.text();
@@ -126,6 +156,7 @@ export const uploadProductPhoto = async (
       // ignore
     }
     throw new Error(errText || `Upload gagal (status ${status})`);
+    // throw new Error(response.text() || `Upload gagal (status ${status})`);
   }
 
   return response.json();
