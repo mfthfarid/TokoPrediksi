@@ -12,6 +12,7 @@ interface ScreenLayoutProps {
   paddingVertical?: number;
   backgroundColor?: string;
   showHeader?: boolean;
+  onNotificationPress?: () => void;
 }
 
 export default function ScreenLayout({
@@ -23,6 +24,7 @@ export default function ScreenLayout({
   paddingVertical = 16,
   backgroundColor = '#F5F5F5',
   showHeader = true,
+  onNotificationPress,
 }: ScreenLayoutProps) {
   const Content = (
     <View
@@ -43,7 +45,13 @@ export default function ScreenLayout({
       style={[styles.container, { backgroundColor }]}
       behavior="padding"
     >
-      {showHeader && <Header title={title} subtitle={subtitle} />}
+      {showHeader && (
+        <Header
+          title={title}
+          subtitle={subtitle}
+          onNotificationPress={onNotificationPress}
+        />
+      )}
       {scrollable ? (
         <ScrollView
           showsVerticalScrollIndicator={false}

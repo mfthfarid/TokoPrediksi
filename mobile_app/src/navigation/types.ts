@@ -20,6 +20,7 @@ export type BottomTabParamList = {
 export type DashboardStackParamList = {
   Dashboard: undefined;
   Notifikasi: undefined;
+  Kategori: undefined;
 };
 
 export type BarangStackParamList = {
