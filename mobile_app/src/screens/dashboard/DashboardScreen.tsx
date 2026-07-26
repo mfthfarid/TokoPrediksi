@@ -1,66 +1,263 @@
-import React from 'react';
-import { Alert, Text, View } from 'react-native';
-import { useDoubleBackExit } from '../../hooks/useDoubleBackExit';
+import React, { useCallback, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  Wallet,
+  Receipt,
+  Package,
+  AlertTriangle,
+  LayoutGrid,
+  TrendingUp,
+  Sparkles,
+  ChevronDown,
+} from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
-import PrimaryButton from '../../components/ui/PrimaryButton';
-import { useToast } from '../../contexts/ToastContext';
+import { Colors } from '../../styles';
+import {
+  getDashboardSummary,
+  DashboardSummaryApi,
+} from '../../services/dashboardService';
+import { getCurrentUser } from '../../services/userService';
+import { useDoubleBackExit } from '../../hooks/useDoubleBackExit';
+import { DashboardStackParamList } from '../../navigation/types';
+import styles from './styles';
 
-const Dashboard = () => {
+type NavigationProp = NativeStackNavigationProp<
+  DashboardStackParamList,
+  'Dashboard'
+>;
+
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 11) return 'Selamat Pagi';
+  if (hour < 15) return 'Selamat Siang';
+  if (hour < 18) return 'Selamat Sore';
+  return 'Selamat Malam';
+};
+
+const formatRupiah = (value: number): string =>
+  `Rp ${value.toLocaleString('id-ID')}`;
+
+const formatPercentage = (value: number): string =>
+  `${value.toLocaleString('id-ID', { maximumFractionDigits: 1 })}%`;
+
+const DashboardScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
   useDoubleBackExit();
-  const toast = useToast();
 
-  // Fungsi khusus untuk testing animasi toast berulang kali
-  const handleTestToastError = () => {
-    // 🚧 Ganti Alert.alert ini dengan fungsi pemanggil Toast custom Anda
-    // Contoh jika menggunakan custom state:
-    // setVisibleToast(true); setAnimasiToast(...);
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [summary, setSummary] = useState<DashboardSummaryApi | null>(null);
+  const [lowStockExpanded, setLowStockExpanded] = useState(false);
+  const [bestSellerExpanded, setBestSellerExpanded] = useState(false);
 
-    toast.error('Barang tersimpan, tapi foto gagal diupload');
+  const fetchData = useCallback(async () => {
+    try {
+      const [userRes, summaryRes] = await Promise.all([
+        getCurrentUser(),
+        getDashboardSummary(),
+      ]);
+      setUserName(userRes.data.name);
+      setSummary(summaryRes.data);
+    } catch (error) {
+      // Dashboard tetap ditampilkan walau gagal (nggak block user),
+      // cuma datanya kosong/0 - beda dari screen lain yang blocking error.
+      console.error('Dashboard fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData]),
+  );
+
+  const handleGoToBarang = () => {
+    // Navigasi lintas-tab (Dashboard -> tab Barang), lewat parent tab navigator
+    navigation.getParent()?.navigate('BarangTab' as never);
   };
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  const lowStockItems = summary?.low_stock_products ?? [];
+  const bestSellers = summary?.top_selling_products ?? [];
 
   return (
     <ScreenLayout
-      title="Dashboard"
-      subtitle="Selamat datang di halaman dashboard"
+      title={'Dashboard'}
+      onNotificationPress={() => navigation.navigate('Notifikasi')}
     >
-      <Text>Ini adalah halaman dashboard</Text>
-      {/* --- AREA DEBUGGING: HAPUS SEBELUM RILIS --- */}
-      <View
-        style={{
-          marginVertical: 16,
-          padding: 12,
-          backgroundColor: '#ffebee',
-          borderWidth: 1,
-          borderColor: '#ffcdd2',
-          borderRadius: 8,
-        }}
-      >
-        <Text
-          style={{
-            textAlign: 'center',
-            marginBottom: 8,
-            fontWeight: 'bold',
-            color: '#c62828',
-            fontSize: 12,
-          }}
-        >
-          🚧 AREA DEBUGGING (JANGAN LUPA DIHAPUS)
+      {/* Sambutan */}
+      <View style={styles.greetingContainer}>
+        <Text style={styles.greeting}>
+          {`${getGreeting()}, ${userName || '...'}`}
         </Text>
-
-        <PrimaryButton
-          title="🔧 Test Animasi Toast Error"
-          onPress={handleTestToastError}
-          // Jika PrimaryButton Anda punya props tipe warna, bisa diset ke warna bahaya/merah
-        />
       </View>
-      {/* ------------------------------------------- */}
-    </ScreenLayout>
 
-    // <View style={{ flex: 1 }}>
-    //   <Text>Ini adalah halaman dashboard</Text>
-    //   <Text>Header dan TabNavigator sekarang muncul!</Text>
-    // </View>
+      {/* Grid statistik 2x2 */}
+      <View style={styles.statsGrid}>
+        <View style={styles.statCard}>
+          <Wallet size={20} color={Colors.primary} />
+          <Text style={styles.statLabel}>Penjualan Hari Ini</Text>
+          <Text style={styles.statValue}>
+            {formatRupiah(summary?.total_sales_today ?? 0)}
+          </Text>
+        </View>
+        <View style={styles.statCard}>
+          <TrendingUp size={20} color="#4caf50" />
+          <Text style={styles.statLabel}>Laba Hari Ini</Text>
+          <Text style={styles.statValue}>
+            {formatRupiah(summary?.total_profit_today ?? 0)}
+            <Text style={styles.statValueSuffix}>
+              {' '}
+              ({formatPercentage(summary?.profit_margin_today ?? 0)})
+            </Text>
+          </Text>
+        </View>
+        <View style={styles.statCard}>
+          <Receipt size={20} color={Colors.primary} />
+          <Text style={styles.statLabel}>Transaksi Hari Ini</Text>
+          <Text style={styles.statValue}>
+            {summary?.total_transactions_today ?? 0}
+          </Text>
+        </View>
+        <View style={styles.statCard}>
+          <AlertTriangle size={20} color="#ff9800" />
+          <Text style={styles.statLabel}>Stok Menipis</Text>
+          <Text style={[styles.statValue, styles.statValueWarning]}>
+            {summary?.low_stock_count ?? 0}
+          </Text>
+        </View>
+      </View>
+
+      {/* Card Stok Menipis */}
+      <View style={styles.card}>
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.cardTitle}>Stok Menipis</Text>
+          <TouchableOpacity onPress={handleGoToBarang}>
+            <Text style={styles.cardLink}>Kelola</Text>
+          </TouchableOpacity>
+        </View>
+        {lowStockItems.length === 0 ? (
+          <Text style={styles.emptyText}>Semua stok aman</Text>
+        ) : (
+          <>
+            {(lowStockExpanded ? lowStockItems : lowStockItems.slice(0, 3)).map(
+              item => (
+                <View key={item.id} style={styles.listRow}>
+                  <Text style={styles.listRowText} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.listRowWarning}>
+                    Tersisa {item.stock}
+                  </Text>
+                </View>
+              ),
+            )}
+            {lowStockItems.length > 3 && (
+              <TouchableOpacity
+                style={styles.expandButton}
+                onPress={() => setLowStockExpanded(prev => !prev)}
+              >
+                <Text style={styles.expandButtonText}>
+                  {lowStockExpanded
+                    ? 'Sembunyikan'
+                    : `Lihat Semua (${lowStockItems.length})`}
+                </Text>
+                <ChevronDown
+                  size={14}
+                  color={Colors.primary}
+                  style={lowStockExpanded ? styles.chevronFlipped : undefined}
+                />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+
+      {/* Card Barang Terlaris */}
+      <View style={styles.card}>
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.cardTitle}>Barang Terlaris</Text>
+        </View>
+        {bestSellers.length === 0 ? (
+          <Text style={styles.emptyText}>Belum ada data penjualan</Text>
+        ) : (
+          <>
+            {(bestSellerExpanded ? bestSellers : bestSellers.slice(0, 3)).map(
+              item => (
+                <View key={item.id} style={styles.listRow}>
+                  <Text style={styles.listRowText} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.listRowBold}>{item.qty}x</Text>
+                </View>
+              ),
+            )}
+            {bestSellers.length > 3 && (
+              <TouchableOpacity
+                style={styles.expandButton}
+                onPress={() => setBestSellerExpanded(prev => !prev)}
+              >
+                <Text style={styles.expandButtonText}>
+                  {bestSellerExpanded
+                    ? 'Sembunyikan'
+                    : `Lihat Semua (${bestSellers.length})`}
+                </Text>
+                <ChevronDown
+                  size={14}
+                  color={Colors.primary}
+                  style={bestSellerExpanded ? styles.chevronFlipped : undefined}
+                />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+
+      {/* Prediksi */}
+      {(summary?.predicted_stockout_count ?? 0) > 0 && (
+        <TouchableOpacity
+          style={styles.stockoutBanner}
+          onPress={() =>
+            navigation.getParent()?.navigate('PrediksiTab' as never)
+          }
+        >
+          <Sparkles size={16} color="#fff" />
+          <Text style={styles.stockoutBannerText}>
+            {summary?.predicted_stockout_count} produk berpotensi kehabisan
+            stok, cek Prediksi
+          </Text>
+          <Text style={styles.stockoutBannerArrow}>→</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Menu Lainnya */}
+      <Text style={styles.menuSectionTitle}>Menu Lainnya</Text>
+      <View style={styles.menuGrid}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Kategori')}
+        >
+          <View style={styles.menuIconBox}>
+            <LayoutGrid size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Kategori</Text>
+        </TouchableOpacity>
+
+        {/* TODO: tambah menu Supplier di sini kalau sudah dibangun */}
+      </View>
+    </ScreenLayout>
   );
 };
 
-export default Dashboard;
+export default DashboardScreen;
