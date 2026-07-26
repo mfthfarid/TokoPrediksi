@@ -592,6 +592,7 @@ import { SystemBars } from 'react-native-edge-to-edge';
 import { RootStack } from './src/navigation';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ToastProvider } from './src/contexts/ToastContext';
+import { ConfirmProvider } from './src/contexts/ConfirmContext';
 
 export default function App() {
   return (
@@ -600,9 +601,11 @@ export default function App() {
         <SystemBars style="light" />
         <AuthProvider>
           <ToastProvider>
-            <NavigationContainer>
-              <RootStack />
-            </NavigationContainer>
+            <ConfirmProvider>
+              <NavigationContainer>
+                <RootStack />
+              </NavigationContainer>
+            </ConfirmProvider>
           </ToastProvider>
         </AuthProvider>
       </SafeAreaProvider>

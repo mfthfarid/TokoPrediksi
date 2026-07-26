@@ -1,6 +1,11 @@
 package category
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+)
 
 type CategoryService struct {
 	repo *CategoryRepository
@@ -50,5 +55,14 @@ func (s *CategoryService) Delete(id uint) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return errors.New("kategori tidak ditemukan")
 	}
+
+	var count int64
+	if err := config.DB.Table("products").Where("id_kategori = ?", id).Count(&count).Error; err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("kategori tidak dapat dihapus, masih digunakan oleh %d produk", count)
+	}
+
 	return s.repo.Delete(id)
 }

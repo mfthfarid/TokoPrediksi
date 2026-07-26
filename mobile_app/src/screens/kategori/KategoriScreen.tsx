@@ -23,10 +23,12 @@ import {
   CategoryApi,
 } from '../../services/categoryService';
 import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 import styles from './styles';
 
 const KategoriScreen = () => {
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [categories, setCategories] = useState<CategoryApi[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,30 +102,26 @@ const KategoriScreen = () => {
     }
   };
 
-  const handleDelete = (category: CategoryApi) => {
-    Alert.alert(
-      'Hapus Kategori',
-      `Yakin ingin menghapus "${category.name}"? Produk yang masih memakai kategori ini mungkin akan bermasalah.`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteCategory(category.id);
-              toast.success('Kategori berhasil dihapus');
-              fetchCategories();
-            } catch (error: any) {
-              const message =
-                error.response?.data?.message ||
-                'Gagal menghapus kategori (mungkin masih dipakai produk lain)';
-              Alert.alert('Gagal', message);
-            }
-          },
-        },
-      ],
-    );
+  const handleDelete = async (category: CategoryApi) => {
+    const confirmed = await confirm({
+      title: 'Hapus Kategori',
+      message: `Yakin ingin menghapus kategori "${category.name}"?`,
+      confirmText: 'Hapus',
+      danger: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await deleteCategory(category.id);
+      toast.success('Kategori berhasil dihapus');
+      fetchCategories();
+    } catch (error: any) {
+      const message =
+        error.response?.data?.error ||
+        'Gagal menghapus kategori (mungkin masih dipakai produk lain)';
+      toast.error(message);
+    }
   };
 
   if (loading) {
