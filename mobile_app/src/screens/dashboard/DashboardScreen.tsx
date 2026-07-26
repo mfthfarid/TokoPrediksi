@@ -1,5 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -11,6 +17,8 @@ import {
   TrendingUp,
   Sparkles,
   ChevronDown,
+  ShoppingCart,
+  FileText,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { Colors } from '../../styles';
@@ -21,6 +29,7 @@ import {
 import { getCurrentUser } from '../../services/userService';
 import { useDoubleBackExit } from '../../hooks/useDoubleBackExit';
 import { DashboardStackParamList } from '../../navigation/types';
+import { useToast } from '../../contexts/ToastContext';
 import styles from './styles';
 
 type NavigationProp = NativeStackNavigationProp<
@@ -43,6 +52,7 @@ const formatPercentage = (value: number): string =>
   `${value.toLocaleString('id-ID', { maximumFractionDigits: 1 })}%`;
 
 const DashboardScreen = () => {
+  const toast = useToast();
   const navigation = useNavigation<NavigationProp>();
   useDoubleBackExit();
 
@@ -244,6 +254,7 @@ const DashboardScreen = () => {
       {/* Menu Lainnya */}
       <Text style={styles.menuSectionTitle}>Menu Lainnya</Text>
       <View style={styles.menuGrid}>
+        {/* Kategori */}
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate('Kategori')}
@@ -254,7 +265,27 @@ const DashboardScreen = () => {
           <Text style={styles.menuItemText}>Kategori</Text>
         </TouchableOpacity>
 
-        {/* TODO: tambah menu Supplier di sini kalau sudah dibangun */}
+        {/* Pembelian */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => toast.info('Fitur ini akan segera hadir!')}
+        >
+          <View style={styles.menuIconBox}>
+            <ShoppingCart size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Pembelian</Text>
+        </TouchableOpacity>
+
+        {/* Laporan */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => toast.info('Fitur ini akan segera hadir!')}
+        >
+          <View style={styles.menuIconBox}>
+            <FileText size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Laporan</Text>
+        </TouchableOpacity>
       </View>
     </ScreenLayout>
   );
