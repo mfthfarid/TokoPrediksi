@@ -55,10 +55,7 @@ const DateField = ({
   return (
     <View style={styles.wrapper}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity
-        style={styles.field}
-        onPress={() => setShowPicker(true)}
-      >
+      <TouchableOpacity style={styles.field} onPress={() => setShowPicker(true)}>
         <Calendar size={18} color={Colors.textSecondary} />
         <Text style={[styles.valueText, !value && styles.placeholderText]}>
           {value || placeholder}

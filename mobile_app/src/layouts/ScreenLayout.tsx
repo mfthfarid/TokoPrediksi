@@ -13,6 +13,7 @@ interface ScreenLayoutProps {
   backgroundColor?: string;
   showHeader?: boolean;
   onNotificationPress?: () => void;
+  footer?: React.ReactNode;
 }
 
 export default function ScreenLayout({
@@ -25,6 +26,7 @@ export default function ScreenLayout({
   backgroundColor = '#F5F5F5',
   showHeader = true,
   onNotificationPress,
+  footer,
 }: ScreenLayoutProps) {
   const Content = (
     <View
@@ -32,7 +34,10 @@ export default function ScreenLayout({
         styles.content,
         {
           paddingHorizontal,
-          paddingVertical,
+          // Selalu gunakan paddingVertical (default 16) untuk atas
+          paddingTop: paddingVertical,
+          // Jika ada footer, padding bawah jadi 0. Jika tidak, gunakan paddingVertical
+          paddingBottom: footer ? 0 : paddingVertical,
         },
       ]}
     >
@@ -54,6 +59,7 @@ export default function ScreenLayout({
       )}
       {scrollable ? (
         <ScrollView
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -62,6 +68,7 @@ export default function ScreenLayout({
       ) : (
         Content
       )}
+      {footer}
     </KeyboardAvoidingView>
   );
 }
@@ -72,6 +79,10 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    flex: 1,
+  },
+
+  scrollView: {
     flex: 1,
   },
 });

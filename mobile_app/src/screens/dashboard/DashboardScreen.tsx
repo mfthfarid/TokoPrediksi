@@ -18,7 +18,7 @@ import {
   TrendingUp,
   Sparkles,
   ChevronDown,
-  ShoppingCart,
+  ShoppingBag,
   FileText,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
@@ -280,10 +280,10 @@ const DashboardScreen = () => {
         {/* Pembelian */}
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => toast.info('Fitur ini akan segera hadir!')}
+          onPress={() => navigation.navigate('Pembelian')}
         >
           <View style={styles.menuIconBox}>
-            <ShoppingCart size={22} color={Colors.primary} />
+            <ShoppingBag size={22} color={Colors.primary} />
           </View>
           <Text style={styles.menuItemText}>Pembelian</Text>
         </TouchableOpacity>
