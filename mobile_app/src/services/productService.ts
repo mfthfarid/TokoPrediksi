@@ -27,7 +27,7 @@ export interface ProductApi {
   kategori: {
     id: number;
     name: string;
-  };
+  } | null;
   units: ProductUnitApi[];
   photo_url?: string | null;
   photo_thumbnail_url?: string | null;

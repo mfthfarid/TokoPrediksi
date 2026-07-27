@@ -22,6 +22,8 @@ export type DashboardStackParamList = {
   Notifikasi: undefined;
   Kategori: undefined;
   Supplier: undefined;
+  Pembelian: undefined;
+  TambahPembelian: undefined;
 };
 
 export type BarangStackParamList = {

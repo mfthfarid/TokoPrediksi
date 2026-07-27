@@ -22,7 +22,7 @@ const mapProductToInventoryItem = (product: ProductApi): InventoryItem => {
         ? `${formatRupiah(hargaAngka)} / ${baseUnit.unit.name}`
         : 'Harga belum diatur',
     hargaAngka,
-    kategori: product.kategori.name,
+    kategori: product.kategori?.name ?? 'Tanpa Kategori',
     photoThumbnailUrl: product.photo_thumbnail_url ?? null,
     status: stock < LOW_STOCK_THRESHOLD ? 'low' : 'normal',
   };

@@ -211,10 +211,7 @@ const TambahBarangScreen = () => {
         try {
           await uploadProductPhoto(newProductId, photoUri);
         } catch (photoError: any) {
-          console.error(
-            'Upload Photo Error:',
-            photoError?.message || photoError,
-          );
+          console.error('Upload Photo Error:', photoError?.error || photoError);
           toast.error('Barang tersimpan, tapi foto gagal diupload');
           navigation.goBack();
           return;
@@ -225,7 +222,7 @@ const TambahBarangScreen = () => {
       navigation.goBack();
     } catch (error: any) {
       const message =
-        error.response?.data?.message || 'Gagal menambahkan barang.';
+        error.response?.data?.error || 'Gagal menambahkan barang.';
       Alert.alert('Gagal', message);
     } finally {
       setSubmitting(false);

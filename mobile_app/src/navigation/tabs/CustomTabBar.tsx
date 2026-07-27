@@ -10,7 +10,6 @@ import {
 } from 'lucide-react-native';
 import { Colors } from '../../styles';
 
-// Peta nama route (dari BottomTabParamList) ke label & icon yang ditampilkan
 const TAB_CONFIG: Record<string, { label: string; icon: typeof Home }> = {
   DashboardTab: { label: 'Dashboard', icon: Home },
   BarangTab: { label: 'Barang', icon: Package },
@@ -19,7 +18,21 @@ const TAB_CONFIG: Record<string, { label: string; icon: typeof Home }> = {
   PengaturanTab: { label: 'Pengaturan', icon: Settings },
 };
 
-export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+export default function CustomTabBar({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) {
+  const focusedRoute = state.routes[state.index];
+  const focusedOptions = descriptors[focusedRoute.key].options;
+
+  // Screen tertentu (dibuka lewat menu Dashboard, punya footer sendiri)
+  const isHidden =
+    (focusedOptions.tabBarStyle as { display?: string } | undefined)
+      ?.display === 'none';
+
+  if (isHidden) return null;
+
   return (
     <View style={styles.navbar}>
       {state.routes.map((route, index) => {

@@ -4,6 +4,8 @@ import DashboardScreen from '../../screens/dashboard/DashboardScreen';
 import NotifikasiScreen from '../../screens/notifikasi/NotifikasiScreen';
 import KategoriScreen from '../../screens/kategori/KategoriScreen';
 import SupplierScreen from '../../screens/supplier/SupplierScreen';
+import PembelianScreen from '../../screens/pembelian/PembelianScreen';
+import TambahPembelianScreen from '../../screens/pembelian/tambah/TambahPembelianScreen';
 import { DashboardStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<DashboardStackParamList>();
@@ -23,6 +25,8 @@ export default function DashboardStack() {
       />
       <Stack.Screen name="Kategori" component={KategoriScreen} />
       <Stack.Screen name="Supplier" component={SupplierScreen} />
+      <Stack.Screen name="Pembelian" component={PembelianScreen} />
+      <Stack.Screen name="TambahPembelian" component={TambahPembelianScreen} />
     </Stack.Navigator>
   );
 }

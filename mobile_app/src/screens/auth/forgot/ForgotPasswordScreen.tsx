@@ -49,7 +49,7 @@ const ForgotPasswordScreen = () => {
       setStep('reset');
     } catch (error: any) {
       const message =
-        error.response?.data?.message ||
+        error.response?.data?.error ||
         'Gagal mengirim OTP. Pastikan email terdaftar.';
       setErrorMessage(message);
     } finally {
@@ -80,7 +80,7 @@ const ForgotPasswordScreen = () => {
       navigation.goBack();
     } catch (error: any) {
       const message =
-        error.response?.data?.message ||
+        error.response?.data?.error ||
         'Gagal reset password. Cek kembali kode OTP kamu.';
       setErrorMessage(message);
     } finally {
