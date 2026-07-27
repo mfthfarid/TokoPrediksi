@@ -14,6 +14,7 @@ import {
   Package,
   AlertTriangle,
   LayoutGrid,
+  Truck,
   TrendingUp,
   Sparkles,
   ChevronDown,
@@ -263,6 +264,17 @@ const DashboardScreen = () => {
             <LayoutGrid size={22} color={Colors.primary} />
           </View>
           <Text style={styles.menuItemText}>Kategori</Text>
+        </TouchableOpacity>
+
+        {/* Supplier */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Supplier')}
+        >
+          <View style={styles.menuIconBox}>
+            <Truck size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Supplier</Text>
         </TouchableOpacity>
 
         {/* Pembelian */}

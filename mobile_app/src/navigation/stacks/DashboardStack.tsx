@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DashboardScreen from '../../screens/dashboard/DashboardScreen';
 import NotifikasiScreen from '../../screens/notifikasi/NotifikasiScreen';
 import KategoriScreen from '../../screens/kategori/KategoriScreen';
+import SupplierScreen from '../../screens/supplier/SupplierScreen';
 import { DashboardStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<DashboardStackParamList>();
@@ -21,6 +22,7 @@ export default function DashboardStack() {
         options={{ headerShown: true, title: 'Notifikasi' }}
       />
       <Stack.Screen name="Kategori" component={KategoriScreen} />
+      <Stack.Screen name="Supplier" component={SupplierScreen} />
     </Stack.Navigator>
   );
 }
