@@ -178,9 +178,7 @@ const SupplierScreen = () => {
                 <Text style={styles.rowSubText}>{item.phone}</Text>
               ) : null}
               {item.address ? (
-                <Text style={styles.rowSubText} numberOfLines={1}>
-                  {item.address}
-                </Text>
+                <Text style={styles.rowSubText}>{item.address}</Text>
               ) : null}
             </View>
             <TouchableOpacity

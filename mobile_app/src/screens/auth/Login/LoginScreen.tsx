@@ -40,7 +40,7 @@ const LoginScreen = () => {
       // ke Main begitu isAuthenticated jadi true & isLocked false
     } catch (error: any) {
       const message =
-        error.response?.data?.message ||
+        error.response?.data?.error ||
         'Email atau password salah. Silakan coba lagi.';
       setErrorMessage(message);
     } finally {

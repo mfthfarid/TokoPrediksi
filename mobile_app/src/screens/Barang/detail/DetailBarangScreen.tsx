@@ -305,7 +305,7 @@ const DetailBarangScreen = () => {
       setPhotoUri(null);
       await fetchProduct();
     } catch (error: any) {
-      console.error('Save Detail Barang Error:', error?.message || error);
+      console.error('Save Detail Barang Error:', error?.error || error);
       toast.error('Gagal menyimpan perubahan');
     } finally {
       setSaving(false);
