@@ -53,3 +53,17 @@ func (h *PurchaseHandler) AddPurchase(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, p)
 }
+
+func (h *PurchaseHandler) DeletePurchase(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	if err := h.service.Delete(uint(id)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Pembelian berhasil dihapus"})
+}

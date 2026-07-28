@@ -35,7 +35,6 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 	}
 
 	var created Purchase
-
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		header := &Purchase{
 			SupplierID:   input.SupplierID,
@@ -46,7 +45,6 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 		}
 
 		var totalAmount uint
-
 		for _, item := range input.Items {
 			if item.Quantity.LessThanOrEqual(decimal.NewFromInt(0)) {
 				return errors.New("quantity harus lebih besar dari 0")
@@ -91,7 +89,6 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 				UpdateColumn("stock", gorm.Expr("stock + ?", quantityBase)).Error; err != nil {
 				return err
 			}
-
 			totalAmount += subtotal
 		}
 
@@ -109,4 +106,32 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 	}
 
 	return s.repo.FindByID(created.ID)
+}
+
+func (s *PurchaseService) Delete(id uint) error {
+	purchase, err := s.repo.FindByID(id)
+	if err != nil {
+		return errors.New("pembelian tidak ditemukan")
+	}
+
+	// Pastikan belum ada stok dari pembelian ini yang sudah terjual (FIFO belum menyentuhnya)
+	for _, item := range purchase.Items {
+		if !item.QuantityRemaining.Equal(item.QuantityBase) {
+			return errors.New("pembelian tidak dapat dihapus karena sebagian stoknya sudah terjual")
+		}
+	}
+
+	return config.DB.Transaction(func(tx *gorm.DB) error {
+		// Kembalikan (kurangi) stok produk yang sempat ditambahkan saat pembelian ini dibuat
+		for _, item := range purchase.Items {
+			if err := tx.Model(&product.Product{}).
+				Where("id = ?", item.ProductID).
+				UpdateColumn("stock", gorm.Expr("stock - ?", item.QuantityBase)).Error; err != nil {
+				return err
+			}
+		}
+
+		// purchase_items otomatis ikut terhapus lewat ON DELETE CASCADE
+		return tx.Delete(&Purchase{}, id).Error
+	})
 }
