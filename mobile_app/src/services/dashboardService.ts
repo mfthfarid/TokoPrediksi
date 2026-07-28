@@ -9,7 +9,7 @@ export interface LowStockProductApi {
 export interface TopSellingProductApi {
   id: number;
   name: string;
-  qty: number; // asumsi - di data contoh kamu masih null, belum ketahuan bentuknya
+  total_sold: number; // asumsi - di data contoh kamu masih null, belum ketahuan bentuknya
 }
 
 export interface DashboardSummaryApi {
