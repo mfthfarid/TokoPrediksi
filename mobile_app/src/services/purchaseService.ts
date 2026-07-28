@@ -45,3 +45,9 @@ export const getPurchases = () => api.get<PurchaseApi[]>('/api/purchases');
 
 export const createPurchase = (data: CreatePurchaseInput) =>
   api.post<PurchaseApi>('/api/purchases', data);
+
+export const getPurchaseById = (id: number) =>
+  api.get<PurchaseApi>(`/api/purchases/${id}`);
+
+export const deletePurchase = (id: number) =>
+  api.delete(`/api/purchases/${id}`);

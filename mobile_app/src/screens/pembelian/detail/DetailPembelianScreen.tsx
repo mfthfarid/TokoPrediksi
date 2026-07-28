@@ -6,7 +6,13 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  useFocusEffect,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   Truck,
   Phone,
@@ -17,41 +23,44 @@ import {
 } from 'lucide-react-native';
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import { Colors } from '../../../styles';
-import { getPurchases, PurchaseApi } from '../../../services/purchaseService';
+import {
+  getPurchaseById,
+  deletePurchase,
+  PurchaseApi,
+} from '../../../services/purchaseService';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { DashboardStackParamList } from '../../../navigation/types';
 import styles from './styles';
 
 type DetailRouteProp = RouteProp<DashboardStackParamList, 'DetailPembelian'>;
+type NavigationProp = NativeStackNavigationProp<
+  DashboardStackParamList,
+  'DetailPembelian'
+>;
 
 const formatRupiah = (value: number): string =>
   `Rp ${value.toLocaleString('id-ID')}`;
 
 const DetailPembelianScreen = () => {
   const route = useRoute<DetailRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const { id } = route.params;
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [loading, setLoading] = useState(true);
   const [purchase, setPurchase] = useState<PurchaseApi | null>(null);
 
   const fetchPurchase = useCallback(async () => {
     try {
-      // Belum ada GET /api/purchases/:id, jadi ambil semua lalu cari
-      // sendiri berdasarkan id. Kalau nanti endpoint by-id sudah ada,
-      // ini bisa diganti jadi lebih efisien.
-      const response = await getPurchases();
-      const found = response.data.find(p => p.id === id);
-      if (!found) {
-        toast.error('Data pembelian tidak ditemukan');
-      }
-      setPurchase(found ?? null);
+      const response = await getPurchaseById(id);
+      setPurchase(response.data);
     } catch (error) {
       toast.error('Gagal memuat detail pembelian');
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useFocusEffect(
@@ -60,13 +69,26 @@ const DetailPembelianScreen = () => {
     }, [fetchPurchase]),
   );
 
-  const handleDelete = () => {
-    // TODO: sambungkan begitu DELETE /api/purchases/:id sudah tersedia
-    // di backend (termasuk rollback stok/quantity_remaining).
-    Alert.alert(
-      'Belum Tersedia',
-      'Fitur hapus riwayat pembelian masih dalam pengembangan.',
-    );
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: 'Hapus Riwayat Pembelian',
+      message:
+        'Yakin ingin menghapus pembelian ini? Stok yang sempat ditambahkan akan dikurangi lagi.',
+      confirmText: 'Hapus',
+      danger: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await deletePurchase(id);
+      toast.success('Pembelian berhasil dihapus');
+      navigation.goBack();
+    } catch (error: any) {
+      const message =
+        error.response?.data?.error || 'Gagal menghapus pembelian';
+      toast.error(message);
+    }
   };
 
   if (loading) {
