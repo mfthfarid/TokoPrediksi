@@ -8,4 +8,5 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("", handler.GetPurchases)
 	rg.GET("/:id", handler.GetPurchase)
 	rg.POST("", handler.AddPurchase)
+	rg.DELETE("/:id", handler.DeletePurchase)
 }

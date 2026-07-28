@@ -76,7 +76,13 @@ const PembelianScreen = () => {
         keyExtractor={item => String(item.id)}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.7}
+            onPress={() =>
+              navigation.navigate('DetailPembelian', { id: item.id })
+            }
+          >
             <View style={styles.cardHeaderRow}>
               <Text style={styles.supplierName}>{item.supplier.name}</Text>
               <Text style={styles.purchaseDate}>{item.purchase_date}</Text>
@@ -87,7 +93,7 @@ const PembelianScreen = () => {
             <Text style={styles.totalAmount}>
               {formatRupiah(item.total_amount)}
             </Text>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>

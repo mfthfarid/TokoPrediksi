@@ -34,3 +34,7 @@ func (r *PurchaseRepository) FindByID(id uint) (*Purchase, error) {
 	}
 	return &p, nil
 }
+
+func (r *PurchaseRepository) Delete(id uint) error {
+	return config.DB.Delete(&Purchase{}, id).Error
+}

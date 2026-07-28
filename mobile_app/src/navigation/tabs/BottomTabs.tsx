@@ -19,6 +19,7 @@ const HIDDEN_TABBAR_ROUTES = [
   'Supplier',
   'Pembelian',
   'TambahPembelian',
+  'DetailPembelian',
 ];
 
 const getDashboardTabBarStyle = (
