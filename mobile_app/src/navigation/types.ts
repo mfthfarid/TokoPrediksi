@@ -24,6 +24,7 @@ export type DashboardStackParamList = {
   Supplier: undefined;
   Pembelian: undefined;
   TambahPembelian: undefined;
+  DetailPembelian: { id: number };
 };
 
 export type BarangStackParamList = {
