@@ -26,7 +26,7 @@ func (r *DashboardRepository) GetTotalTransactionsToday() (int, error) {
 func (r *DashboardRepository) GetTotalProfitToday() (int, error) {
 	var total float64
 	err := config.DB.Table("transaction_items").
-		Select("COALESCE(SUM((transaction_items.price_at_sale - transaction_items.cost_price) * transaction_items.quantity), 0)").
+		Select("COALESCE(SUM((CAST(transaction_items.price_at_sale AS SIGNED) - CAST(transaction_items.cost_price AS SIGNED)) * transaction_items.quantity), 0)").
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
 		Where("transactions.transaction_date = CURDATE()").
 		Scan(&total).Error

@@ -12,7 +12,7 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 			SUM(transaction_items.quantity_base) as total_qty,
 			SUM(transaction_items.subtotal) as total_revenue,
 			SUM(transaction_items.cost_price) as total_cost,
-			SUM(transaction_items.subtotal - transaction_items.cost_price) as total_profit
+			SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price AS SIGNED)) as total_profit
 		`).
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
 		Joins("JOIN products ON products.id = transaction_items.product_id").

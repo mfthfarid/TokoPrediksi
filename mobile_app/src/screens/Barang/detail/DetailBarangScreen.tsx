@@ -50,7 +50,7 @@ type DetailRouteProp = RouteProp<BarangStackParamList, 'DetailBarang'>;
 
 interface UnitRow {
   key: string;
-  originalId: number | null; // null = baris baru, belum ada di server
+  originalId: number | null;
   unitId: number | null;
   conversionToBase: string;
   sellPrice: string;
@@ -134,7 +134,6 @@ const DetailBarangScreen = () => {
 
   const handleToggleEdit = () => {
     if (editMode && product) {
-      // Batal -> reset semua ke data asli
       setName(product.name);
       setCategoryId(product.id_kategori);
       setUnitRows(originalUnitRowsRef.current);
@@ -232,18 +231,15 @@ const DetailBarangScreen = () => {
 
     setSaving(true);
     try {
-      // 1. Update field produk (name, id_kategori)
       await updateProduct(id, {
         name: name.trim(),
         id_kategori: categoryId as number,
       });
 
-      // 2. Upload foto baru kalau diganti
       if (photoUri) {
         await uploadProductPhoto(id, photoUri);
       }
 
-      // 3. Diff satuan terhadap data asli
       const original = originalUnitRowsRef.current;
       const originalIds = original
         .map(r => r.originalId)
@@ -252,13 +248,11 @@ const DetailBarangScreen = () => {
         .map(r => r.originalId)
         .filter((v): v is number => v != null);
 
-      // Dihapus user -> DELETE
       const deletedIds = originalIds.filter(oid => !currentIds.includes(oid));
       for (const unitId of deletedIds) {
         await deleteUnit(id, unitId);
       }
 
-      // Baris baru -> POST
       const newRows = unitRows.filter(r => r.originalId == null);
       for (const row of newRows) {
         await addUnit(id, {
@@ -270,7 +264,6 @@ const DetailBarangScreen = () => {
         });
       }
 
-      // Baris lama yang berubah -> PUT (field biasa) / PUT khusus (harga)
       const existingRows = unitRows.filter(r => r.originalId != null);
       for (const row of existingRows) {
         const orig = original.find(o => o.originalId === row.originalId);
@@ -305,8 +298,13 @@ const DetailBarangScreen = () => {
       setPhotoUri(null);
       await fetchProduct();
     } catch (error: any) {
-      console.error('Save Detail Barang Error:', error?.error || error);
-      toast.error('Gagal menyimpan perubahan');
+      console.error(
+        'Save Detail Barang Error:',
+        error?.response?.data?.error || error?.message || error,
+      );
+      const message =
+        error?.response?.data?.error || 'Gagal menyimpan perubahan';
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -389,7 +387,7 @@ const DetailBarangScreen = () => {
         ) : (
           <View style={styles.viewField}>
             <Text style={styles.viewLabel}>Kategori</Text>
-            <Text style={styles.viewValue}>{product?.kategori.name}</Text>
+            <Text style={styles.viewValue}>{product?.kategori?.name}</Text>
           </View>
         )}
 

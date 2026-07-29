@@ -120,21 +120,6 @@ func (h *ProductUnitHandler) GetPriceHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, history)
 }
 
-// Delete
-func (h *ProductUnitHandler) DeleteUnit(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("unitId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
-		return
-	}
-
-	if err := h.service.DeleteUnit(uint(id)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Satuan berhasil dihapus"})
-}
-
 func (h *ProductUnitHandler) GetPriceInfo(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("unitId"))
 	if err != nil {
@@ -148,4 +133,19 @@ func (h *ProductUnitHandler) GetPriceInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, info)
+}
+
+// Delete
+func (h *ProductUnitHandler) DeleteUnit(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("unitId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	if err := h.service.DeleteUnit(uint(id)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Satuan berhasil dihapus"})
 }

@@ -90,10 +90,10 @@ export const deleteUnit = (productId: number, unitId: number) =>
 export const updateUnitPrice = (
   productId: number,
   unitId: number,
-  sellPrice: number,
+  newPrice: number,
 ) =>
   api.put<ProductUnitApi>(`/api/products/${productId}/units/${unitId}/price`, {
-    sell_price: sellPrice,
+    new_price: newPrice,
   });
 
 export const getProductByBarcode = (barcode: string) =>

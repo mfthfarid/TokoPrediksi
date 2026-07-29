@@ -1,6 +1,9 @@
 package transaction
 
-import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+import (
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+	"gorm.io/gorm"
+)
 
 type TransactionRepository struct{}
 
@@ -8,7 +11,7 @@ func (r *TransactionRepository) FindAll() ([]Transaction, error) {
 	var transactions []Transaction
 	err := config.DB.
 		Preload("Items").
-		Preload("Items.Product").
+		Preload("Items.Product", func(db *gorm.DB) *gorm.DB { return db.Unscoped() }).
 		Preload("Items.ProductUnit").
 		Preload("Items.ProductUnit.Unit").
 		Order("transaction_date DESC").
@@ -23,7 +26,7 @@ func (r *TransactionRepository) FindByID(id uint) (*Transaction, error) {
 	var t Transaction
 	err := config.DB.
 		Preload("Items").
-		Preload("Items.Product").
+		Preload("Items.Product", func(db *gorm.DB) *gorm.DB { return db.Unscoped() }).
 		Preload("Items.ProductUnit").
 		Preload("Items.ProductUnit.Unit").
 		First(&t, id).Error

@@ -99,8 +99,13 @@ const DashboardScreen = () => {
     );
   }
 
+  // const lowStockItems = summary?.low_stock_products ?? [];
+  // const bestSellers = summary?.top_selling_products ?? [];
+  // Ekstrak nilainya agar rapi
   const lowStockItems = summary?.low_stock_products ?? [];
   const bestSellers = summary?.top_selling_products ?? [];
+  const profitMargin = summary?.profit_margin_today ?? 0;
+  const lowStockCount = summary?.low_stock_count ?? 0;
 
   return (
     <ScreenLayout
@@ -124,16 +129,27 @@ const DashboardScreen = () => {
           </Text>
         </View>
         <View style={styles.statCard}>
-          <TrendingUp size={20} color="#4caf50" />
+          {/* Ikon ikut berubah warna menyesuaikan margin */}
+          <TrendingUp
+            size={20}
+            color={profitMargin < 0 ? '#f44336' : '#4caf50'}
+          />
           <Text style={styles.statLabel}>Laba Hari Ini</Text>
           <Text style={styles.statValue}>
             {formatRupiah(summary?.total_profit_today ?? 0)}
-            <Text style={styles.statValueSuffix}>
+            <Text
+              style={[
+                styles.statValueSuffix,
+                profitMargin < 0 ? styles.textDanger : styles.textSuccess,
+              ]}
+            >
               {' '}
-              ({formatPercentage(summary?.profit_margin_today ?? 0)})
+              ({formatPercentage(profitMargin)})
             </Text>
           </Text>
         </View>
+
+        {/* Jumlah Transaksi Hari Ini */}
         <View style={styles.statCard}>
           <Receipt size={20} color={Colors.primary} />
           <Text style={styles.statLabel}>Transaksi Hari Ini</Text>
@@ -141,11 +157,24 @@ const DashboardScreen = () => {
             {summary?.total_transactions_today ?? 0}
           </Text>
         </View>
+
+        {/* Stok Menipis */}
         <View style={styles.statCard}>
-          <AlertTriangle size={20} color="#ff9800" />
+          {/* Ikon Alert hijau jika stok aman (0), kuning/orange jika ada yang menipis */}
+          <AlertTriangle
+            size={20}
+            color={lowStockCount === 0 ? '#4caf50' : '#ff9800'}
+          />
           <Text style={styles.statLabel}>Stok Menipis</Text>
-          <Text style={[styles.statValue, styles.statValueWarning]}>
-            {summary?.low_stock_count ?? 0}
+          <Text
+            style={[
+              styles.statValue,
+              lowStockCount === 0
+                ? styles.textSuccess
+                : styles.statValueWarning,
+            ]}
+          >
+            {lowStockCount}
           </Text>
         </View>
       </View>
@@ -210,7 +239,7 @@ const DashboardScreen = () => {
                   <Text style={styles.listRowText} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={styles.listRowBold}>{item.qty}x</Text>
+                  <Text style={styles.listRowBold}>{item.total_sold}x</Text>
                 </View>
               ),
             )}

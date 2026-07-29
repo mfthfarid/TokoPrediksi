@@ -47,10 +47,16 @@ const styles = StyleSheet.create({
   statValueSuffix: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4caf50',
+    // color: '#4caf50',
   },
   statValueWarning: {
     color: '#ff9800',
+  },
+  textSuccess: {
+    color: '#4caf50',
+  },
+  textDanger: {
+    color: '#f44336',
   },
 
   card: {

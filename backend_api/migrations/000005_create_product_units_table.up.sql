@@ -6,6 +6,7 @@ CREATE TABLE product_units (
     conversion_to_base DECIMAL(10,2) UNSIGNED NOT NULL,
     sell_price INT UNSIGNED NULL,
     is_base_unit BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_productunits_product
         FOREIGN KEY (product_id) REFERENCES products(id)
