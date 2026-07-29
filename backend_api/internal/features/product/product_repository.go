@@ -75,3 +75,7 @@ func (r *ProductRepository) GetLatestCostPerBase(productID uint) (*uint, error) 
 	}
 	return &costPerBase, nil
 }
+
+func (r *ProductRepository) Delete(id uint) error {
+	return config.DB.Delete(&Product{}, id).Error
+}

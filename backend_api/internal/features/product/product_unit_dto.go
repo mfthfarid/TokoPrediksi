@@ -11,8 +11,11 @@ type AddProductUnitInput struct {
 }
 
 type UpdateProductUnitInput struct {
+	UnitID           *uint            `json:"unit_id" binding:"omitempty"`
 	Barcode          *string          `json:"barcode" binding:"omitempty"`
 	ConversionToBase *decimal.Decimal `json:"conversion_to_base" binding:"omitempty"`
+	IsBaseUnit       *bool            `json:"is_base_unit" binding:"omitempty"`
+	IsActive         *bool            `json:"is_active" binding:"omitempty"`
 }
 
 type UpdatePriceInput struct {

@@ -12,6 +12,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	rg.PUT("/:id", handler.UpdateProduct)
 	rg.POST("/:id/photo", handler.UploadPhoto)
 	rg.GET("/scan/:barcode", handler.ScanBarcode)
+	rg.DELETE("/:id", handler.DeleteProduct)
 	
 	rg.GET("/:id/units", unitHandler.GetUnitsByProduct)
 	rg.POST("/:id/units", unitHandler.AddUnit)

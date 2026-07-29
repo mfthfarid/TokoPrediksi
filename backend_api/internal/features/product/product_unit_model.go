@@ -14,4 +14,5 @@ type ProductUnit struct {
 	ConversionToBase decimal.Decimal `json:"conversion_to_base" gorm:"type:decimal(10,2);not null"`
 	SellPrice        *uint           `json:"sell_price"`
 	IsBaseUnit       bool            `json:"is_base_unit" gorm:"default:false"`
+	IsActive         bool            `json:"is_active" gorm:"default:true"`
 }

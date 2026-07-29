@@ -6,8 +6,11 @@ CREATE TABLE products (
     id_kategori BIGINT UNSIGNED NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
 
     CONSTRAINT fk_products_kategori
         FOREIGN KEY (id_kategori) REFERENCES categories(id)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+
+    INDEX idx_products_deleted_at (deleted_at)
 );

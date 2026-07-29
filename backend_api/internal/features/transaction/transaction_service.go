@@ -37,7 +37,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 	}
 
 	var created Transaction
-
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		header := &Transaction{
 			TransactionDate: time.Now().Format("2006-01-02"),
@@ -49,7 +48,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 		}
 
 		var totalAmount uint
-
 		for _, item := range input.Items {
 			if item.Quantity.LessThanOrEqual(decimal.Zero) {
 				return errors.New("quantity harus lebih besar dari 0")
@@ -59,6 +57,9 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 			var pu product.ProductUnit
 			if err := tx.First(&pu, item.ProductUnitID).Error; err != nil {
 				return errors.New("satuan produk tidak ditemukan")
+			}
+			if !pu.IsActive {
+				return errors.New("satuan ini sudah tidak aktif/dijual")
 			}
 			if pu.SellPrice == nil {
 				return errors.New("satuan ini belum punya harga jual")

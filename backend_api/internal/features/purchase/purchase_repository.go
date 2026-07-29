@@ -1,6 +1,9 @@
 package purchase
 
-import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+import (
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+	"gorm.io/gorm"
+)
 
 type PurchaseRepository struct{}
 
@@ -9,7 +12,7 @@ func (r *PurchaseRepository) FindAll() ([]Purchase, error) {
 	err := config.DB.
 		Preload("Supplier").
 		Preload("Items").
-		Preload("Items.Product").
+		Preload("Items.Product", func(db *gorm.DB) *gorm.DB { return db.Unscoped() }).
 		Preload("Items.ProductUnit").
 		Preload("Items.ProductUnit.Unit").
 		Order("purchase_date DESC").
@@ -25,7 +28,7 @@ func (r *PurchaseRepository) FindByID(id uint) (*Purchase, error) {
 	err := config.DB.
 		Preload("Supplier").
 		Preload("Items").
-		Preload("Items.Product").
+		Preload("Items.Product", func(db *gorm.DB) *gorm.DB { return db.Unscoped() }).
 		Preload("Items.ProductUnit").
 		Preload("Items.ProductUnit.Unit").
 		First(&p, id).Error
