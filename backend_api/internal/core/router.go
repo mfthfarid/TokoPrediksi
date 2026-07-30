@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/middleware"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/adjustment"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/auth"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/category"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/dashboard"
@@ -42,6 +43,7 @@ func SetupRouter() *gin.Engine {
 		user.RegisterRoutes(protected.Group("/users"))
 		dashboard.RegisterRoutes(protected.Group("/dashboard"))
 		report.RegisterRoutes(protected.Group("/reports"))
+		adjustment.RegisterRoutes(protected.Group("/stock-adjustments"))
 	}
 
 	return r

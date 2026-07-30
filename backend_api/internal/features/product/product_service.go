@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -143,9 +144,14 @@ func (s *ProductService) FindByBarcode(barcode string) (*ProductUnit, error) {
 // 	return response, nil
 // }
 
+// ganti method Delete yang lama
 func (s *ProductService) Delete(id uint) error {
-	if _, err := s.repo.FindByID(id); err != nil {
+	p, err := s.repo.FindByID(id)
+	if err != nil {
 		return errors.New("produk tidak ditemukan")
+	}
+	if p.Stock.GreaterThan(decimal.Zero) {
+		return errors.New("produk masih memiliki stok, lakukan penyesuaian stok terlebih dahulu sebelum menghapus")
 	}
 	return s.repo.Delete(id)
 }
