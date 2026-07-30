@@ -7,8 +7,10 @@ import {
   Alert,
   Platform,
   PermissionsAndroid,
+  Switch,
 } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import FastImage from 'react-native-fast-image';
 import {
   Package,
@@ -20,6 +22,7 @@ import {
   Pencil,
   X,
   Image as ImageIconLucide,
+  History,
 } from 'lucide-react-native';
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import TextField from '../../../components/ui/TextField';
@@ -44,9 +47,18 @@ import {
 } from '../../../services/productService';
 import { BarangStackParamList } from '../../../navigation/types';
 import { useToast } from '../../../contexts/ToastContext';
+import { useAlertInfo } from '../../../contexts/ConfirmContext';
+import {
+  getPriceInfo,
+  PriceInfoApi,
+} from '../../../services/priceHistoryService';
 import styles from './styles';
 
 type DetailRouteProp = RouteProp<BarangStackParamList, 'DetailBarang'>;
+type NavigationProp = NativeStackNavigationProp<
+  BarangStackParamList,
+  'DetailBarang'
+>;
 
 interface UnitRow {
   key: string;
@@ -56,6 +68,7 @@ interface UnitRow {
   sellPrice: string;
   barcode: string;
   isBaseUnit: boolean;
+  isActive: boolean;
 }
 
 const createEmptyRow = (): UnitRow => ({
@@ -66,6 +79,7 @@ const createEmptyRow = (): UnitRow => ({
   sellPrice: '',
   barcode: '',
   isBaseUnit: false,
+  isActive: true,
 });
 
 const mapUnitApiToRow = (u: ProductUnitApi): UnitRow => ({
@@ -76,12 +90,15 @@ const mapUnitApiToRow = (u: ProductUnitApi): UnitRow => ({
   sellPrice: u.sell_price != null ? String(u.sell_price) : '',
   barcode: u.barcode ?? '',
   isBaseUnit: u.is_base_unit,
+  isActive: u.is_active,
 });
 
 const DetailBarangScreen = () => {
   const route = useRoute<DetailRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const { id } = route.params;
   const toast = useToast();
+  const alertInfo = useAlertInfo();
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<ProductApi | null>(null);
@@ -97,6 +114,9 @@ const DetailBarangScreen = () => {
   const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
   const [unitOptions, setUnitOptions] = useState<SelectOption[]>([]);
   const [scanningRowKey, setScanningRowKey] = useState<string | null>(null);
+  const [priceInfoMap, setPriceInfoMap] = useState<
+    Record<number, PriceInfoApi>
+  >({});
 
   const fetchProduct = useCallback(async () => {
     setLoading(true);
@@ -132,14 +152,31 @@ const DetailBarangScreen = () => {
     fetchProduct();
   }, [fetchProduct]);
 
-  const handleToggleEdit = () => {
+  const handleToggleEdit = async () => {
     if (editMode && product) {
       setName(product.name);
       setCategoryId(product.id_kategori);
       setUnitRows(originalUnitRowsRef.current);
       setPhotoUri(null);
+      setEditMode(false);
+      return;
     }
-    setEditMode(!editMode);
+
+    // Masuk ke mode edit -> ambil harga modal terbaru tiap satuan yang sudah ada
+    setEditMode(true);
+    const existingRows = unitRows.filter(r => r.originalId != null);
+    try {
+      const results = await Promise.all(
+        existingRows.map(row => getPriceInfo(id, row.originalId as number)),
+      );
+      const map: Record<number, PriceInfoApi> = {};
+      existingRows.forEach((row, index) => {
+        map[row.originalId as number] = results[index].data;
+      });
+      setPriceInfoMap(map);
+    } catch (error) {
+      // Gagal ambil info modal bukan hal fatal - biarkan edit tetap jalan
+    }
   };
 
   const updateRow = (key: string, patch: Partial<UnitRow>) => {
@@ -250,7 +287,21 @@ const DetailBarangScreen = () => {
 
       const deletedIds = originalIds.filter(oid => !currentIds.includes(oid));
       for (const unitId of deletedIds) {
-        await deleteUnit(id, unitId);
+        try {
+          await deleteUnit(id, unitId);
+        } catch (deleteError: any) {
+          const message =
+            deleteError?.response?.data?.error || 'Satuan tidak dapat dihapus.';
+          await alertInfo({
+            title: 'Tidak Bisa Dihapus',
+            message,
+            danger: true,
+          });
+          // Hentikan proses simpan di sini - biarkan user tetap di mode
+          // edit untuk memutuskan (mis. batalkan hapus satuan itu)
+          setSaving(false);
+          return;
+        }
       }
 
       const newRows = unitRows.filter(r => r.originalId == null);
@@ -261,6 +312,7 @@ const DetailBarangScreen = () => {
           sell_price: row.sellPrice ? Number(row.sellPrice) : undefined,
           barcode: row.barcode || undefined,
           is_base_unit: row.isBaseUnit,
+          is_active: row.isActive,
         });
       }
 
@@ -273,7 +325,8 @@ const DetailBarangScreen = () => {
           row.unitId !== orig.unitId ||
           row.conversionToBase !== orig.conversionToBase ||
           row.barcode !== orig.barcode ||
-          row.isBaseUnit !== orig.isBaseUnit;
+          row.isBaseUnit !== orig.isBaseUnit ||
+          row.isActive !== orig.isActive;
 
         if (otherChanged) {
           await updateUnit(id, row.originalId as number, {
@@ -281,6 +334,7 @@ const DetailBarangScreen = () => {
             conversion_to_base: row.conversionToBase,
             barcode: row.barcode || undefined,
             is_base_unit: row.isBaseUnit,
+            is_active: row.isActive,
           });
         }
 
@@ -325,17 +379,30 @@ const DetailBarangScreen = () => {
     >
       <View style={styles.headerRow}>
         <TouchableOpacity
-          style={styles.editToggleButton}
+          style={styles.historyButton}
+          onPress={() =>
+            toast.error('Fitur Riwayat Stok masih dalam pengembangan')
+          }
+        >
+          <History size={16} color={Colors.primary} />
+          <Text style={styles.historyButtonText}>Riwayat Stok</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.editToggleButton,
+            editMode && styles.cancelToggleButton,
+          ]}
           onPress={handleToggleEdit}
         >
           {editMode ? (
             <>
-              <X size={16} color="#dc2626" />
-              <Text style={styles.editToggleTextCancel}>Batal</Text>
+              <X size={16} color="#fff" />
+              <Text style={styles.editToggleText}>Batal</Text>
             </>
           ) : (
             <>
-              <Pencil size={16} color={Colors.primary} />
+              <Pencil size={16} color="#fff" />
               <Text style={styles.editToggleText}>Edit</Text>
             </>
           )}
@@ -387,7 +454,9 @@ const DetailBarangScreen = () => {
         ) : (
           <View style={styles.viewField}>
             <Text style={styles.viewLabel}>Kategori</Text>
-            <Text style={styles.viewValue}>{product?.kategori?.name}</Text>
+            <Text style={styles.viewValue}>
+              {product?.kategori?.name ?? 'Tanpa Kategori'}
+            </Text>
           </View>
         )}
 
@@ -437,6 +506,16 @@ const DetailBarangScreen = () => {
               )}
             </View>
 
+            <View style={styles.activeToggleRow}>
+              <Text style={styles.activeToggleLabel}>
+                {row.isActive ? 'Aktif Dijual' : 'Nonaktif (tidak dijual)'}
+              </Text>
+              <Switch
+                value={row.isActive}
+                onValueChange={value => updateRow(row.key, { isActive: value })}
+              />
+            </View>
+
             <SelectField
               label={`Satuan ${index + 1}`}
               placeholder="Pilih Satuan"
@@ -472,6 +551,16 @@ const DetailBarangScreen = () => {
               </View>
             </View>
 
+            {row.originalId != null &&
+              priceInfoMap[row.originalId]?.cost_per_unit != null && (
+                <Text style={styles.costInfoText}>
+                  Harga Modal Terbaru: Rp{' '}
+                  {priceInfoMap[row.originalId].cost_per_unit!.toLocaleString(
+                    'id-ID',
+                  )}
+                </Text>
+              )}
+
             <View style={styles.barcodeRow}>
               <View style={styles.barcodeInput}>
                 <TextField
@@ -491,14 +580,33 @@ const DetailBarangScreen = () => {
             </View>
           </View>
         ) : (
-          <View key={row.key} style={styles.unitViewCard}>
+          <TouchableOpacity
+            key={row.key}
+            style={styles.unitViewCard}
+            activeOpacity={0.7}
+            onPress={() =>
+              navigation.navigate('RiwayatHarga', {
+                productId: id,
+                unitId: row.originalId as number,
+                unitName: getUnitName(row.unitId),
+              })
+            }
+            disabled={row.originalId == null}
+          >
             <View style={styles.unitViewHeader}>
               <Text style={styles.unitViewName}>{getUnitName(row.unitId)}</Text>
-              {row.isBaseUnit && (
-                <View style={styles.baseBadge}>
-                  <Text style={styles.baseBadgeText}>Satuan Dasar</Text>
-                </View>
-              )}
+              <View style={styles.unitViewBadges}>
+                {row.isBaseUnit && (
+                  <View style={styles.baseBadge}>
+                    <Text style={styles.baseBadgeText}>Satuan Dasar</Text>
+                  </View>
+                )}
+                {!row.isActive && (
+                  <View style={styles.inactiveBadge}>
+                    <Text style={styles.inactiveBadgeText}>Nonaktif</Text>
+                  </View>
+                )}
+              </View>
             </View>
             <Text style={styles.unitViewDetail}>
               Harga:{' '}
@@ -514,7 +622,10 @@ const DetailBarangScreen = () => {
             {row.barcode ? (
               <Text style={styles.unitViewDetail}>Barcode: {row.barcode}</Text>
             ) : null}
-          </View>
+            <Text style={styles.unitViewTapHint}>
+              Tekan untuk lihat riwayat harga →
+            </Text>
+          </TouchableOpacity>
         ),
       )}
 

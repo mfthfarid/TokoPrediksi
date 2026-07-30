@@ -8,5 +8,5 @@ type PriceHistory struct {
 	OldPrice      *uint     `json:"old_price"`
 	NewPrice      uint      `json:"new_price" gorm:"not null"`
 	ChangedBy     *uint     `json:"changed_by"`
-	ChangedAt     time.Time `json:"changed_at"`
+	ChangedAt     time.Time `json:"changed_at" gorm:"autoCreateTime"`
 }

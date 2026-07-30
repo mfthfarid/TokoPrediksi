@@ -11,6 +11,9 @@ import ConfirmDialogView, {
 
 interface ConfirmContextType {
   confirm: (options: ConfirmDialogOptions) => Promise<boolean>;
+  alertInfo: (
+    options: Omit<ConfirmDialogOptions, 'hideCancel' | 'cancelText'>,
+  ) => Promise<void>;
 }
 
 const ConfirmContext = createContext<ConfirmContextType | undefined>(undefined);
@@ -28,6 +31,16 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const alertInfo = (
+    opts: Omit<ConfirmDialogOptions, 'hideCancel' | 'cancelText'>,
+  ): Promise<void> => {
+    setOptions({ ...opts, hideCancel: true });
+    setVisible(true);
+    return new Promise(resolve => {
+      resolveRef.current = () => resolve();
+    });
+  };
+
   const handleConfirm = () => {
     setVisible(false);
     resolveRef.current?.(true);
@@ -39,7 +52,7 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ConfirmContext.Provider value={{ confirm }}>
+    <ConfirmContext.Provider value={{ confirm, alertInfo }}>
       {children}
       <ConfirmDialogView
         visible={visible}
@@ -57,4 +70,12 @@ export const useConfirm = (): ConfirmContextType['confirm'] => {
     throw new Error('useConfirm harus dipakai di dalam <ConfirmProvider>');
   }
   return context.confirm;
+};
+
+export const useAlertInfo = (): ConfirmContextType['alertInfo'] => {
+  const context = useContext(ConfirmContext);
+  if (!context) {
+    throw new Error('useAlertInfo harus dipakai di dalam <ConfirmProvider>');
+  }
+  return context.alertInfo;
 };

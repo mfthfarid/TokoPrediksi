@@ -17,6 +17,7 @@ export interface ProductUnitApi {
   conversion_to_base: string; // desimal sebagai string, mis. "11"
   sell_price: number | null; // null = belum diatur harganya untuk satuan ini
   is_base_unit: boolean;
+  is_active: boolean; // satuan masih dijual atau tidak
 }
 
 export interface ProductApi {
@@ -43,6 +44,7 @@ export interface ProductUnitInput {
   sell_price?: number; // number, bukan string - beda dari conversion_to_base
   barcode?: string;
   is_base_unit: boolean;
+  is_active?: boolean; // opsional, backend default TRUE kalau tidak dikirim
 }
 
 export interface CreateProductInput {
@@ -71,6 +73,9 @@ export interface UpdateProductInput {
 // Satuan (units) wajib dikelola lewat endpoint terpisah di bawah.
 export const updateProduct = (id: number, data: UpdateProductInput) =>
   api.put<ProductApi>(`/api/products/${id}`, data);
+
+// Soft delete - backend akan menolak (400) kalau stok masih tersisa
+export const deleteProduct = (id: number) => api.delete(`/api/products/${id}`);
 
 export const addUnit = (productId: number, data: ProductUnitInput) =>
   api.post<ProductUnitApi>(`/api/products/${productId}/units`, data);
@@ -143,7 +148,6 @@ export const uploadProductPhoto = async (
   );
 
   const status = response.info().status;
-
   if (__DEV__) {
     console.log('Upload photo response status:', status);
   }
