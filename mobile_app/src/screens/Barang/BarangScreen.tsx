@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,12 +16,17 @@ import { useProducts } from '../../hooks/useProducts';
 import { InventoryItem } from '../../types/types';
 import { Colors } from '../../styles';
 import { BarangStackParamList } from '../../navigation/types';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
+import { deleteProduct } from '../../services/productService';
 import styles from './BarangStyles';
 
 type NavigationProp = NativeStackNavigationProp<BarangStackParamList, 'Barang'>;
 
 const BarangScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const toast = useToast();
+  const confirm = useConfirm();
   const { products, loading, error, refetch } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -65,13 +69,26 @@ const BarangScreen = () => {
     navigation.navigate('DetailBarang', { id: item.id });
   };
 
-  const handleDelete = (item: InventoryItem) => {
-    // Backend saat ini belum punya endpoint DELETE /api/products/:id,
-    // yang ada baru hapus per-satuan (DELETE /api/products/:id/units/:unitId)
-    Alert.alert(
-      'Belum Tersedia',
-      'Hapus produk belum didukung backend saat ini.',
-    );
+  const handleDelete = async (item: InventoryItem) => {
+    const confirmed = await confirm({
+      title: 'Hapus Barang',
+      message: `Yakin ingin menghapus "${item.nama}"?`,
+      confirmText: 'Hapus',
+      danger: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await deleteProduct(item.id);
+      toast.success('Barang berhasil dihapus');
+      refetch();
+    } catch (error: any) {
+      const message =
+        error.response?.data?.error ||
+        'Gagal menghapus barang (mungkin masih ada stok tersisa)';
+      toast.error(message);
+    }
   };
 
   if (loading && products.length === 0) {
@@ -173,17 +190,13 @@ const BarangScreen = () => {
         refreshing={refreshing}
         onRefresh={handleRefresh}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('DetailBarang', { id: item.id })}
-          >
+          <View style={styles.card}>
             <View style={styles.imagePlaceholder}>
               {item.photoThumbnailUrl ? (
                 <FastImage
                   source={{ uri: item.photoThumbnailUrl }}
                   style={styles.productImage}
-                  resizeMode={FastImage.resizeMode.contain}
+                  resizeMode={FastImage.resizeMode.cover}
                 />
               ) : (
                 <Icon name="image-outline" size={28} color="#bbb" />
@@ -221,8 +234,8 @@ const BarangScreen = () => {
                 style={styles.editButton}
                 onPress={() => handleEdit(item)}
               >
-                <Icon name="pencil" size={14} color="#fff" />
-                <Text style={styles.actionButtonText}>Edit</Text>
+                <Icon name="text-box-search-outline" size={14} color="#fff" />
+                <Text style={styles.actionButtonText}>Detail</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
@@ -232,7 +245,7 @@ const BarangScreen = () => {
                 <Text style={styles.actionButtonText}>Hapus</Text>
               </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          </View>
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>

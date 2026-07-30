@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BarangScreen from '../../screens/barang/BarangScreen';
 import TambahBarangScreen from '../../screens/barang/tambah/TambahBarangScreen';
 import DetailBarangScreen from '../../screens/barang/detail/DetailBarangScreen';
+import RiwayatHargaScreen from '../../screens/barang/riwayat-harga/RiwayatHargaScreen';
 import { BarangStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<BarangStackParamList>();
@@ -13,6 +14,7 @@ export default function BarangStack() {
       <Stack.Screen name="Barang" component={BarangScreen} />
       <Stack.Screen name="TambahBarang" component={TambahBarangScreen} />
       <Stack.Screen name="DetailBarang" component={DetailBarangScreen} />
+      <Stack.Screen name="RiwayatHarga" component={RiwayatHargaScreen} />
     </Stack.Navigator>
   );
 }

@@ -11,29 +11,43 @@ const styles = StyleSheet.create({
 
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: Spacing.sm,
+    gap: 8,
+    marginBottom: Spacing.md,
   },
-  editToggleButton: {
+  historyButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    justifyContent: 'center',
+    gap: 6,
+    height: 44,
+    borderRadius: 10,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: Colors.primary,
   },
-  editToggleText: {
+  historyButtonText: {
     color: Colors.primary,
     fontSize: 13,
     fontWeight: '600',
   },
-  editToggleTextCancel: {
-    color: '#dc2626',
+  editToggleButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: Colors.primary,
+  },
+  cancelToggleButton: {
+    backgroundColor: '#dc2626',
+  },
+  editToggleText: {
+    color: '#fff',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
   basicInfoCard: {
@@ -101,7 +115,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Kartu satuan mode edit (sama pola dengan TambahBarangScreen)
+  // Kartu satuan mode edit
   unitCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -144,6 +158,31 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: '600',
   },
+
+  activeToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: Spacing.sm,
+  },
+  activeToggleLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+
+  costInfoText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#16a34a',
+    marginBottom: Spacing.sm,
+    marginTop: -6,
+  },
+
   rowInline: {
     flexDirection: 'row',
     gap: 10,
@@ -190,6 +229,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
   },
+  unitViewBadges: {
+    flexDirection: 'row',
+    gap: 6,
+  },
   baseBadge: {
     backgroundColor: '#eff6ff',
     paddingHorizontal: 8,
@@ -201,10 +244,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.primary,
   },
+  inactiveBadge: {
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  inactiveBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6b7280',
+  },
   unitViewDetail: {
     fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  unitViewTapHint: {
+    fontSize: 10,
+    color: Colors.primary,
+    marginTop: 6,
+    fontWeight: '600',
   },
 });
 

@@ -8,10 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { AlertTriangle } from 'lucide-react-native';
-// import { Colors } from '../../styles';
 import { Colors, Spacing } from '../../styles';
-
-// import styles from './ConfirmDialogStyles';
 
 export interface ConfirmDialogOptions {
   title: string;
@@ -19,6 +16,7 @@ export interface ConfirmDialogOptions {
   confirmText?: string;
   cancelText?: string;
   danger?: boolean;
+  hideCancel?: boolean; // true = mode info, cuma 1 tombol (OK)
 }
 
 interface ConfirmDialogViewProps extends ConfirmDialogOptions {
@@ -31,12 +29,15 @@ const ConfirmDialogView = ({
   visible,
   title,
   message,
-  confirmText = 'Ya',
+  confirmText,
   cancelText = 'Batal',
   danger = false,
+  hideCancel = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogViewProps) => {
+  const finalConfirmText = confirmText ?? (hideCancel ? 'OK' : 'Ya');
+
   return (
     <Modal
       visible={visible}
@@ -44,7 +45,10 @@ const ConfirmDialogView = ({
       animationType="fade"
       onRequestClose={onCancel}
     >
-      <Pressable style={styles.backdrop} onPress={onCancel}>
+      <Pressable
+        style={styles.backdrop}
+        onPress={hideCancel ? onConfirm : onCancel}
+      >
         <Pressable style={styles.card}>
           {danger && (
             <View style={styles.iconCircle}>
@@ -56,9 +60,11 @@ const ConfirmDialogView = ({
           {message ? <Text style={styles.message}>{message}</Text> : null}
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-              <Text style={styles.cancelText}>{cancelText}</Text>
-            </TouchableOpacity>
+            {!hideCancel && (
+              <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+                <Text style={styles.cancelText}>{cancelText}</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[
                 styles.confirmButton,
@@ -66,7 +72,7 @@ const ConfirmDialogView = ({
               ]}
               onPress={onConfirm}
             >
-              <Text style={styles.confirmText}>{confirmText}</Text>
+              <Text style={styles.confirmText}>{finalConfirmText}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -146,5 +152,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
 export default ConfirmDialogView;
