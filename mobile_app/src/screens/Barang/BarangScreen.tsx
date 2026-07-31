@@ -18,6 +18,7 @@ import { Colors } from '../../styles';
 import { BarangStackParamList } from '../../navigation/types';
 import { useToast } from '../../contexts/ToastContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import { useAlertInfo } from '../../contexts/ConfirmContext';
 import { deleteProduct } from '../../services/productService';
 import styles from './BarangStyles';
 
@@ -27,6 +28,7 @@ const BarangScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const toast = useToast();
   const confirm = useConfirm();
+  const alertInfo = useAlertInfo();
   const { products, loading, error, refetch } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -87,7 +89,7 @@ const BarangScreen = () => {
       const message =
         error.response?.data?.error ||
         'Gagal menghapus barang (mungkin masih ada stok tersisa)';
-      toast.error(message);
+      await alertInfo({ title: 'Tidak Bisa Dihapus', message, danger: true });
     }
   };
 
