@@ -33,17 +33,15 @@ const RiwayatHargaScreen = () => {
   const route = useRoute<RiwayatHargaRouteProp>();
   const { productId, unitId, unitName } = route.params;
   const toast = useToast();
-
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<PriceHistoryApi[]>([]);
 
   const fetchHistory = useCallback(async () => {
     try {
       const response = await getPriceHistory(productId, unitId);
-      // Terbaru dulu - jaga-jaga urutan dari backend belum tentu terurut
       const sorted = [...response.data].sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          new Date(b.changed_at).getTime() - new Date(a.changed_at).getTime(),
       );
       setHistory(sorted);
     } catch (error) {
@@ -110,7 +108,7 @@ const RiwayatHargaScreen = () => {
                   </Text>
                 </View>
                 <Text style={styles.date}>
-                  {formatDateTime(item.created_at)}
+                  {formatDateTime(item.changed_at)}
                 </Text>
               </View>
             </View>

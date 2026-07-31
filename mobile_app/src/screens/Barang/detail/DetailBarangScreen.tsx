@@ -47,6 +47,7 @@ import {
 } from '../../../services/productService';
 import { BarangStackParamList } from '../../../navigation/types';
 import { useToast } from '../../../contexts/ToastContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { useAlertInfo } from '../../../contexts/ConfirmContext';
 import {
   getPriceInfo,
@@ -98,6 +99,7 @@ const DetailBarangScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { id } = route.params;
   const toast = useToast();
+  const confirm = useConfirm();
   const alertInfo = useAlertInfo();
 
   const [loading, setLoading] = useState(true);
@@ -189,23 +191,63 @@ const DetailBarangScreen = () => {
     setUnitRows(rows => [...rows, createEmptyRow()]);
   };
 
-  const handleRemoveRow = (key: string) => {
-    setUnitRows(rows => {
-      if (rows.length === 1) {
-        Alert.alert('Tidak Bisa', 'Minimal harus ada 1 satuan.');
-        return rows;
-      }
-      const target = rows.find(r => r.key === key);
-      const remaining = rows.filter(r => r.key !== key);
-      if (target?.isBaseUnit && remaining.length > 0) {
-        remaining[0] = {
-          ...remaining[0],
-          isBaseUnit: true,
-          conversionToBase: '1',
-        };
-      }
-      return remaining;
+  const handleRemoveRow = async (row: UnitRow) => {
+    if (unitRows.length === 1) {
+      Alert.alert('Tidak Bisa', 'Minimal harus ada 1 satuan.');
+      return;
+    }
+
+    // Baris baru yang belum pernah tersimpan di server - cukup hapus lokal
+    if (row.originalId == null) {
+      setUnitRows(rows => rows.filter(r => r.key !== row.key));
+      return;
+    }
+
+    const confirmed = await confirm({
+      title: 'Hapus Satuan',
+      message: `Yakin ingin menghapus satuan "${getUnitName(row.unitId)}"?`,
+      confirmText: 'Hapus',
+      danger: true,
     });
+    if (!confirmed) return;
+
+    try {
+      await deleteUnit(id, row.originalId);
+      setUnitRows(rows => {
+        const remaining = rows.filter(r => r.key !== row.key);
+        // Kalau yang dihapus itu satuan dasar, promosikan baris pertama sisanya
+        if (
+          row.isBaseUnit &&
+          remaining.length > 0 &&
+          !remaining.some(r => r.isBaseUnit)
+        ) {
+          const newBaseRow = remaining[0];
+          remaining[0] = {
+            ...newBaseRow,
+            isBaseUnit: true,
+            conversionToBase: '1',
+          };
+          if (newBaseRow.originalId != null) {
+            updateUnit(id, newBaseRow.originalId, {
+              unit_id: newBaseRow.unitId as number,
+              conversion_to_base: '1',
+              is_base_unit: true,
+            }).catch(() => {});
+          }
+        }
+        return remaining;
+      });
+
+      originalUnitRowsRef.current = originalUnitRowsRef.current.filter(
+        r => r.originalId !== row.originalId,
+      );
+
+      toast.success('Satuan berhasil dihapus');
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.error || 'Satuan tidak dapat dihapus.';
+      await alertInfo({ title: 'Tidak Bisa Dihapus', message, danger: true });
+    }
   };
 
   const handleSetBaseUnit = (key: string) => {
@@ -284,25 +326,6 @@ const DetailBarangScreen = () => {
       const currentIds = unitRows
         .map(r => r.originalId)
         .filter((v): v is number => v != null);
-
-      const deletedIds = originalIds.filter(oid => !currentIds.includes(oid));
-      for (const unitId of deletedIds) {
-        try {
-          await deleteUnit(id, unitId);
-        } catch (deleteError: any) {
-          const message =
-            deleteError?.response?.data?.error || 'Satuan tidak dapat dihapus.';
-          await alertInfo({
-            title: 'Tidak Bisa Dihapus',
-            message,
-            danger: true,
-          });
-          // Hentikan proses simpan di sini - biarkan user tetap di mode
-          // edit untuk memutuskan (mis. batalkan hapus satuan itu)
-          setSaving(false);
-          return;
-        }
-      }
 
       const newRows = unitRows.filter(r => r.originalId == null);
       for (const row of newRows) {
@@ -500,7 +523,7 @@ const DetailBarangScreen = () => {
               </TouchableOpacity>
 
               {unitRows.length > 1 && (
-                <TouchableOpacity onPress={() => handleRemoveRow(row.key)}>
+                <TouchableOpacity onPress={() => handleRemoveRow(row)}>
                   <Trash2 size={18} color="#dc2626" />
                 </TouchableOpacity>
               )}

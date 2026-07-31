@@ -6,7 +6,7 @@ export interface PriceHistoryApi {
   old_price: number | null;
   new_price: number;
   changed_by: number | null;
-  created_at: string;
+  changed_at: string;
 }
 
 export const getPriceHistory = (productId: number, unitId: number) =>
