@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ShoppingBag,
   FileText,
+  PackageMinus,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { Colors } from '../../styles';
@@ -315,6 +316,17 @@ const DashboardScreen = () => {
             <ShoppingBag size={22} color={Colors.primary} />
           </View>
           <Text style={styles.menuItemText}>Pembelian</Text>
+        </TouchableOpacity>
+
+        {/* Penyesuaian Stok */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('PenyesuaianStok')}
+        >
+          <View style={styles.menuIconBox}>
+            <PackageMinus size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Penyesuaian</Text>
         </TouchableOpacity>
 
         {/* Laporan */}

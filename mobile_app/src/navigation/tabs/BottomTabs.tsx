@@ -20,6 +20,9 @@ const HIDDEN_TABBAR_ROUTES = [
   'Pembelian',
   'TambahPembelian',
   'DetailPembelian',
+  'PenyesuaianStok',
+  'TambahPenyesuaian',
+  'RiwayatPenyesuaian',
 ];
 
 const getDashboardTabBarStyle = (
