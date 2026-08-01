@@ -25,6 +25,14 @@ export type DashboardStackParamList = {
   Pembelian: undefined;
   TambahPembelian: undefined;
   DetailPembelian: { id: number };
+  PenyesuaianStok: undefined;
+  TambahPenyesuaian: {
+    productId?: number;
+    productName?: string;
+    tanggalKadaluwarsa?: string;
+    maxQuantity?: number;
+  };
+  RiwayatPenyesuaian: { productId?: number };
 };
 
 export type BarangStackParamList = {

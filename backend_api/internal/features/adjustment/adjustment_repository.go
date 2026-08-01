@@ -9,7 +9,7 @@ func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, er
 		Select(`
 			products.id as product_id,
 			products.name as product_name,
-			purchase_items.tanggal_kadaluwarsa,
+			DATE_FORMAT(purchase_items.tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
 			SUM(purchase_items.quantity_remaining) as total_remaining
 		`).
 		Joins("JOIN products ON products.id = purchase_items.product_id").
@@ -37,12 +37,12 @@ func (r *Repository) FindHistory(query HistoryQuery) ([]AdjustmentHistoryRow, er
 			stock_adjustments.id,
 			stock_adjustments.product_id,
 			products.name as product_name,
-			stock_adjustments.tanggal_kadaluwarsa,
+			DATE_FORMAT(stock_adjustments.tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
 			stock_adjustments.quantity_adjusted,
 			stock_adjustments.adjustment_type,
 			stock_adjustments.estimated_loss,
 			stock_adjustments.note,
-			stock_adjustments.created_at
+			DATE_FORMAT(stock_adjustments.created_at, '%d/%m/%Y %H:%i') as created_at
 		`).
 		Joins("JOIN products ON products.id = stock_adjustments.product_id")
 
