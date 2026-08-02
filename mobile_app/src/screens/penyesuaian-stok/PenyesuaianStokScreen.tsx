@@ -36,7 +36,22 @@ const PenyesuaianStokScreen = () => {
   const fetchItems = useCallback(async (search?: string) => {
     try {
       const response = await getExpiringProducts(search || undefined);
-      setItems(response.data);
+
+      // Backend belum punya parameter buat batasi rentang tanggal, jadi
+      // difilter di sini: tampilkan yang kadaluwarsa dalam 5 bulan ke depan
+      // (termasuk yang sudah lewat - itu malah paling mendesak).
+      const fiveMonthsFromNow = new Date();
+      fiveMonthsFromNow.setMonth(fiveMonthsFromNow.getMonth() + 5);
+
+      const filtered = response.data.filter(item => {
+        const [day, month, year] = item.tanggal_kadaluwarsa
+          .split('/')
+          .map(Number);
+        const expiryDate = new Date(year, month - 1, day);
+        return expiryDate <= fiveMonthsFromNow;
+      });
+
+      setItems(filtered);
     } catch (error) {
       toast.error('Gagal memuat data barang mendekati kadaluwarsa');
     } finally {
