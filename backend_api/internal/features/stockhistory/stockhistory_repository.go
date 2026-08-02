@@ -6,7 +6,7 @@ type Repository struct{}
 
 func (r *Repository) FindByProductID(productID uint) ([]StockHistoryRow, error) {
 	query := `
-		SELECT purchases.purchase_date as event_date,
+		SELECT purchase_items.created_at as event_date,
 		       'masuk' as type,
 		       purchase_items.quantity_base as quantity,
 		       CONCAT('Pembelian', IFNULL(CONCAT(' dari ', suppliers.name), '')) as reference
@@ -17,7 +17,7 @@ func (r *Repository) FindByProductID(productID uint) ([]StockHistoryRow, error) 
 
 		UNION ALL
 
-		SELECT transactions.transaction_date as event_date,
+		SELECT transaction_items.created_at as event_date,
 		       'keluar' as type,
 		       transaction_items.quantity_base as quantity,
 		       'Penjualan' as reference
@@ -46,7 +46,7 @@ func (r *Repository) FindByProductID(productID uint) ([]StockHistoryRow, error) 
 	}
 
 	for i := range rows {
-		rows[i].Date = rows[i].EventDate.Format("02/01/2006")
+		rows[i].Date = rows[i].EventDate.Format("02/01/2006 15:04")
 	}
 
 	return rows, nil
