@@ -404,7 +404,10 @@ const DetailBarangScreen = () => {
         <TouchableOpacity
           style={styles.historyButton}
           onPress={() =>
-            toast.error('Fitur Riwayat Stok masih dalam pengembangan')
+            navigation.navigate('RiwayatStok', {
+              productId: id,
+              productName: product?.name ?? '',
+            })
           }
         >
           <History size={16} color={Colors.primary} />

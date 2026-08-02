@@ -40,6 +40,7 @@ export type BarangStackParamList = {
   TambahBarang: undefined;
   DetailBarang: { id: number };
   RiwayatHarga: { productId: number; unitId: number; unitName: string };
+  RiwayatStok: { productId: number; productName: string };
 };
 
 export type TransaksiStackParamList = {

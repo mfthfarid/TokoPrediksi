@@ -2,9 +2,7 @@ import api, { API_BASE_URL } from './api';
 import { getToken } from './tokenStorage';
 import RNBlobUtil from 'react-native-blob-util';
 
-// ================================
 // Bentuk data ASLI dari backend (response)
-// ================================
 export interface ProductUnitApi {
   id: number;
   product_id: number;
@@ -35,9 +33,7 @@ export interface ProductApi {
   photo_detail_url?: string | null;
 }
 
-// ================================
 // Bentuk data untuk dikirim (request)
-// ================================
 export interface ProductUnitInput {
   unit_id: number;
   conversion_to_base: string;
@@ -53,9 +49,14 @@ export interface CreateProductInput {
   units: ProductUnitInput[];
 }
 
-// ================================
+export interface StockHistoryApi {
+  date: string; // DD/MM/YYYY
+  type: 'masuk' | 'keluar' | 'rugi' | 'retur' | string;
+  quantity: number;
+  reference: string;
+}
+
 // Endpoint
-// ================================
 export const getProducts = () => api.get<ProductApi[]>('/api/products');
 
 export const getProductById = (id: number) =>
@@ -106,6 +107,9 @@ export const getProductByBarcode = (barcode: string) =>
 
 export const getProductUnits = (id: number) =>
   api.get<ProductUnitApi[]>(`/api/products/${id}/units`);
+
+export const getStockHistory = (productId: number) =>
+  api.get<StockHistoryApi[]>(`/api/products/${productId}/stock-history`);
 
 // fileUri: path lokal hasil PhotoPicker (sudah dikompres)
 // PENTING: pakai fetch() native, BUKAN instance axios (api) di atas.
