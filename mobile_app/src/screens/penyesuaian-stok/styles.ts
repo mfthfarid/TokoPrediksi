@@ -9,25 +9,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    height: 44,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#eee',
-    marginBottom: Spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.text,
-    padding: 0,
-  },
-
   actionRow: {
     flexDirection: 'row',
     gap: 8,
@@ -49,21 +30,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   historyButton: {
-    flex: 1,
-    flexDirection: 'row',
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    height: 44,
     borderRadius: 10,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: Colors.primary,
-  },
-  historyButtonText: {
-    color: Colors.primary,
-    fontWeight: '600',
-    fontSize: 13,
   },
 
   listContent: {
@@ -92,20 +66,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#dc2626',
     marginTop: 2,
+    marginBottom: 6,
   },
   countBadge: {
-    minWidth: 36,
-    height: 36,
-    borderRadius: 18,
+    alignSelf: 'flex-start',
     backgroundColor: '#fff3e0',
-    alignItems: 'center',
-    justifyContent: 'center',
     paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
   },
   countBadgeText: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '700',
     color: '#ff9800',
+  },
+
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   emptyState: {

@@ -5,12 +5,21 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// DTO untuk opsi Dropdown Batch di Frontend
+type BatchOptionDTO struct {
+	PurchaseItemID     uint            `json:"purchase_item_id"`
+	TanggalKadaluwarsa string          `json:"tanggal_kadaluwarsa"`
+	QuantityRemaining  decimal.Decimal `json:"quantity_remaining"`
+	CostPerBase        int             `json:"cost_per_base"`
+}
+
 type CreateAdjustmentInput struct {
-	ProductID          uint            `json:"product_id" binding:"required"`
+	ProductID      uint            `json:"product_id" binding:"required"`
+	PurchaseItemID uint            `json:"purchase_item_id" binding:"required"`
 	TanggalKadaluwarsa customtype.Date `json:"tanggal_kadaluwarsa"`
-	Quantity           decimal.Decimal `json:"quantity"`
-	AdjustmentType     string          `json:"adjustment_type" binding:"required,oneof=retur rugi"`
-	Note               *string         `json:"note" binding:"omitempty,max=255"`
+	Quantity       decimal.Decimal `json:"quantity" binding:"required"`
+	AdjustmentType string          `json:"adjustment_type" binding:"required,oneof=retur rugi"`
+	Note           *string         `json:"note" binding:"omitempty,max=255"`
 }
 
 type ExpiringBatchGroup struct {

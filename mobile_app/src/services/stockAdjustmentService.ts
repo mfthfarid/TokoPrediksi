@@ -14,9 +14,22 @@ export const getExpiringProducts = (search?: string) =>
     params: search ? { search } : undefined,
   });
 
+// Interface baru untuk penampung batch pilihan (Ide 2)
+export interface AvailableBatchApi {
+  purchase_item_id: number;
+  tanggal_kadaluwarsa: string;
+  quantity_remaining: number;
+  cost_per_base: number;
+}
+
+// Endpoint untuk mengambil batch terurut dari yang paling tua
+export const getAvailableBatches = (productId: number) =>
+  api.get<AvailableBatchApi[]>(`/api/stock-adjustments/batches/${productId}`);
+
 export interface CreateAdjustmentInput {
   product_id: number;
-  tanggal_kadaluwarsa: string; // ambil persis dari ExpiringProductApi
+  purchase_item_id: number; // Tambahkan ini (Wajib untuk Ide 2)
+  tanggal_kadaluwarsa?: string;
   quantity: string; // string desimal, mis. "5" atau "1.5"
   adjustment_type: AdjustmentType;
   note?: string;
@@ -25,6 +38,7 @@ export interface CreateAdjustmentInput {
 export interface CreateAdjustmentResponseApi {
   id: number;
   product_id: number;
+  purchase_item_id: number; // Tambahkan ini
   tanggal_kadaluwarsa: string;
   quantity_adjusted: string; // STRING di response create
   adjustment_type: AdjustmentType;
@@ -60,3 +74,13 @@ export const getAdjustmentHistory = (params?: AdjustmentHistoryParams) =>
   api.get<AdjustmentHistoryApi[]>('/api/stock-adjustments/history', {
     params,
   });
+
+// Interface untuk endpoint produk yang ringan
+export interface SimpleProductApi {
+  id: number;
+  name: string;
+}
+
+// Endpoint produk simpel
+export const getAdjustmentProducts = () =>
+  api.get<SimpleProductApi[]>('/api/stock-adjustments/products');

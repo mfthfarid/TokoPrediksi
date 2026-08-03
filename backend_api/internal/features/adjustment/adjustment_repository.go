@@ -4,6 +4,31 @@ import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 
 type Repository struct{}
 
+func (r *Repository) GetProductsSimple() ([]ProductSimple, error) {
+    var products []ProductSimple
+    err := config.DB.Table("products").
+        Select("id, name").
+        Order("name ASC").
+        Scan(&products).Error
+        
+    return products, err
+}
+
+func (r *Repository) GetAvailableBatches(productID uint) ([]BatchOptionDTO, error) {
+	var batches []BatchOptionDTO
+	err := config.DB.Table("purchase_items").
+		Select("id as purchase_item_id, tanggal_kadaluwarsa, quantity_remaining, cost_per_base").
+		Where("product_id = ? AND quantity_remaining > 0", productID).
+		Order("tanggal_kadaluwarsa ASC"). // Urutkan dari yang paling tua/dekat kadaluwarsa (Ide 2)
+		Scan(&batches).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return batches, nil
+}
+
 func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, error) {
 	query := config.DB.Table("purchase_items").
 		Select(`
