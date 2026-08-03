@@ -8,6 +8,7 @@ CREATE TABLE transaction_items (
     price_at_sale INT UNSIGNED NOT NULL,
     cost_price INT UNSIGNED NOT NULL,
     subtotal INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_transitems_transaction
         FOREIGN KEY (transaction_id) REFERENCES transactions(id)

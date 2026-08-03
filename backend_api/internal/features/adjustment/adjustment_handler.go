@@ -2,6 +2,7 @@ package adjustment
 
 import (
 	"net/http"
+	"strconv" // Tambahkan ini untuk parsing parameter URL
 
 	"github.com/gin-gonic/gin"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/validator"
@@ -13,6 +14,33 @@ type Handler struct {
 
 func NewHandler() *Handler {
 	return &Handler{service: NewService()}
+}
+
+func (h *Handler) GetProductsSimple(c *gin.Context) {
+	products, err := h.service.GetProductsSimple()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil daftar produk"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
+// POINT 2: Endpoint baru untuk mengambil batch terurut (Ide 2)
+func (h *Handler) GetAvailableBatches(c *gin.Context) {
+	productIDStr := c.Param("productId")
+	productID, err := strconv.ParseUint(productIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID produk tidak valid"})
+		return
+	}
+
+	batches, err := h.service.GetAvailableBatches(uint(productID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil daftar batch"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, batches)
 }
 
 func (h *Handler) GetExpiringBatches(c *gin.Context) {

@@ -10,6 +10,7 @@ CREATE TABLE purchase_items (
     cost_per_base INT UNSIGNED NOT NULL,
     tanggal_kadaluwarsa DATE NULL,
     subtotal INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_purchaseitems_purchase
         FOREIGN KEY (purchase_id) REFERENCES purchases(id)

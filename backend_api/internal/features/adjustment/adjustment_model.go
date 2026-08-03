@@ -14,9 +14,15 @@ const (
 	AdjustmentKerugian AdjustmentType = "rugi"
 )
 
+type ProductSimple struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
 type StockAdjustment struct {
 	ID                 uint            `json:"id" gorm:"primaryKey"`
 	ProductID          uint            `json:"product_id" gorm:"not null"`
+	PurchaseItemID     uint            `json:"purchase_item_id" gorm:"not null"`
 	TanggalKadaluwarsa customtype.Date `json:"tanggal_kadaluwarsa" gorm:"type:date"`
 	QuantityAdjusted   decimal.Decimal `json:"quantity_adjusted" gorm:"type:decimal(10,2);not null"`
 	AdjustmentType     AdjustmentType  `json:"adjustment_type" gorm:"type:enum('retur','rugi');not null"`

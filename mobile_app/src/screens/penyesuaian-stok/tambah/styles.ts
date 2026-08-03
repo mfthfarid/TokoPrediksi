@@ -9,6 +9,43 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
+  infoBanner: {
+    backgroundColor: '#E6F4EA',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#34A853',
+    marginBottom: 20,
+    marginTop: -8, // Menaikkan sedikit agar dekat dengan SelectField batch
+  },
+  bannerHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  infoBannerTitle: {
+    fontWeight: '700',
+    color: '#137333',
+    marginLeft: 6,
+    fontSize: 13,
+  },
+  infoBannerText: {
+    fontSize: 12,
+    color: '#137333',
+    lineHeight: 18,
+  },
+
+  resolvingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.md,
+  },
+  resolvingText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+
   infoCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -46,6 +83,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: Colors.text,
+    marginBottom: 6,
+  },
+
+  quantityHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  useAllText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primary,
     marginBottom: 6,
   },
 
@@ -92,11 +141,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     backgroundColor: '#fff',
-  },
-  hintText: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    marginTop: 4,
   },
 
   dateDisplay: {

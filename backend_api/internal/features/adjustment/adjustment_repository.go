@@ -4,6 +4,31 @@ import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 
 type Repository struct{}
 
+func (r *Repository) GetProductsSimple() ([]ProductSimple, error) {
+    var products []ProductSimple
+    err := config.DB.Table("products").
+        Select("id, name").
+        Order("name ASC").
+        Scan(&products).Error
+        
+    return products, err
+}
+
+func (r *Repository) GetAvailableBatches(productID uint) ([]BatchOptionDTO, error) {
+	var batches []BatchOptionDTO
+	err := config.DB.Table("purchase_items").
+		Select("id as purchase_item_id, tanggal_kadaluwarsa, quantity_remaining, cost_per_base").
+		Where("product_id = ? AND quantity_remaining > 0", productID).
+		Order("tanggal_kadaluwarsa ASC"). // Urutkan dari yang paling tua/dekat kadaluwarsa (Ide 2)
+		Scan(&batches).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return batches, nil
+}
+
 func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, error) {
 	query := config.DB.Table("purchase_items").
 		Select(`
@@ -13,7 +38,8 @@ func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, er
 			SUM(purchase_items.quantity_remaining) as total_remaining
 		`).
 		Joins("JOIN products ON products.id = purchase_items.product_id").
-		Where("purchase_items.quantity_remaining > 0 AND purchase_items.tanggal_kadaluwarsa IS NOT NULL")
+		Where("purchase_items.quantity_remaining > 0 AND purchase_items.tanggal_kadaluwarsa IS NOT NULL").
+		Where("purchase_items.tanggal_kadaluwarsa <= DATE_ADD(CURDATE(), INTERVAL 5 MONTH)")
 
 	if search != "" {
 		query = query.Where("products.name LIKE ?", "%"+search+"%")

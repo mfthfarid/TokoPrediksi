@@ -6,8 +6,9 @@ import {
   Modal,
   FlatList,
   Pressable,
+  TextInput,
 } from 'react-native';
-import { ChevronDown, Check } from 'lucide-react-native';
+import { ChevronDown, Check, Search } from 'lucide-react-native';
 import styles from './styles';
 import { Colors } from '../../../styles';
 
@@ -24,6 +25,8 @@ interface SelectFieldProps {
   onSelect: (value: number | string) => void;
   leftIcon?: React.ReactNode;
   disabled?: boolean;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }
 
 const SelectField = ({
@@ -34,9 +37,24 @@ const SelectField = ({
   onSelect,
   leftIcon,
   disabled = false,
+  searchable = false,
+  searchPlaceholder = 'Cari...',
 }: SelectFieldProps) => {
   const [visible, setVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const selected = options.find(o => o.value === value);
+
+  const filteredOptions =
+    searchable && searchQuery.trim()
+      ? options.filter(o =>
+          o.label.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+        )
+      : options;
+
+  const handleClose = () => {
+    setVisible(false);
+    setSearchQuery('');
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -61,20 +79,35 @@ const SelectField = ({
         visible={visible}
         transparent
         animationType="fade"
-        onRequestClose={() => setVisible(false)}
+        onRequestClose={handleClose}
       >
-        <Pressable style={styles.backdrop} onPress={() => setVisible(false)}>
+        <Pressable style={styles.backdrop} onPress={handleClose}>
           <Pressable style={styles.sheet}>
             <Text style={styles.sheetTitle}>{label ?? placeholder}</Text>
+
+            {searchable && (
+              <View style={styles.searchBox}>
+                <Search size={16} color={Colors.textSecondary} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder={searchPlaceholder}
+                  placeholderTextColor="#999"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoFocus
+                />
+              </View>
+            )}
+
             <FlatList
-              data={options}
+              data={filteredOptions}
               keyExtractor={item => String(item.value)}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.option}
                   onPress={() => {
                     onSelect(item.value);
-                    setVisible(false);
+                    handleClose();
                   }}
                 >
                   <Text style={styles.optionText}>{item.label}</Text>
@@ -84,7 +117,9 @@ const SelectField = ({
                 </TouchableOpacity>
               )}
               ListEmptyComponent={
-                <Text style={styles.emptyText}>Belum ada data</Text>
+                <Text style={styles.emptyText}>
+                  {searchQuery ? 'Tidak ditemukan' : 'Belum ada data'}
+                </Text>
               }
             />
           </Pressable>

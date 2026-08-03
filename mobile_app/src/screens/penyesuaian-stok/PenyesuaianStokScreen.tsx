@@ -3,13 +3,12 @@ import {
   View,
   Text,
   FlatList,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Search, Plus, History, PackageX } from 'lucide-react-native';
+import { Plus, History, PackageX, ChevronRight } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { Colors } from '../../styles';
 import {
@@ -31,27 +30,13 @@ const PenyesuaianStokScreen = () => {
 
   const [items, setItems] = useState<ExpiringProductApi[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchItems = useCallback(async (search?: string) => {
+  const fetchItems = useCallback(async () => {
     try {
-      const response = await getExpiringProducts(search || undefined);
-
-      // Backend belum punya parameter buat batasi rentang tanggal, jadi
-      // difilter di sini: tampilkan yang kadaluwarsa dalam 5 bulan ke depan
-      // (termasuk yang sudah lewat - itu malah paling mendesak).
-      const fiveMonthsFromNow = new Date();
-      fiveMonthsFromNow.setMonth(fiveMonthsFromNow.getMonth() + 5);
-
-      const filtered = response.data.filter(item => {
-        const [day, month, year] = item.tanggal_kadaluwarsa
-          .split('/')
-          .map(Number);
-        const expiryDate = new Date(year, month - 1, day);
-        return expiryDate <= fiveMonthsFromNow;
-      });
-
-      setItems(filtered);
+      // Backend sudah filter "mendekati kadaluwarsa" sendiri di /expiring,
+      // tidak perlu filter tambahan di mobile lagi.
+      const response = await getExpiringProducts();
+      setItems(response.data);
     } catch (error) {
       toast.error('Gagal memuat data barang mendekati kadaluwarsa');
     } finally {
@@ -62,15 +47,9 @@ const PenyesuaianStokScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchItems(searchQuery);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []),
+      fetchItems();
+    }, [fetchItems]),
   );
-
-  const handleSearchChange = (text: string) => {
-    setSearchQuery(text);
-    fetchItems(text);
-  };
 
   const handleSelectItem = (item: ExpiringProductApi) => {
     navigation.navigate('TambahPenyesuaian', {
@@ -92,34 +71,22 @@ const PenyesuaianStokScreen = () => {
   return (
     <ScreenLayout
       title="Penyesuaian Stok"
-      subtitle="Retur & Barang Rusak"
+      subtitle="Barang Mendekati Kadaluwarsa"
       scrollable={false}
     >
-      <View style={styles.searchContainer}>
-        <Search size={20} color="#999" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Cari nama barang..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={handleSearchChange}
-        />
-      </View>
-
       <View style={styles.actionRow}>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('TambahPenyesuaian', {})}
         >
           <Plus size={18} color="#fff" />
-          <Text style={styles.addButtonText}>Tambah</Text>
+          <Text style={styles.addButtonText}>Tambah (Barang Rusak)</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.historyButton}
           onPress={() => navigation.navigate('RiwayatPenyesuaian', {})}
         >
           <History size={18} color={Colors.primary} />
-          <Text style={styles.historyButtonText}>Riwayat</Text>
         </TouchableOpacity>
       </View>
 
@@ -130,11 +97,7 @@ const PenyesuaianStokScreen = () => {
         }
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.7}
-            onPress={() => handleSelectItem(item)}
-          >
+          <View style={styles.card}>
             <View style={styles.cardInfo}>
               <Text style={styles.productName} numberOfLines={1}>
                 {item.product_name}
@@ -142,19 +105,27 @@ const PenyesuaianStokScreen = () => {
               <Text style={styles.expiryText}>
                 Kadaluwarsa: {item.tanggal_kadaluwarsa}
               </Text>
+              <View style={styles.countBadge}>
+                <Text style={styles.countBadgeText}>
+                  Sisa {item.total_remaining}
+                </Text>
+              </View>
             </View>
-            <View style={styles.countBadge}>
-              <Text style={styles.countBadgeText}>{item.total_remaining}</Text>
-            </View>
-          </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleSelectItem(item)}
+            >
+              <Text style={styles.actionButtonText}>Sesuaikan</Text>
+              <ChevronRight size={16} color="#fff" />
+            </TouchableOpacity>
+          </View>
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <PackageX size={40} color="#ccc" />
             <Text style={styles.emptyText}>
-              {searchQuery
-                ? 'Barang tidak ditemukan'
-                : 'Tidak ada barang mendekati kadaluwarsa'}
+              Tidak ada barang mendekati kadaluwarsa
             </Text>
           </View>
         }
