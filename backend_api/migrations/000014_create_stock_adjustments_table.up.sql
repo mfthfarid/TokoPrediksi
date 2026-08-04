@@ -13,7 +13,7 @@ CREATE TABLE stock_adjustments (
     CONSTRAINT fk_adjustments_product
         FOREIGN KEY (product_id) REFERENCES products(id)
         ON DELETE RESTRICT,
-    CONSTRAINT fk_adjustments_product
+    CONSTRAINT fk_adjustments_purchase_item
         FOREIGN KEY (purchase_item_id) REFERENCES purchase_items(id)
         ON DELETE CASCADE,
     CONSTRAINT fk_adjustments_user
