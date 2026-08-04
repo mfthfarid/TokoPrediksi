@@ -107,7 +107,6 @@ const TambahPenyesuaianScreen = () => {
       try {
         const response = await getAvailableBatches(selectedProductId);
         const data = response.data;
-
         if (data && data.length > 0) {
           setBatches(data);
 
@@ -251,7 +250,7 @@ const TambahPenyesuaianScreen = () => {
       )}
 
       {/* 2. Pemilihan Batch & Banner (Hanya muncul jika batch tersedia) */}
-      {!resolvingBatch && batches.length > 0 && (
+      {!hasPrefill && !resolvingBatch && batches.length > 0 && (
         <>
           <SelectField
             label="Pilih Batch / Kadaluwarsa"

@@ -38,13 +38,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
+  keyboard: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   sheet: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.xl,
+    // paddingBottom: Spacing.lg,
+    // paddingBottom: 40,
     maxHeight: '70%',
   },
   sheetTitle: {
@@ -68,6 +73,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     padding: 0,
+  },
+
+  optionContainer: {
+    flexShrink: 1,
+    paddingBottom: Spacing.lg,
   },
   option: {
     flexDirection: 'row',
