@@ -8,6 +8,7 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { ChevronDown, Check, Search } from 'lucide-react-native';
 import styles from './styles';
 import { Colors } from '../../../styles';
@@ -59,7 +60,6 @@ const SelectField = ({
   return (
     <View style={styles.wrapper}>
       {label && <Text style={styles.label}>{label}</Text>}
-
       <TouchableOpacity
         style={[styles.field, disabled && styles.fieldDisabled]}
         onPress={() => !disabled && setVisible(true)}
@@ -80,49 +80,52 @@ const SelectField = ({
         transparent
         animationType="fade"
         onRequestClose={handleClose}
+        statusBarTranslucent={true}
       >
         <Pressable style={styles.backdrop} onPress={handleClose}>
-          <Pressable style={styles.sheet}>
-            <Text style={styles.sheetTitle}>{label ?? placeholder}</Text>
-
-            {searchable && (
-              <View style={styles.searchBox}>
-                <Search size={16} color={Colors.textSecondary} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder={searchPlaceholder}
-                  placeholderTextColor="#999"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoFocus
-                />
-              </View>
-            )}
-
-            <FlatList
-              data={filteredOptions}
-              keyExtractor={item => String(item.value)}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.option}
-                  onPress={() => {
-                    onSelect(item.value);
-                    handleClose();
-                  }}
-                >
-                  <Text style={styles.optionText}>{item.label}</Text>
-                  {item.value === value && (
-                    <Check size={18} color={Colors.primary} />
-                  )}
-                </TouchableOpacity>
+          <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
+            <Pressable style={styles.sheet}>
+              <Text style={styles.sheetTitle}>{label ?? placeholder}</Text>
+              {searchable && (
+                <View style={styles.searchBox}>
+                  <Search size={16} color={Colors.textSecondary} />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder={searchPlaceholder}
+                    placeholderTextColor="#999"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoFocus
+                  />
+                </View>
               )}
-              ListEmptyComponent={
-                <Text style={styles.emptyText}>
-                  {searchQuery ? 'Tidak ditemukan' : 'Belum ada data'}
-                </Text>
-              }
-            />
-          </Pressable>
+
+              <FlatList
+                data={filteredOptions}
+                keyExtractor={item => String(item.value)}
+                style={styles.optionContainer}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.option}
+                    onPress={() => {
+                      onSelect(item.value);
+                      handleClose();
+                    }}
+                  >
+                    <Text style={styles.optionText}>{item.label}</Text>
+                    {item.value === value && (
+                      <Check size={18} color={Colors.primary} />
+                    )}
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  <Text style={styles.emptyText}>
+                    {searchQuery ? 'Tidak ditemukan' : 'Belum ada data'}
+                  </Text>
+                }
+              />
+            </Pressable>
+          </KeyboardAvoidingView>
         </Pressable>
       </Modal>
     </View>

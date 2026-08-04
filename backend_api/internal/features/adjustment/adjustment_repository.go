@@ -17,9 +17,14 @@ func (r *Repository) GetProductsSimple() ([]ProductSimple, error) {
 func (r *Repository) GetAvailableBatches(productID uint) ([]BatchOptionDTO, error) {
 	var batches []BatchOptionDTO
 	err := config.DB.Table("purchase_items").
-		Select("id as purchase_item_id, tanggal_kadaluwarsa, quantity_remaining, cost_per_base").
+		Select(`
+			id as purchase_item_id,
+			DATE_FORMAT(tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
+			quantity_remaining,
+			cost_per_base
+		`).
 		Where("product_id = ? AND quantity_remaining > 0", productID).
-		Order("tanggal_kadaluwarsa ASC"). // Urutkan dari yang paling tua/dekat kadaluwarsa (Ide 2)
+		Order("tanggal_kadaluwarsa ASC").
 		Scan(&batches).Error
 
 	if err != nil {

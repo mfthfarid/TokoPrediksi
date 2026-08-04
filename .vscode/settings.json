@@ -1,3 +1,8 @@
 {
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "editor.linkedEditing": true,
+  "files.watcherExclude": {
+    "**/node_modules/**": true
+  },
+  "js/ts.validate.enabled": false
 }
