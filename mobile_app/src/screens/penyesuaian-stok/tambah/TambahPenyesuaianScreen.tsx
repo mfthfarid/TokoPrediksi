@@ -29,7 +29,7 @@ import {
 } from '../../../services/stockAdjustmentService';
 import { useToast } from '../../../contexts/ToastContext';
 import { DashboardStackParamList } from '../../../navigation/types';
-import styles from './styles'; // Pastikan Anda menambahkan style banner di file ini nanti
+import styles from './styles';
 
 type NavigationProp = NativeStackNavigationProp<
   DashboardStackParamList,
