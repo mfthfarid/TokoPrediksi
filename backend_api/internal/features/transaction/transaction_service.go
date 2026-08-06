@@ -69,10 +69,16 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 			quantityBase := item.Quantity.Mul(pu.ConversionToBase)
 
 			// FIFO reguler: konsumsi dari batch mana saja (expiryDate = nil)
-			costPrice, err := purchase.ConsumeStock(tx, item.ProductID, nil, quantityBase)
+			totalCostPrice, err := purchase.ConsumeStock(tx, item.ProductID, nil, quantityBase)
 			if err != nil {
 				return err
 			}
+
+			// --- PERBAIKAN: Hitung rata-rata harga modal per 1 item satuan ---
+			// Karena HPP dari ConsumeStock adalah total keseluruhan, kita bagi dengan Quantity
+			perUnitCostDecimal := decimal.NewFromInt(int64(totalCostPrice)).Div(item.Quantity)
+			costPricePerItem := uint(perUnitCostDecimal.Round(0).IntPart())
+			// -----------------------------------------------------------------
 
 			priceAtSale := *pu.SellPrice
 			subtotalDecimal := decimal.NewFromInt(int64(priceAtSale)).Mul(item.Quantity)
@@ -85,7 +91,7 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 				Quantity:      item.Quantity,
 				QuantityBase:  quantityBase,
 				PriceAtSale:   priceAtSale,
-				CostPrice:     costPrice,
+				CostPrice:     costPricePerItem, // <-- Masukkan harga modal per 1 item di sini
 				Subtotal:      subtotal,
 			}
 			if err := tx.Create(transItem).Error; err != nil {
