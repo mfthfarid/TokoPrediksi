@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Spacing } from '../../styles';
+import { Colors, Spacing } from '../../../styles';
 
 const styles = StyleSheet.create({
   backdrop: {

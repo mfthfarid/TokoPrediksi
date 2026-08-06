@@ -10,7 +10,7 @@ import {
 import { Minus, Plus, Trash2, X, ShoppingCart } from 'lucide-react-native';
 import { Colors } from '../../../styles';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
-import { CartItem } from './types';
+import { CartItem } from '../types';
 import styles from './styles';
 
 interface CartModalProps {
