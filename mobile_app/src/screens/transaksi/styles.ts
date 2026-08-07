@@ -1,261 +1,237 @@
-import { StyleSheet, Platform } from 'react-native';
-import { Colors } from '../../styles'; // Pastikan path ini sesuai dengan project Anda
+import { StyleSheet } from 'react-native';
+import { Colors, Spacing } from '../../styles';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA', // Background abu-abu sangat terang agar konten menonjol
+    backgroundColor: Colors.background,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.background,
   },
 
-  // TAB BAR (Transaksi / Riwayat)
+  // Tab Transaksi / Riwayat
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    zIndex: 10,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.md,
+    paddingTop: 12,
+    paddingBottom: 12,
+    gap: 8,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 14,
+    height: 38,
+    borderRadius: 10,
     alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   tabButtonActive: {
-    borderBottomColor: Colors.primary,
-  },
-  tabText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#9CA3AF', // Abu-abu
-  },
-  tabTextActive: {
-    color: Colors.primary,
+    backgroundColor: '#fff',
   },
   tabRiwayatContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  tabTextActive: {
+    color: Colors.primary,
   },
 
-  // MAIN CONTENT AREA
   content: {
     flex: 1,
+    padding: 16,
   },
 
-  // SEARCH BAR & SCAN BUTTON
+  // Search + scan
   searchRow: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 12,
     alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.md,
   },
   searchContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 10,
     paddingHorizontal: 12,
-    height: 48,
+    height: 44,
+    gap: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#eee',
   },
   searchInput: {
     flex: 1,
-    marginLeft: 10,
     fontSize: 14,
-    color: '#1F2937',
-    height: '100%',
+    color: Colors.text,
+    padding: 0,
   },
   scanButton: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     backgroundColor: Colors.primary,
-    borderRadius: 8,
-    justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    justifyContent: 'center',
   },
 
-  // CATEGORY FILTER
+  // Filter kategori
   categoryList: {
-    maxHeight: 44, // Mencegah flatlist kategori melebar vertikal
-    marginBottom: 12,
+    flexGrow: 0,
+    marginBottom: Spacing.md,
   },
   categoryListContent: {
-    paddingHorizontal: 16,
     gap: 8,
-    alignItems: 'center',
   },
   categoryChip: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
+    borderRadius: 999,
     backgroundColor: '#fff',
-    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#eee',
   },
   categoryChipActive: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
   categoryChipText: {
-    fontSize: 13,
-    color: '#6B7280',
-    fontWeight: '500',
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '600',
   },
   categoryChipTextActive: {
     color: '#fff',
-    fontWeight: 'bold',
   },
 
-  // PRODUCT GRID
+  // Grid produk
   productList: {
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 100, // Ruang lega di bawah agar item terakhir tidak tertutup Cart Bar
+    paddingBottom: 90, // ruang buat cart bar floating
   },
   row: {
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
   },
   card: {
-    width: '48%', // Untuk 2 kolom di Flatlist
+    width: '48%',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 10,
-    marginBottom: 16,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
-    // Shadow ringan
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    borderColor: '#f0f0f0',
   },
   imagePlaceholder: {
-    height: 90,
-    backgroundColor: '#F3F4F6',
+    height: 70,
     borderRadius: 8,
-    justifyContent: 'center',
+    backgroundColor: '#eff6ff',
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   imagePlaceholderText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#D1D5DB',
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.primary,
   },
   productName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.text,
   },
   stockText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 10,
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 2,
+    marginBottom: 6,
   },
 
-  // UNIT BUTTONS (DALAM KARTU)
   unitButtonsRow: {
-    flexDirection: 'column', // Disusun ke bawah (vertikal) di dalam card
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
-  noUnitText: {
-    fontSize: 11,
-    color: '#EF4444',
-    fontStyle: 'italic',
-    textAlign: 'center',
-    paddingVertical: 4,
-  },
   unitButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 6,
-    paddingVertical: 8,
+    flexGrow: 1,
+    minWidth: '47%',
+    backgroundColor: '#eff6ff',
+    borderRadius: 8,
+    paddingVertical: 6,
     paddingHorizontal: 8,
+    alignItems: 'center',
   },
   unitButtonName: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#4B5563',
-    flex: 1,
-    marginRight: 4,
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.primary,
   },
   unitButtonPrice: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.text,
+    marginTop: 1,
+  },
+  noUnitText: {
+    fontSize: 10,
+    color: '#999',
+    fontStyle: 'italic',
   },
 
-  // EMPTY STATE (Barang Kosong)
   emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 60,
+    paddingVertical: 60,
   },
   emptyText: {
-    color: '#9CA3AF',
-    fontSize: 15,
+    color: Colors.textSecondary,
+    fontSize: 13,
   },
 
-  // FLOATING CART BAR (Bawah)
+  // Floating cart bar
   cartBar: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 24 : 16,
     left: 16,
     right: 16,
-    backgroundColor: Colors.primary,
+    bottom: 16,
+    height: 52,
     borderRadius: 14,
+    backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    // Efek melayang
-    elevation: 8,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    paddingHorizontal: 16,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
     shadowRadius: 6,
   },
   cartBarLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12, // Jarak icon dengan teks
+    gap: 8,
   },
   cartBarText: {
     color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   cartBarTotal: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
 
