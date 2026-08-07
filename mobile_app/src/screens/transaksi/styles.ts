@@ -14,24 +14,28 @@ const styles = StyleSheet.create({
   },
 
   // Tab Transaksi / Riwayat
+  // Tab Transaksi / Riwayat
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.md,
-    paddingTop: 12,
-    paddingBottom: 12,
-    gap: 8,
+    backgroundColor: Colors.background, // <-- Diubah menyatu dengan background utama
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8, // Jarak bawah sedikit dirapatkan dengan search bar
+    gap: 12, // Jarak antar tombol agak dilebarkan sedikit
   },
   tabButton: {
     flex: 1,
-    height: 38,
-    borderRadius: 10,
+    height: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: '#fff', // Tombol mati berwarna putih
+    borderWidth: 1,
+    borderColor: '#e5e5e5', // Garis pinggir tipis agar tombol mati tetap terlihat
   },
   tabButtonActive: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.primary, // Tombol hidup berwarna utama (biru)
+    borderColor: Colors.primary, // Border ikut biru agar rapi
   },
   tabRiwayatContent: {
     flexDirection: 'row',
@@ -41,10 +45,10 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.textSecondary, // Teks tombol mati warna abu-abu
   },
   tabTextActive: {
-    color: Colors.primary,
+    color: '#fff', // Teks tombol hidup warna putih
   },
 
   content: {
