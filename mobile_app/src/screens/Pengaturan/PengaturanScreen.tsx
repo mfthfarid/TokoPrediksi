@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Switch, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Switch,
+  Alert,
+  StyleSheet,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenLayout from '../../layouts/ScreenLayout';
-import { PengaturanStyles } from './PengaturanStyles';
+import { PengaturanStyles } from './PengaturanStyles'; // Asumsi style di-import dari file terpisah
 import { useAuth } from '../../contexts/AuthContext';
 
 const PengaturanScreen = () => {
   const { isBiometricEnabled, enableBiometric, disableBiometric, logout } =
     useAuth();
   const [toggling, setToggling] = useState(false);
+
+  // State sementara untuk toggle notifikasi (Nanti bisa dihubungkan ke AsyncStorage/Backend)
+  const [notifStok, setNotifStok] = useState(true);
+  const [notifExpired, setNotifExpired] = useState(true);
 
   const handleToggleBiometric = async (value: boolean) => {
     setToggling(true);
@@ -42,16 +53,6 @@ const PengaturanScreen = () => {
 
   return (
     <ScreenLayout title="Pengaturan" subtitle="Konfigurasi Aplikasi">
-      {/* Bagian Toko */}
-      <View style={PengaturanStyles.settingsSection}>
-        <Text style={PengaturanStyles.settingsSectionTitle}>Toko</Text>
-        <TouchableOpacity style={PengaturanStyles.settingItem}>
-          <Icon name="store" size={24} color="#666" />
-          <Text style={PengaturanStyles.settingText}>Informasi Toko</Text>
-          <Icon name="chevron-right" size={24} color="#ccc" />
-        </TouchableOpacity>
-      </View>
-
       {/* Bagian Keamanan */}
       <View style={PengaturanStyles.settingsSection}>
         <Text style={PengaturanStyles.settingsSectionTitle}>Keamanan</Text>
@@ -66,27 +67,45 @@ const PengaturanScreen = () => {
         </View>
       </View>
 
-      {/* Bagian Data */}
+      {/* Bagian Notifikasi (Poin 3) */}
       <View style={PengaturanStyles.settingsSection}>
-        <Text style={PengaturanStyles.settingsSectionTitle}>Data</Text>
-        <TouchableOpacity style={PengaturanStyles.settingItem}>
-          <Icon name="cloud-upload" size={24} color="#666" />
-          <Text style={PengaturanStyles.settingText}>Backup Data</Text>
-          <Icon name="chevron-right" size={24} color="#ccc" />
-        </TouchableOpacity>
+        <Text style={PengaturanStyles.settingsSectionTitle}>
+          Preferensi Notifikasi
+        </Text>
 
-        <TouchableOpacity style={PengaturanStyles.settingItem}>
-          <Icon name="file-export" size={24} color="#666" />
-          <Text style={PengaturanStyles.settingText}>Export Laporan</Text>
-          <Icon name="chevron-right" size={24} color="#ccc" />
-        </TouchableOpacity>
+        <View style={PengaturanStyles.settingItem}>
+          <Icon name="bell-alert-outline" size={24} color="#666" />
+          <Text style={PengaturanStyles.settingText}>
+            Peringatan Stok Menipis
+          </Text>
+          <Switch value={notifStok} onValueChange={setNotifStok} />
+        </View>
+
+        <View style={PengaturanStyles.settingItem}>
+          <Icon name="calendar-alert" size={24} color="#666" />
+          <Text style={PengaturanStyles.settingText}>
+            Peringatan Kedaluwarsa
+          </Text>
+          <Switch value={notifExpired} onValueChange={setNotifExpired} />
+        </View>
       </View>
 
-      {/* Bagian Tentang */}
+      {/* Bagian Tentang (Poin 4) */}
       <View style={PengaturanStyles.settingsSection}>
-        <Text style={PengaturanStyles.settingsSectionTitle}>Tentang</Text>
+        <Text style={PengaturanStyles.settingsSectionTitle}>
+          Informasi & Dukungan
+        </Text>
+
+        {/* Tombol Pusat Bantuan */}
+        <TouchableOpacity style={PengaturanStyles.settingItem}>
+          <Icon name="help-circle-outline" size={24} color="#666" />
+          <Text style={PengaturanStyles.settingText}>Pusat Bantuan / FAQ</Text>
+          <Icon name="chevron-right" size={24} color="#ccc" />
+        </TouchableOpacity>
+
+        {/* Informasi Versi */}
         <View style={PengaturanStyles.settingItem}>
-          <Icon name="information" size={24} color="#666" />
+          <Icon name="information-outline" size={24} color="#666" />
           <Text style={PengaturanStyles.settingText}>Versi Aplikasi</Text>
           <Text style={PengaturanStyles.settingVersion}>v1.0.0</Text>
         </View>
