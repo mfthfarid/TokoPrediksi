@@ -16,7 +16,7 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 		`).
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
 		Joins("JOIN products ON products.id = transaction_items.product_id").
-		Where("transactions.transaction_date BETWEEN ? AND ?", startDate, endDate)
+		Where("DATE(transactions.transaction_date) BETWEEN ? AND ?", startDate, endDate) // sebelumnya tanpa DATE(...)
 
 	if productID != nil {
 		query = query.Where("transaction_items.product_id = ?", *productID)
