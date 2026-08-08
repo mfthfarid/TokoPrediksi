@@ -10,7 +10,7 @@ func (r *DashboardRepository) GetTotalSalesToday() (uint, error) {
 	var total uint
 	err := config.DB.Table("transactions").
 		Select("COALESCE(SUM(final_amount), 0)").
-		Where("transaction_date = CURDATE()").
+		Where("DATE(transaction_date) = CURDATE()"). // sebelumnya: transaction_date = CURDATE()
 		Scan(&total).Error
 	return total, err
 }
@@ -18,7 +18,7 @@ func (r *DashboardRepository) GetTotalSalesToday() (uint, error) {
 func (r *DashboardRepository) GetTotalTransactionsToday() (int, error) {
 	var count int64
 	err := config.DB.Table("transactions").
-		Where("transaction_date = CURDATE()").
+		Where("DATE(transaction_date) = CURDATE()").
 		Count(&count).Error
 	return int(count), err
 }
@@ -28,7 +28,7 @@ func (r *DashboardRepository) GetTotalProfitToday() (int, error) {
 	err := config.DB.Table("transaction_items").
 		Select("COALESCE(SUM((CAST(transaction_items.price_at_sale AS SIGNED) - CAST(transaction_items.cost_price AS SIGNED)) * transaction_items.quantity), 0)").
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
-		Where("transactions.transaction_date = CURDATE()").
+		Where("DATE(transactions.transaction_date) = CURDATE()").
 		Scan(&total).Error
 	return int(total), err
 }
