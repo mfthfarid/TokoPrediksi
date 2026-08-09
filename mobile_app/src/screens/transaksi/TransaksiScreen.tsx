@@ -234,7 +234,12 @@ const TransaksiScreen = () => {
   }
 
   return (
-    <ScreenLayout title="Transaksi" paddingHorizontal={0} paddingVertical={0}>
+    <ScreenLayout
+      title="Transaksi"
+      paddingHorizontal={0}
+      paddingVertical={0}
+      scrollable={false}
+    >
       <View style={styles.container}>
         {/* Tab Transaksi / Riwayat */}
         <View style={styles.tabRow}>

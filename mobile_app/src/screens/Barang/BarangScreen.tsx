@@ -118,7 +118,7 @@ const BarangScreen = () => {
   return (
     <ScreenLayout
       title="Barang"
-      subtitle="Kelola Data Barang"
+      // subtitle="Kelola Data Barang"
       scrollable={false}
     >
       {/* Search + Tambah */}
