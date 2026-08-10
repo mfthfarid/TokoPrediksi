@@ -22,6 +22,9 @@ import { createTransaction } from '../../services/transactionService';
 import { useToast } from '../../contexts/ToastContext';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import BarcodeScannerModal from '../../components/common/BarcodeScannerModal';
+import RiwayatTransaksiView from './riwayat/RiwayatTransaksiScreen';
+import FastImage from 'react-native-fast-image';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CartModal from './cart/CartModal';
 import PaymentModal from './payment/PaymentModal';
 import { CartItem } from './types';
@@ -264,9 +267,7 @@ const TransaksiScreen = () => {
               styles.tabButton,
               activeTab === 'riwayat' && styles.tabButtonActive,
             ]}
-            onPress={() =>
-              toast.error('Riwayat transaksi masih dalam pengembangan')
-            }
+            onPress={() => setActiveTab('riwayat')}
           >
             <View style={styles.tabRiwayatContent}>
               <History
@@ -285,117 +286,127 @@ const TransaksiScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.content}>
-          {/* Search + scan */}
-          <View style={styles.searchRow}>
-            <View style={styles.searchContainer}>
-              <Search size={18} color="#999" />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Cari nama barang..."
-                placeholderTextColor="#999"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.scanButton}
-              onPress={handleOpenScanner}
-            >
-              <ScanLine size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Filter kategori */}
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={categories}
-            keyExtractor={(item, index) => `${item}-${index}`}
-            style={styles.categoryList}
-            contentContainerStyle={styles.categoryListContent}
-            renderItem={({ item }) => {
-              const isActive = item === selectedCategory;
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.categoryChip,
-                    isActive && styles.categoryChipActive,
-                  ]}
-                  onPress={() => setSelectedCategory(item)}
-                >
-                  <Text
-                    style={[
-                      styles.categoryChipText,
-                      isActive && styles.categoryChipTextActive,
-                    ]}
-                  >
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
-
-          {/* Grid produk */}
-          <FlatList
-            style={styles.productList}
-            data={filteredProducts}
-            keyExtractor={item => String(item.id)}
-            numColumns={2}
-            columnWrapperStyle={styles.row}
-            contentContainerStyle={styles.listContent}
-            renderItem={({ item }) => {
-              const activeUnits = item.units.filter(u => u.is_active);
-              const stock = parseFloat(item.stock) || 0;
-
-              return (
-                <View style={styles.card}>
-                  <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>
-                      {item.name.charAt(0).toUpperCase()}
-                    </Text>
-                  </View>
-
-                  <Text style={styles.productName} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.stockText}>Stok {stock}</Text>
-
-                  <View style={styles.unitButtonsRow}>
-                    {activeUnits.length === 0 && (
-                      <Text style={styles.noUnitText}>
-                        Belum ada satuan aktif
-                      </Text>
-                    )}
-                    {activeUnits.map(unit => (
-                      <TouchableOpacity
-                        key={unit.id}
-                        style={styles.unitButton}
-                        onPress={() => addToCart(item, unit)}
-                        disabled={unit.sell_price == null}
-                      >
-                        <Text style={styles.unitButtonName} numberOfLines={1}>
-                          {unit.unit.name}
-                        </Text>
-                        <Text style={styles.unitButtonPrice}>
-                          {unit.sell_price != null
-                            ? formatRupiah(unit.sell_price)
-                            : '-'}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              );
-            }}
-            ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>Barang tidak ditemukan</Text>
+        {activeTab === 'riwayat' ? (
+          <RiwayatTransaksiView />
+        ) : (
+          <View style={styles.content}>
+            {/* Search + scan */}
+            <View style={styles.searchRow}>
+              <View style={styles.searchContainer}>
+                <Search size={18} color="#999" />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Cari nama barang..."
+                  placeholderTextColor="#999"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
               </View>
-            }
-          />
-        </View>
+              <TouchableOpacity
+                style={styles.scanButton}
+                onPress={handleOpenScanner}
+              >
+                <ScanLine size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Filter kategori */}
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={categories}
+              keyExtractor={(item, index) => `${item}-${index}`}
+              style={styles.categoryList}
+              contentContainerStyle={styles.categoryListContent}
+              renderItem={({ item }) => {
+                const isActive = item === selectedCategory;
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.categoryChip,
+                      isActive && styles.categoryChipActive,
+                    ]}
+                    onPress={() => setSelectedCategory(item)}
+                  >
+                    <Text
+                      style={[
+                        styles.categoryChipText,
+                        isActive && styles.categoryChipTextActive,
+                      ]}
+                    >
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+
+            {/* Grid produk */}
+            <FlatList
+              style={styles.productList}
+              data={filteredProducts}
+              keyExtractor={item => String(item.id)}
+              numColumns={2}
+              columnWrapperStyle={styles.row}
+              contentContainerStyle={styles.listContent}
+              renderItem={({ item }) => {
+                const activeUnits = item.units.filter(u => u.is_active);
+                const stock = parseFloat(item.stock) || 0;
+
+                return (
+                  <View style={styles.card}>
+                    <View style={styles.imagePlaceholder}>
+                      {item.photo_thumbnail_url ? (
+                        <FastImage
+                          source={{ uri: item.photo_thumbnail_url }}
+                          style={styles.productImage}
+                          resizeMode={FastImage.resizeMode.cover}
+                        />
+                      ) : (
+                        <Icon name="image-outline" size={28} color="#bbb" />
+                      )}
+                    </View>
+
+                    <Text style={styles.productName} numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.stockText}>Stok {stock}</Text>
+
+                    <View style={styles.unitButtonsRow}>
+                      {activeUnits.length === 0 && (
+                        <Text style={styles.noUnitText}>
+                          Belum ada satuan aktif
+                        </Text>
+                      )}
+                      {activeUnits.map(unit => (
+                        <TouchableOpacity
+                          key={unit.id}
+                          style={styles.unitButton}
+                          onPress={() => addToCart(item, unit)}
+                          disabled={unit.sell_price == null}
+                        >
+                          <Text style={styles.unitButtonName} numberOfLines={1}>
+                            {unit.unit.name}
+                          </Text>
+                          <Text style={styles.unitButtonPrice}>
+                            {unit.sell_price != null
+                              ? formatRupiah(unit.sell_price)
+                              : '-'}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                );
+              }}
+              ListEmptyComponent={
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyText}>Barang tidak ditemukan</Text>
+                </View>
+              }
+            />
+          </View>
+        )}
 
         {/* Floating cart bar */}
         {cart.length > 0 && (

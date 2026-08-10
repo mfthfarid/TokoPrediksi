@@ -145,17 +145,17 @@ const styles = StyleSheet.create({
     borderColor: '#f0f0f0',
   },
   imagePlaceholder: {
-    height: 70,
+    height: 80,
     borderRadius: 8,
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#f5f5f5',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
   },
-  imagePlaceholderText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Colors.primary,
+  productImage: {
+    width: '100%',
+    height: '100%',
   },
   productName: {
     fontSize: 13,
