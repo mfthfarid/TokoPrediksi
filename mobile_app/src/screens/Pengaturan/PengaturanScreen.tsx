@@ -9,13 +9,22 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenLayout from '../../layouts/ScreenLayout';
-import { PengaturanStyles } from './PengaturanStyles'; // Asumsi style di-import dari file terpisah
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { PengaturanStackParamList } from '../../navigation/types';
+import { PengaturanStyles } from './PengaturanStyles';
 import { useAuth } from '../../contexts/AuthContext';
+
+type NavigationProp = NativeStackNavigationProp<
+  PengaturanStackParamList,
+  'Pengaturan'
+>;
 
 const PengaturanScreen = () => {
   const { isBiometricEnabled, enableBiometric, disableBiometric, logout } =
     useAuth();
   const [toggling, setToggling] = useState(false);
+  const navigation = useNavigation<NavigationProp>();
 
   // State sementara untuk toggle notifikasi (Nanti bisa dihubungkan ke AsyncStorage/Backend)
   const [notifStok, setNotifStok] = useState(true);
@@ -53,6 +62,26 @@ const PengaturanScreen = () => {
 
   return (
     <ScreenLayout title="Pengaturan" subtitle="Konfigurasi Aplikasi">
+      {/* Bagian Akun & Profil */}
+      <View style={PengaturanStyles.settingsSection}>
+        <Text style={PengaturanStyles.settingsSectionTitle}>Akun & Profil</Text>
+
+        <TouchableOpacity
+          style={PengaturanStyles.settingItem}
+          onPress={() => {
+            navigation.navigate('Profil');
+            // Arahkan ke halaman edit profil / ubah password
+            // navigation.navigate('EditProfil' as never);
+          }}
+        >
+          <Icon name="account-cog-outline" size={24} color="#666" />
+          <Text style={PengaturanStyles.settingText}>
+            Ubah Nama, Email & Kata Sandi
+          </Text>
+          <Icon name="chevron-right" size={24} color="#ccc" />
+        </TouchableOpacity>
+      </View>
+
       {/* Bagian Keamanan */}
       <View style={PengaturanStyles.settingsSection}>
         <Text style={PengaturanStyles.settingsSectionTitle}>Keamanan</Text>
