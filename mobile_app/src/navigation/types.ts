@@ -53,4 +53,5 @@ export type PrediksiStackParamList = {
 
 export type PengaturanStackParamList = {
   Pengaturan: undefined;
+  Profil: undefined;
 };
