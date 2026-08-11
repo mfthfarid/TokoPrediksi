@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { User, Mail, Lock, ShieldCheck } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout'; // Sesuaikan path Anda
 import PrimaryButton from '../../components/ui/PrimaryButton'; // Sesuaikan path Anda
+import PasswordField from '../../components/ui/PasswordField';
 import { Colors } from '../../styles'; // Sesuaikan path Anda
 import styles from './styles';
 
@@ -18,6 +19,8 @@ const EditProfilScreen = () => {
   // State untuk keamanan (opsional)
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // State loading
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -128,7 +131,21 @@ const EditProfilScreen = () => {
           Kosongkan bagian ini jika Anda tidak ingin mengubah kata sandi.
         </Text>
 
-        <View style={styles.inputGroup}>
+        <PasswordField
+          label="Password Saat Ini"
+          placeholder="Masukkan password lama"
+          value={currentPassword}
+          onChangeText={setCurrentPassword}
+          leftIcon={<Lock size={20} color={Colors.textSecondary} />}
+        />
+        <PasswordField
+          label="Password Baru"
+          placeholder="Masukkan password baru"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          leftIcon={<Lock size={20} color={Colors.textSecondary} />}
+        />
+        {/* <View style={styles.inputGroup}>
           <Text style={styles.label}>Kata Sandi Saat Ini</Text>
           <View style={styles.inputContainer}>
             <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
@@ -140,9 +157,9 @@ const EditProfilScreen = () => {
               secureTextEntry
             />
           </View>
-        </View>
+        </View> */}
 
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <Text style={styles.label}>Kata Sandi Baru</Text>
           <View style={styles.inputContainer}>
             <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
@@ -154,7 +171,7 @@ const EditProfilScreen = () => {
               secureTextEntry
             />
           </View>
-        </View>
+        </View> */}
       </View>
     </ScreenLayout>
   );
