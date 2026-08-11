@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../../styles'; // Pastikan path ini menunjuk ke file Colors global Anda
+import { Colors } from '../../styles';
 
 const styles = StyleSheet.create({
   card: {
@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#eee',
-    // Efek shadow ringan untuk kesan premium
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -33,39 +32,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 18,
   },
-  inputGroup: {
+  // Style baru untuk memberi jarak antar komponen TextField
+  fieldWrapper: {
     marginBottom: 16,
   },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 8,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FAFAFA',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    height: 48,
-  },
-  inputErrorBorder: {
-    borderColor: '#F44336', // Warna merah jika error
-    backgroundColor: '#FFEBEE',
-  },
-  inputIcon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.text,
-  },
   errorText: {
-    color: '#F44336', // Merah danger
+    color: '#F44336',
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
@@ -75,7 +47,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    // Memastikan footer tidak tumpang tindih dengan shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.05,

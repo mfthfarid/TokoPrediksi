@@ -5,6 +5,7 @@ import { User, Mail, Lock, ShieldCheck } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout'; // Sesuaikan path Anda
 import PrimaryButton from '../../components/ui/PrimaryButton'; // Sesuaikan path Anda
 import PasswordField from '../../components/ui/PasswordField';
+import TextField from '../../components/ui/TextField';
 import { Colors } from '../../styles'; // Sesuaikan path Anda
 import styles from './styles';
 
@@ -19,8 +20,8 @@ const EditProfilScreen = () => {
   // State untuk keamanan (opsional)
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [confirmPassword, setConfirmPassword] = useState('');
 
   // State loading
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,36 +85,26 @@ const EditProfilScreen = () => {
           <Text style={styles.cardTitle}>Informasi Pribadi</Text>
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nama Lengkap</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Masukkan nama lengkap"
-            />
-          </View>
+        {/* Menggunakan TextField agar konsisten */}
+        <View style={styles.fieldWrapper}>
+          <TextField
+            label="Nama Lengkap"
+            placeholder="Masukkan nama lengkap"
+            value={name}
+            onChangeText={setName}
+          />
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Alamat Email</Text>
-          <View
-            style={[
-              styles.inputContainer,
-              emailError ? styles.inputErrorBorder : null,
-            ]}
-          >
-            <Mail size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={validateEmail}
-              placeholder="Masukkan alamat email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+        <View style={styles.fieldWrapper}>
+          <TextField
+            label="Alamat Email"
+            placeholder="Masukkan alamat email"
+            value={email}
+            onChangeText={validateEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            leftIcon={<Mail size={20} color={Colors.textSecondary} />}
+          />
           {/* Teks Peringatan Validasi Real-time */}
           {emailError ? (
             <Text style={styles.errorText}>{emailError}</Text>
@@ -131,47 +122,25 @@ const EditProfilScreen = () => {
           Kosongkan bagian ini jika Anda tidak ingin mengubah kata sandi.
         </Text>
 
-        <PasswordField
-          label="Password Saat Ini"
-          placeholder="Masukkan password lama"
-          value={currentPassword}
-          onChangeText={setCurrentPassword}
-          leftIcon={<Lock size={20} color={Colors.textSecondary} />}
-        />
-        <PasswordField
-          label="Password Baru"
-          placeholder="Masukkan password baru"
-          value={newPassword}
-          onChangeText={setNewPassword}
-          leftIcon={<Lock size={20} color={Colors.textSecondary} />}
-        />
-        {/* <View style={styles.inputGroup}>
-          <Text style={styles.label}>Kata Sandi Saat Ini</Text>
-          <View style={styles.inputContainer}>
-            <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              placeholder="Masukkan kata sandi lama"
-              secureTextEntry
-            />
-          </View>
-        </View> */}
+        <View style={styles.fieldWrapper}>
+          <PasswordField
+            label="Password Saat Ini"
+            placeholder="Masukkan password lama"
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            leftIcon={<Lock size={20} color={Colors.textSecondary} />}
+          />
+        </View>
 
-        {/* <View style={styles.inputGroup}>
-          <Text style={styles.label}>Kata Sandi Baru</Text>
-          <View style={styles.inputContainer}>
-            <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={newPassword}
-              onChangeText={setNewPassword}
-              placeholder="Masukkan kata sandi baru"
-              secureTextEntry
-            />
-          </View>
-        </View> */}
+        <View style={styles.fieldWrapper}>
+          <PasswordField
+            label="Password Baru"
+            placeholder="Masukkan password baru"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            leftIcon={<Lock size={20} color={Colors.textSecondary} />}
+          />
+        </View>
       </View>
     </ScreenLayout>
   );
