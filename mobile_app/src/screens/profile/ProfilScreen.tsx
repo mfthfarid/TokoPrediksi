@@ -1,163 +1,299 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { User, Mail, Lock, ShieldCheck } from 'lucide-react-native';
-import ScreenLayout from '../../layouts/ScreenLayout'; // Sesuaikan path Anda
-import PrimaryButton from '../../components/ui/PrimaryButton'; // Sesuaikan path Anda
-import { Colors } from '../../styles'; // Sesuaikan path Anda
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import { User, Mail, Lock, Edit2 } from 'lucide-react-native';
+import ScreenLayout from '../../layouts/ScreenLayout';
+import TextField from '../../components/ui/TextField';
+import PasswordField from '../../components/ui/PasswordField';
+import PrimaryButton from '../../components/ui/PrimaryButton';
+import { Colors } from '../../styles';
+import {
+  getCurrentUser,
+  updateProfile,
+  updatePassword,
+} from '../../services/userService';
+import { extractErrorMessage } from '../../utils/errorMessage';
+import { useToast } from '../../contexts/ToastContext';
 import styles from './styles';
 
-const EditProfilScreen = () => {
-  const navigation = useNavigation();
+const ProfilScreen = () => {
+  const toast = useToast();
+  const [loading, setLoading] = useState(true);
 
-  // State untuk form
-  const [name, setName] = useState('Budi Kasir');
-  const [email, setEmail] = useState('budi@tokoprediksi.com');
-  const [emailError, setEmailError] = useState('');
+  // UX State untuk Profil
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [originalName, setOriginalName] = useState('');
+  const [originalEmail, setOriginalEmail] = useState('');
 
-  // State untuk keamanan (opsional)
-  const [currentPassword, setCurrentPassword] = useState('');
+  // Bagian profil
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // UX State untuk Password
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+
+  // Bagian password
+  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
 
-  // State loading
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getCurrentUser();
+        setName(response.data.name);
+        setEmail(response.data.email);
+        setOriginalName(response.data.name);
+        setOriginalEmail(response.data.email);
+      } catch (error) {
+        toast.error('Gagal memuat data profil');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Fungsi Validasi Email Real-time
-  const validateEmail = (text: string) => {
-    setEmail(text);
-    // Regex sederhana untuk mengecek format email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (text.length > 0 && !emailRegex.test(text)) {
-      setEmailError('Format email tidak valid (contoh: nama@email.com)');
-    } else {
-      setEmailError('');
-    }
+  const handleCancelProfileEdit = () => {
+    setName(originalName);
+    setEmail(originalEmail);
+    setIsEditingProfile(false);
   };
 
-  // Fungsi Simpan Perubahan
-  const handleSave = () => {
-    if (emailError) {
-      Alert.alert('Gagal', 'Silakan perbaiki format email terlebih dahulu.');
+  const handleCancelPasswordEdit = () => {
+    // Kosongkan form password jika batal
+    setOldPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setIsEditingPassword(false);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!name.trim()) {
+      Alert.alert('Periksa Kembali', 'Nama tidak boleh kosong');
+      return;
+    }
+    if (!email.trim()) {
+      Alert.alert('Periksa Kembali', 'Email tidak boleh kosong');
       return;
     }
 
-    if (!name.trim() || !email.trim()) {
-      Alert.alert('Gagal', 'Nama dan Email tidak boleh kosong.');
+    setSavingProfile(true);
+    try {
+      const response = await updateProfile({
+        name: name.trim(),
+        email: email.trim(),
+      });
+      setName(response.data.name);
+      setEmail(response.data.email);
+      setOriginalName(response.data.name);
+      setOriginalEmail(response.data.email);
+
+      toast.success('Profil berhasil diperbarui');
+      setIsEditingProfile(false);
+    } catch (error) {
+      toast.error(extractErrorMessage(error, 'Gagal memperbarui profil'));
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      Alert.alert('Periksa Kembali', 'Semua kolom password wajib diisi');
+      return;
+    }
+    if (newPassword.length < 6) {
+      Alert.alert('Periksa Kembali', 'Password baru minimal 6 karakter');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Periksa Kembali', 'Konfirmasi password tidak cocok');
       return;
     }
 
-    // Mulai animasi loading
-    setIsSubmitting(true);
-
-    // Simulasi proses ke Backend (API Call)
-    setTimeout(() => {
-      setIsSubmitting(false);
-      Alert.alert('Berhasil', 'Profil Anda berhasil diperbarui!', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    }, 1500); // Simulasi delay 1.5 detik
+    setSavingPassword(true);
+    try {
+      await updatePassword({
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      });
+      toast.success('Password berhasil diubah');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setIsEditingPassword(false); // Kunci form password setelah sukses
+    } catch (error) {
+      toast.error(extractErrorMessage(error, 'Gagal mengubah password'));
+    } finally {
+      setSavingPassword(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
-    <ScreenLayout
-      title="Profil & Akun"
-      subtitle="Kelola informasi pribadi dan keamanan akun Anda"
-      // Memanfaatkan prop footer yang pernah kita diskusikan (Sticky Footer)
-      footer={
-        <View style={styles.footerContainer}>
-          <PrimaryButton
-            title={isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-            onPress={handleSave}
-            disabled={isSubmitting || emailError.length > 0}
-            loading={isSubmitting} // Asumsi PrimaryButton Anda mendukung prop loading
-          />
-        </View>
-      }
-    >
-      {/* Kartu Informasi Pribadi */}
+    <ScreenLayout title="Profil" subtitle="Akun & Keamanan">
+      {/* KARTU PROFIL */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <User size={20} color={Colors.primary} />
-          <Text style={styles.cardTitle}>Informasi Pribadi</Text>
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.cardTitle}>Informasi Akun</Text>
+          {!isEditingProfile && (
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setIsEditingProfile(true)}
+            >
+              <Edit2 size={14} color={Colors.primary} />
+              <Text style={styles.editButtonText}>Edit</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nama Lengkap</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Masukkan nama lengkap"
+        <TextField
+          label="Nama"
+          placeholder="Nama lengkap"
+          value={name}
+          onChangeText={setName}
+          editable={isEditingProfile}
+          leftIcon={
+            <User
+              size={18}
+              color={isEditingProfile ? Colors.primary : Colors.textSecondary}
             />
-          </View>
-        </View>
+          }
+        />
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Alamat Email</Text>
-          <View
-            style={[
-              styles.inputContainer,
-              emailError ? styles.inputErrorBorder : null,
-            ]}
-          >
-            <Mail size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={validateEmail}
-              placeholder="Masukkan alamat email"
-              keyboardType="email-address"
-              autoCapitalize="none"
+        <TextField
+          label="Email"
+          placeholder="Alamat email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={isEditingProfile}
+          leftIcon={
+            <Mail
+              size={18}
+              color={isEditingProfile ? Colors.primary : Colors.textSecondary}
             />
+          }
+        />
+
+        {isEditingProfile && (
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancelProfileEdit}
+            >
+              <Text style={styles.cancelButtonText}>Batal</Text>
+            </TouchableOpacity>
+            <View style={styles.saveButtonContainer}>
+              <PrimaryButton
+                title="Simpan"
+                loadingTitle="Menyimpan..."
+                loading={savingProfile}
+                onPress={handleSaveProfile}
+              />
+            </View>
           </View>
-          {/* Teks Peringatan Validasi Real-time */}
-          {emailError ? (
-            <Text style={styles.errorText}>{emailError}</Text>
-          ) : null}
-        </View>
+        )}
       </View>
 
-      {/* Kartu Keamanan Akun */}
+      {/* KARTU GANTI PASSWORD */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <ShieldCheck size={20} color={Colors.primary} />
-          <Text style={styles.cardTitle}>Keamanan Akun (Opsional)</Text>
-        </View>
-        <Text style={styles.cardDescription}>
-          Kosongkan bagian ini jika Anda tidak ingin mengubah kata sandi.
-        </Text>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Kata Sandi Saat Ini</Text>
-          <View style={styles.inputContainer}>
-            <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              placeholder="Masukkan kata sandi lama"
-              secureTextEntry
-            />
-          </View>
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.cardTitle}>Ganti Password</Text>
+          {!isEditingPassword && (
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setIsEditingPassword(true)}
+            >
+              <Edit2 size={14} color={Colors.primary} />
+              <Text style={styles.editButtonText}>Ubah</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Kata Sandi Baru</Text>
-          <View style={styles.inputContainer}>
-            <Lock size={18} color="#9e9e9e" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              value={newPassword}
-              onChangeText={setNewPassword}
-              placeholder="Masukkan kata sandi baru"
-              secureTextEntry
+        <PasswordField
+          label="Password Lama"
+          placeholder={
+            isEditingPassword ? 'Masukkan password lama' : '••••••••'
+          }
+          value={oldPassword}
+          onChangeText={setOldPassword}
+          editable={isEditingPassword}
+          leftIcon={
+            <Lock
+              size={18}
+              color={isEditingPassword ? Colors.primary : Colors.textSecondary}
             />
+          }
+        />
+
+        <PasswordField
+          label="Password Baru"
+          placeholder={isEditingPassword ? 'Minimal 6 karakter' : '••••••••'}
+          value={newPassword}
+          onChangeText={setNewPassword}
+          editable={isEditingPassword}
+          leftIcon={
+            <Lock
+              size={18}
+              color={isEditingPassword ? Colors.primary : Colors.textSecondary}
+            />
+          }
+        />
+
+        <PasswordField
+          label="Konfirmasi Password Baru"
+          placeholder={isEditingPassword ? 'Ulangi password baru' : '••••••••'}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          editable={isEditingPassword}
+          leftIcon={
+            <Lock
+              size={18}
+              color={isEditingPassword ? Colors.primary : Colors.textSecondary}
+            />
+          }
+        />
+
+        {isEditingPassword && (
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancelPasswordEdit}
+            >
+              <Text style={styles.cancelButtonText}>Batal</Text>
+            </TouchableOpacity>
+            <View style={styles.saveButtonContainer}>
+              <PrimaryButton
+                title="Simpan"
+                loadingTitle="Menyimpan..."
+                loading={savingPassword}
+                onPress={handleChangePassword}
+              />
+            </View>
           </View>
-        </View>
+        )}
       </View>
     </ScreenLayout>
   );
 };
 
-export default EditProfilScreen;
+export default ProfilScreen;

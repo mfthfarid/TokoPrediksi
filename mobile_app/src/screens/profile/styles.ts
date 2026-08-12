@@ -1,86 +1,78 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../../styles'; // Pastikan path ini menunjuk ke file Colors global Anda
+import { Colors, Spacing } from '../../styles';
 
 const styles = StyleSheet.create({
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+  },
+
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#eee',
-    // Efek shadow ringan untuk kesan premium
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    padding: 14,
+    marginBottom: Spacing.md,
   },
-  cardHeader: {
+  // cardTitle: {
+  //   fontSize: 14,
+  //   fontWeight: '700',
+  //   color: Colors.text,
+  //   marginBottom: Spacing.md,
+  // },
+
+  cardHeaderRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
     color: Colors.text,
-    marginLeft: 8,
+    // hapus marginBottom: Spacing.md dari cardTitle asli, karena sudah di-handle oleh cardHeaderRow
   },
-  cardDescription: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 16,
-    lineHeight: 18,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 8,
-  },
-  inputContainer: {
+  editButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
+    backgroundColor: '#E3F2FD', // Warna biru super muda
     paddingHorizontal: 12,
-    height: 48,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
-  inputErrorBorder: {
-    borderColor: '#F44336', // Warna merah jika error
-    backgroundColor: '#FFEBEE',
-  },
-  inputIcon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.text,
-  },
-  errorText: {
-    color: '#F44336', // Merah danger
+  editButtonText: {
+    color: Colors.primary,
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '600',
     marginLeft: 4,
   },
-  footerContainer: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    // Memastikan footer tidak tumpang tindih dengan shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 5,
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  cancelButtonText: {
+    color: Colors.textSecondary,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  saveButtonContainer: {
+    flex: 1,
+    marginLeft: 8,
   },
 });
 
