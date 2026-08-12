@@ -9,23 +9,46 @@ interface Props extends TextInputProps {
   rightIcon?: React.ReactNode;
 }
 
-const TextField = ({ label, error, leftIcon, rightIcon, ...props }: Props) => {
+const TextField = ({
+  label,
+  error,
+  leftIcon,
+  rightIcon,
+  editable = true,
+  ...props
+}: Props) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={[styles.inputContainer, focused && styles.focused]}>
+
+      <View
+        style={[
+          styles.inputContainer,
+          focused && styles.focused,
+          // Tambahan efek abu-abu saat terkunci
+          !editable && { backgroundColor: '#F5F5F5', borderColor: '#E0E0E0' },
+        ]}
+      >
         {leftIcon}
+
         <TextInput
           {...props}
-          style={styles.input}
-          placeholderTextColor="#999"
+          editable={editable} // Pastikan properti ini diteruskan ke TextInput
+          style={[
+            styles.input,
+            // Tambahan warna teks memudar saat terkunci
+            !editable && { color: '#9E9E9E' },
+          ]}
+          placeholderTextColor={editable ? '#999' : '#BDBDBD'}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
+
         {rightIcon}
       </View>
+
       {!!error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
