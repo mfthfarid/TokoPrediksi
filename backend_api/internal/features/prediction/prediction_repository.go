@@ -50,3 +50,16 @@ func (r *PredictionRepository) FindByProductID(productID uint) ([]Prediction, er
 	}
 	return predictions, nil
 }
+
+func (r *PredictionRepository) GetProductInfo(productID uint) (string, float64, error) {
+	type row struct {
+		Name  string
+		Stock float64
+	}
+	var res row
+	err := config.DB.Table("products").
+		Select("name, stock").
+		Where("id = ?", productID).
+		Scan(&res).Error
+	return res.Name, res.Stock, err
+}

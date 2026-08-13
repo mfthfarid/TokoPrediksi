@@ -28,3 +28,33 @@ type pythonPredictResponse struct {
 	ProductID   uint                     `json:"product_id"`
 	Predictions []pythonPredictionPoint  `json:"predictions"`
 }
+
+type ChartPoint struct {
+	Date     string  `json:"date"`
+	Quantity float64 `json:"quantity"`
+}
+
+type ChartPredictedPoint struct {
+	Date     string `json:"date"`
+	Quantity int    `json:"quantity"`
+	Lower    *int   `json:"lower"`
+	Upper    *int   `json:"upper"`
+}
+
+type ChartData struct {
+	Actual    []ChartPoint          `json:"actual"`
+	Predicted []ChartPredictedPoint `json:"predicted"`
+}
+
+type PredictionSummaryResponse struct {
+	ProductID                  uint       `json:"product_id"`
+	ProductName                string     `json:"product_name"`
+	HasPrediction               bool       `json:"has_prediction"`
+	CurrentStock                float64    `json:"current_stock"`
+	AverageDailySales            float64    `json:"average_daily_sales"`
+	DaysRemaining                 *float64   `json:"days_remaining"` // null kalau rata-rata penjualan 0 (gak bisa dihitung)
+	Urgency                       string     `json:"urgency"`         // "tinggi" | "sedang" | "rendah"
+	RecommendedRestockQuantity    int        `json:"recommended_restock_quantity"`
+	ChartData                     ChartData  `json:"chart_data"`
+	Predictions                   []Prediction `json:"predictions"`
+}
