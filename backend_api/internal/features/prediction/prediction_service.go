@@ -92,6 +92,46 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	return s.buildSummary(productID, toSave, dailySales)
 }
 
+func (s *PredictionService) PredictAll(periods int) error {
+	if periods <= 0 {
+		periods = defaultPeriods
+	}
+
+	// 1. Ambil seluruh ID Produk aktif dari repository
+    // (Anda perlu membuat fungsi GetAllProductIDs di PredictionRepository)
+	productIDs, err := s.repo.GetAllProductIDs()
+	if err != nil {
+		return err
+	}
+
+	// 2. Jalankan proses di background menggunakan Goroutine
+    // Agar API langsung membalas "Proses dimulai" tanpa membuat klien menunggu lama
+	go func() {
+		fmt.Println("Memulai prediksi massal untuk", len(productIDs), "produk...")
+		successCount := 0
+		failCount := 0
+
+		for _, id := range productIDs {
+			// Memanfaatkan fungsi Predict yang sudah Anda buat!
+			_, err := s.Predict(id, periods)
+			if err != nil {
+				// Log error, tapi TETAP LANJUT ke produk berikutnya
+				fmt.Printf("❌ [Produk ID: %d] Gagal: %v\n", id, err)
+				failCount++
+				continue
+			}
+			fmt.Printf("✅ [Produk ID: %d] Berhasil diprediksi\n", id)
+			successCount++
+		}
+
+		fmt.Printf("🏁 Prediksi massal selesai! Berhasil: %d, Gagal: %d\n", successCount, failCount)
+        // Opsional: Di sini Anda bisa menambahkan kode untuk mengirim notifikasi
+        // ke aplikasi (misal via Firebase Cloud Messaging/FCM) bahwa "Prediksi Mingguan Selesai!"
+	}()
+
+	return nil
+}
+
 func (s *PredictionService) GetByProductID(productID uint) (*PredictionSummaryResponse, error) {
 	predictions, err := s.repo.FindByProductID(productID)
 	if err != nil {

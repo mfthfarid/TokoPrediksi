@@ -28,6 +28,20 @@ func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, erro
 	return results, nil
 }
 
+func (r *PredictionRepository) GetAllProductIDs() ([]uint, error) {
+	var ids []uint
+	
+	// Gunakan Pluck untuk efisiensi memori (hanya menarik kolom ID)
+	err := config.DB.Table("products").
+		Where("deleted_at IS NULL"). // (Opsional) Memastikan produk yang sudah di-soft-delete tidak ikut diprediksi
+		Pluck("id", &ids).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
 func (r *PredictionRepository) DeleteByProductID(productID uint) error {
 	return config.DB.Where("product_id = ?", productID).Delete(&Prediction{}).Error
 }
