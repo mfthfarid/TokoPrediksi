@@ -32,9 +32,10 @@ func SetupRouter() *gin.Engine {
 		productGroup := protected.Group("/products")
 		product.RegisterRoutes(productGroup)
 
-		predictionHandler := prediction.NewPredictionHandler()
-		productGroup.POST("/:id/predict", predictionHandler.Predict)
-		productGroup.GET("/:id/predictions", predictionHandler.GetPredictions)
+		prediction.RegisterRoutes(protected)
+		// predictionHandler := prediction.NewPredictionHandler()
+		// productGroup.POST("/:id/predict", predictionHandler.Predict)
+		// productGroup.GET("/:id/predictions", predictionHandler.GetPredictions)
 
 		stockHistoryHandler := stockhistory.NewHandler()
 		productGroup.GET("/:id/stock-history", stockHistoryHandler.GetHistory)
