@@ -15,17 +15,25 @@ type PredictionRepository struct{}
 // tidak bisa langsung di-scan ke field string tanpa konversi eksplisit).
 func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, error) {
 	var results []DailySales
-	err := config.DB.Table("transaction_items").
-		Select("DATE_FORMAT(transactions.transaction_date, '%Y-%m-%d') as ds, SUM(transaction_items.quantity_base) as y").
-		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
-		Where("transaction_items.product_id = ?", productID).
-		Group("transactions.transaction_date").
-		Order("transactions.transaction_date ASC").
-		Scan(&results).Error
-	if err != nil {
-		return nil, err
-	}
-	return results, nil
+	query := `
+		SELECT ds, SUM(y) as y FROM (
+			SELECT DATE_FORMAT(transactions.transaction_date, '%Y-%m-%d') as ds,
+			       transaction_items.quantity_base as y
+			FROM transaction_items
+			JOIN transactions ON transactions.id = transaction_items.transaction_id
+			WHERE transaction_items.product_id = ?
+
+			UNION ALL
+
+			SELECT DATE_FORMAT(sale_date, '%Y-%m-%d') as ds, quantity_sold as y
+			FROM historical_sales
+			WHERE product_id = ?
+		) combined
+		GROUP BY ds
+		ORDER BY ds ASC
+	`
+	err := config.DB.Raw(query, productID, productID).Scan(&results).Error
+	return results, err
 }
 
 func (r *PredictionRepository) GetAllProductIDs() ([]uint, error) {
