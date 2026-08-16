@@ -15,6 +15,15 @@ func NewPredictionHandler() *PredictionHandler {
 	return &PredictionHandler{service: NewPredictionService()}
 }
 
+func (h *PredictionHandler) GetSummary(c *gin.Context) {
+	summary, err := h.service.GetSummary()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil ringkasan prediksi"})
+		return
+	}
+	c.JSON(http.StatusOK, summary)
+}
+
 func (h *PredictionHandler) Predict(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

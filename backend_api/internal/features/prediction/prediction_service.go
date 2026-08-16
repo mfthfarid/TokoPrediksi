@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
@@ -27,6 +28,57 @@ type PredictionService struct {
 
 func NewPredictionService() *PredictionService {
 	return &PredictionService{repo: &PredictionRepository{}}
+}
+
+func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
+	rows, err := s.repo.GetSummaryRaw()
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]PredictionSummaryItem, len(rows))
+	for i, row := range rows {
+		item := PredictionSummaryItem{
+			ProductID:         row.ProductID,
+			ProductName:       row.ProductName,
+			CurrentStock:      row.CurrentStock,
+			AverageDailySales: row.AverageDailySales,
+			HasPrediction:     row.HasPrediction,
+			Urgency:           "rendah",
+		}
+
+		if row.AverageDailySales > 0 {
+			d := math.Round((row.CurrentStock/row.AverageDailySales)*10) / 10
+			item.DaysRemaining = &d
+			switch {
+			case d <= urgencyHighDays:
+				item.Urgency = "tinggi"
+			case d <= urgencyMediumDays:
+				item.Urgency = "sedang"
+			default:
+				item.Urgency = "rendah"
+			}
+		}
+
+		items[i] = item
+	}
+
+	urgencyRank := map[string]int{"tinggi": 0, "sedang": 1, "rendah": 2}
+	sort.Slice(items, func(i, j int) bool {
+		ri, rj := urgencyRank[items[i].Urgency], urgencyRank[items[j].Urgency]
+		if ri != rj {
+			return ri < rj
+		}
+		if items[i].DaysRemaining == nil {
+			return false
+		}
+		if items[j].DaysRemaining == nil {
+			return true
+		}
+		return *items[i].DaysRemaining < *items[j].DaysRemaining
+	})
+
+	return items, nil
 }
 
 func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSummaryResponse, error) {
