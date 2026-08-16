@@ -58,3 +58,13 @@ type PredictionSummaryResponse struct {
 	ChartData                     ChartData  `json:"chart_data"`
 	Predictions                   []Prediction `json:"predictions"`
 }
+
+type PredictionSummaryItem struct {
+	ProductID         uint     `json:"product_id"`
+	ProductName       string   `json:"product_name"`
+	CurrentStock      float64  `json:"current_stock"`
+	AverageDailySales float64  `json:"average_daily_sales"`
+	DaysRemaining     *float64 `json:"days_remaining"`
+	Urgency           string   `json:"urgency"` // "tinggi" | "sedang" | "rendah"
+	HasPrediction     bool     `json:"has_prediction"`
+}
