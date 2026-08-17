@@ -49,6 +49,7 @@ export type TransaksiStackParamList = {
 
 export type PrediksiStackParamList = {
   Prediksi: undefined;
+  DetailPrediksi: { productId: number };
 };
 
 export type PengaturanStackParamList = {

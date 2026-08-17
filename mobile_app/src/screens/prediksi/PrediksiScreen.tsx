@@ -1,248 +1,162 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
+  FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  FlatList,
-  RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
-  Sparkles,
   AlertTriangle,
   TrendingDown,
-  ShoppingCart,
-  Clock,
-  Package,
+  CheckCircle2,
+  HelpCircle,
 } from 'lucide-react-native';
-import ScreenLayout from '../../layouts/ScreenLayout'; // Sesuaikan path jika berbeda
-import { Colors } from '../../styles'; // Sesuaikan path
+import ScreenLayout from '../../layouts/ScreenLayout';
+import { Colors } from '../../styles';
+import {
+  getPredictionSummary,
+  PredictionSummaryApi,
+  UrgencyLevel,
+} from '../../services/predictionService';
+import { useToast } from '../../contexts/ToastContext';
+import { PrediksiStackParamList } from '../../navigation/types';
 import styles from './styles';
 
-// Tipe data sementara (sesuaikan dengan tipe dari API nantinya)
-interface PredictionItem {
-  id: number;
-  name: string;
-  stock: number;
-  unit: string;
-  daysLeft: number;
-  soldPerDay: number;
-  recommendedRestock: number;
-}
+type NavigationProp = NativeStackNavigationProp<
+  PrediksiStackParamList,
+  'Prediksi'
+>;
 
-// Data Dummy untuk testing UI
-const DUMMY_DATA: PredictionItem[] = [
-  {
-    id: 1,
-    name: 'Beras Sania 5kg',
-    stock: 3,
-    unit: 'Sak',
-    daysLeft: 1, // Kritis (Merah)
-    soldPerDay: 2.5,
-    recommendedRestock: 15,
-  },
-  {
-    id: 2,
-    name: 'Kopi Kapal Api',
-    stock: 20,
-    unit: 'Renceng',
-    daysLeft: 5, // Waspada (Kuning)
-    soldPerDay: 4,
-    recommendedRestock: 10,
-  },
-  {
-    id: 3,
-    name: 'Minyak Goreng Bimoli 2L',
-    stock: 1,
-    unit: 'Pouch',
-    daysLeft: 0, // Habis (Merah)
-    soldPerDay: 1,
-    recommendedRestock: 24,
-  },
-];
+const getUrgencyConfig = (urgency: UrgencyLevel, hasPrediction: boolean) => {
+  if (!hasPrediction) {
+    return {
+      icon: HelpCircle,
+      color: '#9ca3af',
+      bg: '#f3f4f6',
+      label: 'Belum Diprediksi',
+    };
+  }
+  switch (urgency) {
+    case 'tinggi':
+      return {
+        icon: AlertTriangle,
+        color: '#dc2626',
+        bg: '#fee2e2',
+        label: 'Segera Restock',
+      };
+    case 'sedang':
+      return {
+        icon: TrendingDown,
+        color: '#f59e0b',
+        bg: '#fef3c7',
+        label: 'Perlu Diperhatikan',
+      };
+    default:
+      return {
+        icon: CheckCircle2,
+        color: '#16a34a',
+        bg: '#dcfce7',
+        label: 'Stok Aman',
+      };
+  }
+};
 
 const PrediksiScreen = () => {
-  const navigation = useNavigation<any>(); // Ganti dengan tipe navigasi Anda
-  const [activeTab, setActiveTab] = useState<'kritis' | 'rekomendasi'>(
-    'kritis',
+  const navigation = useNavigation<NavigationProp>();
+  const toast = useToast();
+
+  const [items, setItems] = useState<PredictionSummaryApi[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const response = await getPredictionSummary();
+      setItems(response.data);
+    } catch (error) {
+      toast.error('Gagal memuat ringkasan prediksi');
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchSummary();
+    }, [fetchSummary]),
   );
-  const [isPredicting, setIsPredicting] = useState(false);
 
-  // Simulasi menekan tombol "Jalankan Prediksi"
-  const handleJalankanPrediksi = () => {
-    setIsPredicting(true);
-    // Simulasi loading API 2 detik
-    setTimeout(() => {
-      setIsPredicting(false);
-    }, 2000);
-  };
-
-  const handleRestokSekarang = (item: PredictionItem) => {
-    // Arahkan ke halaman TambahPembelian sambil membawa data rekomendasi
-    // navigation.navigate('TambahPembelian', { selectedProduct: item.id, qty: item.recommendedRestock });
-    console.log('Restok:', item.name);
-  };
-
-  const renderItem = ({ item }: { item: PredictionItem }) => {
-    const isCritical = item.daysLeft <= 3;
-
+  if (loading) {
     return (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <View style={styles.productInfo}>
-            <View style={styles.iconContainer}>
-              <Package size={24} color={Colors.primary} />
-            </View>
-            <View>
-              <Text style={styles.productName} numberOfLines={1}>
-                {item.name}
-              </Text>
-              <Text style={styles.stockText}>
-                Sisa: <Text style={styles.stockNumber}>{item.stock}</Text>{' '}
-                {item.unit}
-              </Text>
-            </View>
-          </View>
-
-          {/* Badge Status */}
-          <View
-            style={[
-              styles.badge,
-              isCritical ? styles.badgeDanger : styles.badgeWarning,
-            ]}
-          >
-            {isCritical ? (
-              <AlertTriangle
-                size={12}
-                color={isCritical ? '#dc2626' : '#d97706'}
-              />
-            ) : (
-              <TrendingDown size={12} color="#d97706" />
-            )}
-            <Text
-              style={[
-                styles.badgeText,
-                isCritical ? styles.textDanger : styles.textWarning,
-              ]}
-            >
-              {item.daysLeft === 0
-                ? 'Habis Hari Ini'
-                : `Habis < ${item.daysLeft} Hari`}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.cardFooter}>
-          <View style={styles.statsContainer}>
-            <Text style={styles.statsLabel}>Rata-rata Terjual</Text>
-            <Text style={styles.statsValue}>
-              {item.soldPerDay} {item.unit}/hari
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.restokButton}
-            onPress={() => handleRestokSekarang(item)}
-            activeOpacity={0.8}
-          >
-            <ShoppingCart size={16} color="#fff" style={styles.restokIcon} />
-            <Text style={styles.restokButtonText}>
-              Restok ({item.recommendedRestock})
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
-  };
+  }
 
   return (
-    <ScreenLayout title="Prediksi Cerdas" scrollable={false}>
-      {/* Hero Section (Panel Kontrol AI) */}
-      <View style={styles.heroContainer}>
-        <View style={styles.heroHeader}>
-          <Clock size={16} color="#6366f1" />
-          <Text style={styles.heroUpdateText}>
-            Update terakhir: Hari ini, 07:00 WIB
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.predictButton,
-            isPredicting && styles.predictButtonDisabled,
-          ]}
-          onPress={handleJalankanPrediksi}
-          disabled={isPredicting}
-          activeOpacity={0.8}
-        >
-          {isPredicting ? (
-            <ActivityIndicator
-              color="#fff"
-              size="small"
-              style={{ marginRight: 8 }}
-            />
-          ) : (
-            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-          )}
-          <Text style={styles.predictButtonText}>
-            {isPredicting ? 'Menganalisis Data...' : 'Jalankan Prediksi AI'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Segmented Control / Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'kritis' && styles.tabButtonActive,
-          ]}
-          onPress={() => setActiveTab('kritis')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'kritis' && styles.tabTextActive,
-            ]}
-          >
-            🔥 Rawan Habis
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'rekomendasi' && styles.tabButtonActive,
-          ]}
-          onPress={() => setActiveTab('rekomendasi')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'rekomendasi' && styles.tabTextActive,
-            ]}
-          >
-            🛒 Rekomendasi Restok
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* List Barang */}
+    <ScreenLayout
+      title="Prediksi"
+      subtitle="Rekomendasi Restock"
+      scrollable={false}
+    >
       <FlatList
-        data={DUMMY_DATA}
-        keyExtractor={item => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        // Tambahkan skeleton jika API sedang loading
+        data={items}
+        keyExtractor={item => String(item.product_id)}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => {
+          const config = getUrgencyConfig(item.urgency, item.has_prediction);
+          const Icon = config.icon;
+
+          return (
+            <TouchableOpacity
+              style={styles.card}
+              activeOpacity={0.7}
+              onPress={() =>
+                navigation.navigate('DetailPrediksi', {
+                  productId: item.product_id,
+                })
+              }
+            >
+              <View style={[styles.iconCircle, { backgroundColor: config.bg }]}>
+                <Icon size={20} color={config.color} />
+              </View>
+
+              <View style={styles.cardContent}>
+                <Text style={styles.productName} numberOfLines={1}>
+                  {item.product_name}
+                </Text>
+                <Text style={styles.stockText}>
+                  Stok: {item.current_stock} • Terjual{' '}
+                  {item.average_daily_sales}/hari
+                </Text>
+              </View>
+
+              <View style={styles.cardRight}>
+                <View
+                  style={[styles.urgencyBadge, { backgroundColor: config.bg }]}
+                >
+                  <Text
+                    style={[styles.urgencyBadgeText, { color: config.color }]}
+                  >
+                    {config.label}
+                  </Text>
+                </View>
+                {item.days_remaining != null && (
+                  <Text style={styles.daysText}>
+                    Habis ~{Math.round(item.days_remaining)} hari
+                  </Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              Tidak ada barang yang perlu diwaspadai saat ini.
-            </Text>
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>Belum ada data produk</Text>
           </View>
         }
       />
