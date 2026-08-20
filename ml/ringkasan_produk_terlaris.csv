@@ -1,0 +1,554 @@
+product_id,product_name,jumlah_hari_transaksi,total_unit_terjual,rata2_per_transaksi
+TLR2,Telur 1/2,183,2634.0,14.39344262295082
+MGR001,Mie goreng,134,3936.0,29.37313432835821
+YP500,Yupi 500,111,496.0,4.468468468468468
+MKH001,Mie kuah,94,2526.0,26.872340425531913
+CL1001,Chocolatos 1000,90,514.0,5.711111111111111
+KCP001,Kecap,89,639.0,7.179775280898877
+GRR001,Goriorio,88,576.0,6.545454545454546
+PLS002,Pilus,82,282.0,3.4390243902439024
+KPH001,Kopi hitam,81,1142.0,14.098765432098766
+RTP001,Roti pia,76,300.0,3.9473684210526314
+MSK001,Masako,66,499.0,7.5606060606060606
+GPT001,Gery potato,64,377.0,5.890625
+GL1001,Gula 1kg,63,766.0,12.158730158730158
+TLR1,Telur 1kg,58,568.0,9.793103448275861
+IDM002,Indomilk,56,284.0,5.071428571428571
+DLN001,Dilan 1000,53,257.0,4.849056603773585
+GRM01,Garam,53,222.0,4.188679245283019
+DLN02,Dilan 2000,50,91.0,1.82
+RCK001,Racik,49,96.0,1.9591836734693877
+LDK001,Ladaku,48,148.0,3.0833333333333335
+CL5001,Chocolatos 500,45,475.0,10.555555555555555
+CLB001,Chocolatos bubuk,42,125.0,2.9761904761904763
+GDY001,Good Day,42,122.0,2.9047619047619047
+SBE001,Ekonomi colek,42,73.0,1.7380952380952381
+RYC001,Royco,39,249.0,6.384615384615385
+JLI02,Inaco ecer,38,239.0,6.2894736842105265
+BPT1,B. putih 1/4,37,318.0,8.594594594594595
+OREO001,Oreo,37,121.0,3.27027027027027
+TGJ001,Tepung jempol,37,81.0,2.189189189189189
+GRA001,Garuda atom,37,72.0,1.945945945945946
+NTS001,Nutrisari,35,104.0,2.9714285714285715
+BRS1,Beras 1kg,34,326.0,9.588235294117647
+APT001,Apetito,34,80.0,2.3529411764705883
+TLR4,Telur 1/4,32,462.0,14.4375
+SAR001,Saori,32,59.0,1.84375
+RY001,Roma kopyor,31,43.0,1.3870967741935485
+KB001,Kuah bakso,30,112.0,3.7333333333333334
+STS,Santan sasa,30,96.0,3.2
+Tidak ditemukan,Fruta gummy,30,80.0,2.6666666666666665
+SNK001,Snack,29,134.0,4.620689655172414
+TGP002,Tepung peyek,29,78.0,2.689655172413793
+DNY001,Downy,27,127.0,4.703703703703703
+GCC001,Garuda crunchy,27,57.0,2.111111111111111
+SKB001,Soklin bubuk,27,48.0,1.7777777777777777
+TPL2,Tropical 2Lt,26,262.0,10.076923076923077
+MKE001,Mie eko,26,141.0,5.423076923076923
+RPK001,Rapika,26,82.0,3.1538461538461537
+RST001,Roasta,26,73.0,2.8076923076923075
+FTG001,Fruta gummy 2,26,63.0,2.423076923076923
+KGA001,Kopi gula aren,25,86.0,3.44
+GSK001,Gery salut kecil,23,106.0,4.608695652173913
+MCN001,Micin 1000,23,87.0,3.782608695652174
+EKC001,Ekonomi cair,23,28.0,1.2173913043478262
+THD001,Teh dandang,22,75.0,3.409090909090909
+OKJ2,Okky jelly 2,22,67.0,3.0454545454545454
+DSO001,Desaku opor,22,66.0,3.0
+TRS001,Terasi,21,137.0,6.523809523809524
+LFB001,Lifebouy,21,43.0,2.0476190476190474
+POK001,Permen okky,20,103.0,5.15
+RTG001,Roti gery,20,66.0,3.3
+THD001,Teh Dandang,19,115.0,6.052631578947368
+CLP001,Chocolatos pillow,19,39.0,2.0526315789473686
+PTS001,Piattos,19,32.0,1.6842105263157894
+GSB002,Gery salut besar,18,40.0,2.2222222222222223
+OKJ1,Okky jelly 1,18,32.0,1.7777777777777777
+TGS001,T. segitiga 1kg,17,59.0,3.4705882352941178
+KRS001,Kara santan,17,35.0,2.0588235294117645
+KGK001,Kingkong,17,28.0,1.6470588235294117
+GG001,Gentle Gen,16,64.0,4.0
+GL2001,Gula 1/2,15,108.0,7.2
+MYK001,Minyak kita,15,16.0,1.0666666666666667
+KCG4,Kacang 1/4,14,84.0,6.0
+MP001,Mie panda,14,43.0,3.0714285714285716
+MG001,Maggic,13,86.0,6.615384615384615
+BRS001,Beras,13,52.3,4.023076923076923
+KTB001,Ketumbar,13,47.0,3.6153846153846154
+EMR001,Emeron,13,45.0,3.4615384615384617
+CK001,Cokelat koin,13,43.0,3.3076923076923075
+TGJ02,Tepung kanji 1/4,13,30.0,2.3076923076923075
+GM001,Gula merah 1/4,12,107.0,8.916666666666666
+MRN001,Marinasi,12,43.0,3.5833333333333335
+YP1001,Yupi 1000,12,40.0,3.3333333333333335
+SS001,SOSIS,12,30.0,2.5
+GRR001,Goriorio 1000,12,21.0,1.75
+KPU001,Kerupuk udang,12,18.0,1.5
+ZN001,Zen,12,15.0,1.25
+TLR001,Telur,12,10.0,0.8333333333333334
+MLT001,Molto,11,85.0,7.7272727272727275
+JPT001,Japota,11,64.0,5.818181818181818
+PTT001,Permen tingting,11,51.0,4.636363636363637
+TSP001,Tisu peony,11,29.0,2.6363636363636362
+KS001,Kerupuk seblak,11,26.0,2.3636363636363638
+RST02,Roasta besar,11,19.0,1.7272727272727273
+DTL001,Detol,11,13.0,1.1818181818181819
+SNC2,Sunco 2L,10,48.0,4.8
+PT1/4,Plastik 1/4,10,44.0,4.4
+MCN02,Micin 500,10,37.0,3.7
+SK1,Sus kering 1/4,10,24.0,2.4
+SG2001,Sari gandum 2,10,16.0,1.6
+MGR001,Mie Goreng,9,134.0,14.88888888888889
+GS5001,Gery salut 500,9,65.0,7.222222222222222
+CLS001,Chocolatos,9,29.0,3.2222222222222223
+KRM01,Kurma 1kg,9,22.0,2.4444444444444446
+MLK02,Malkist besar,9,20.0,2.2222222222222223
+TGJ02,Tepung Kanji 1/4,9,19.0,2.111111111111111
+SG7001,Sari gandum 7,9,15.0,1.6666666666666667
+SG10.001,Sari gandum 10,9,10.0,1.1111111111111112
+TLR002,Telur,9,9.5,1.0555555555555556
+RDR001,Roma durian,9,9.0,1.0
+SDK001,Sedaap kaldu,8,107.0,13.375
+SNC001,Sunco 1L,8,94.0,11.75
+CLS002,Chocolatos,8,54.0,6.75
+BRS03,Beras 3kg,8,43.0,5.375
+KRM02,Kurma 1/2,8,27.0,3.375
+ADS001,Adem sari,8,22.0,2.75
+BRL001,Brownis lemonilo,8,12.0,1.5
+GRM001,Garam,8,11.0,1.375
+CLO01,Cleo mineral,8,8.0,1.0
+BBG001,Bubble gum,7,23.0,3.2857142857142856
+PY001,Permen yupi,7,21.0,3.0
+TSN001,Tisu nice,7,18.0,2.5714285714285716
+MSK002,Masako,7,13.0,1.8571428571428572
+TGO001,Tanggo,7,12.0,1.7142857142857142
+GL001,Gula,7,9.0,1.2857142857142858
+SS001,Sabun sayang,7,9.0,1.2857142857142858
+PLP001,Pilus POP,7,7.0,1.0
+PT1/2,Plastik 1/2,6,124.0,20.666666666666668
+KTN001,Kertas nasi,6,62.0,10.333333333333334
+GPK001,Gopek,6,30.0,5.0
+BC001,Boncabe,6,26.0,4.333333333333333
+HDP001,Handsaplast,6,17.0,2.8333333333333335
+PTB001,Potabe,6,16.0,2.6666666666666665
+MLK01,Malkist kecil,6,13.0,2.1666666666666665
+TLA001,Tolak angin,6,12.0,2.0
+PLS001,Pilus,6,11.0,1.8333333333333333
+BTH001,Bonteh,6,10.0,1.6666666666666667
+BB001,Bambo,6,9.0,1.5
+PDS001,Pepsodent siwak,6,7.0,1.1666666666666667
+BG001,Bunga gem 1/2,6,6.0,1.0
+JLI01,Jelly Inaco 1/2,6,6.0,1.0
+CLR001,Chocolatos rich,5,36.0,7.2
+BB001,Bamboe,5,24.0,4.8
+IDM001,Indomilk,5,21.0,4.2
+TM001,Tisu montis,5,21.0,4.2
+BRS002,Beras,5,17.0,3.4
+TSJ001,Tepung sajiku,5,17.0,3.4
+DSK01,Desaku rempah,5,16.0,3.2
+BRJ001,Beras jagung,5,14.0,2.8
+PSD001,Pepsodent,5,8.0,1.6
+BPB001,B. putih bubuk,5,7.0,1.4
+GDY001,GoodDay,5,7.0,1.4
+GSB001,Gery salut besar,5,7.0,1.4
+NO001,Neo mineral,5,6.0,1.2
+CBK001,Cokelat box kecil,5,5.0,1.0
+RMB001,Rambak,5,5.0,1.0
+SK3,Sus kering 1/2,5,5.0,1.0
+TGS02,T. segitiga 1/2,5,5.0,1.0
+RTP001,Roti Pia,4,110.0,27.5
+MKH001,Mie Kuah,4,89.0,22.25
+PT001,Petis 1/4,4,42.0,10.5
+BPT02,B. putih 1/2,4,31.0,7.75
+PYP001,Permen Yupi,4,25.0,6.25
+BKT001,Biskuat,4,15.0,3.75
+GG001,Gentle gen,4,12.0,3.0
+CLB002,Chocolatos bubuk,4,10.0,2.5
+GR003,Gery 500,4,10.0,2.5
+GSL002,Garuda slondok,4,10.0,2.5
+DNY002,Downy 2,4,9.0,2.25
+PTN001,Pantene,4,9.0,2.25
+QKR001,Quaker oat,4,9.0,2.25
+THD002,Teh dandang,4,8.0,2.0
+GRM002,Garam,4,7.0,1.75
+CTT001,Chitato,4,6.0,1.5
+KPS001,Kerupuk pedas,4,6.0,1.5
+MKK001,Malkist kecil,4,6.0,1.5
+PJ001,Permen jumbo,4,6.0,1.5
+GG02,GentleGen 10,4,5.0,1.25
+TGB001,Tango besar,4,5.0,1.25
+TLC001,Toilet cleaner,4,5.0,1.25
+KPU002,Krupuk udang,4,4.0,1.0
+LML002,Le mineral,4,4.0,1.0
+SCB002,Scoth brite,4,4.0,1.0
+KB001,Kuah Bakso,3,30.0,10.0
+KP001,Kopi,3,21.0,7.0
+SNK002,Snack,3,18.0,6.0
+PY001,Permen Yupi,3,17.0,5.666666666666667
+CLV001,Clevo,3,16.0,5.333333333333333
+PKK001,Permen kopiko,3,14.0,4.666666666666667
+SSB001,Santan sasa bubuk,3,14.0,4.666666666666667
+ZC001,Zinc,3,14.0,4.666666666666667
+PYP002,Permen yupi,3,13.0,4.333333333333333
+DLC001,Dilan cookies,3,12.0,4.0
+KSM001,Samiler 1/4,3,12.0,4.0
+PLS001,Pilus garuda,3,10.0,3.3333333333333335
+RIS001,Roti isi selai,3,10.0,3.3333333333333335
+MKH002,Mie kuah,3,8.0,2.6666666666666665
+BSPHP01,Beras SPHP,3,7.0,2.3333333333333335
+GSL001,Garuda slondok,3,7.0,2.3333333333333335
+MS001,Milo sachet,3,6.0,2.0
+MTY001,Okky mounty 1,3,6.0,2.0
+SOI001,Saori,3,6.0,2.0
+TGB01,Tepung bakwan,3,6.0,2.0
+BB002,Bambo,3,5.0,1.6666666666666667
+CCS001,Chocolatos,3,5.0,1.6666666666666667
+GC001,Garuda corn,3,5.0,1.6666666666666667
+KB001,Kapur bagus,3,5.0,1.6666666666666667
+KPT04,K. tongkol 1/4,3,5.0,1.6666666666666667
+MGR002,Mie goreng,3,5.0,1.6666666666666667
+MLG001,Madu Lumbang,3,5.0,1.6666666666666667
+PB001,Permen bola,3,5.0,1.6666666666666667
+BHJ01,Bihun jagung,3,4.0,1.3333333333333333
+KCG3,Kacang ons,3,4.0,1.3333333333333333
+MBK002,Mie baked,3,4.0,1.3333333333333333
+MZ001,Minyak Rizky,3,4.0,1.3333333333333333
+MZ001,Minyak rizky,3,4.0,1.3333333333333333
+STT001,Satelit,3,4.0,1.3333333333333333
+TTL001,Tepung tulip,3,4.0,1.3333333333333333
+0,Petis 1/2,3,3.0,1.0
+BG002,Bunga gem 1kg,3,3.0,1.0
+KPT001,K. tongkol 1bal,3,3.0,1.0
+KSM001,Samiler 1/2,3,3.0,1.0
+PC001,Prochiz lembar,3,3.0,1.0
+PT1001,Plastik 1kg,3,3.0,1.0
+SK2,Sus kering 200,3,3.0,1.0
+GL002,Gula,3,2.5,0.8333333333333334
+GLM001,Gula merah,3,2.25,0.75
+KCG001,Kacang,3,2.0,0.6666666666666666
+MGG001,Maggig,2,123.0,61.5
+MKE001,Mie Eko,2,51.0,25.5
+MYF001,Minyak Filma,2,20.0,10.0
+STS,Santan Sasa,2,20.0,10.0
+MGG001,Magig,2,15.0,7.5
+GC001,Gery Croissant,2,12.0,6.0
+PY002,Permen yupi,2,12.0,6.0
+EKC001,Ekonomi Cair,2,11.0,5.5
+GL003,Gula 1/4,2,11.0,5.5
+PTL001,Potato lite,2,11.0,5.5
+PYP001,Permen yupi,2,11.0,5.5
+TGJ001,Tepung Jempol,2,11.0,5.5
+KPP002,Krupuk puli,2,9.25,4.625
+BBG001,Buble gum,2,8.0,4.0
+EMR002,Emeron,2,8.0,4.0
+KP002,Kopi k.a,2,7.0,3.5
+MTA001,Montea,2,7.0,3.5
+SCK001,Sus coklat 1kg,2,7.0,3.5
+ASM001,Asem,2,5.0,2.5
+CCS002,Chocolatos,2,5.0,2.5
+GD001,Garuda donat,2,5.0,2.5
+GRC001,Garuda crunchy,2,5.0,2.5
+NTJ001,Nutrijell,2,5.0,2.5
+BCB001,Boncabe,2,4.0,2.0
+GDL001,GoodDay latte,2,4.0,2.0
+JL103,Jelly Inaco 1kg,2,4.0,2.0
+JLS001,Jelly stik,2,4.0,2.0
+KTK001,Kertas Kado,2,4.0,2.0
+KTK001,Kertas kado,2,4.0,2.0
+KUS02,Kripik usus 1kg,2,4.0,2.0
+MCN004,Micin 2000,2,4.0,2.0
+MTY001,Okky monty 2,2,4.0,2.0
+PB002,Permen bola,2,4.0,2.0
+SBW002,Sabun wing,2,4.0,2.0
+SLQ001,SilverQueen,2,4.0,2.0
+TGV001,Tepung virgo,2,4.0,2.0
+BLJ02,Belinjo 1/2,2,3.0,1.5
+BPT02,B. putih ons,2,3.0,1.5
+GDY001,Good day,2,3.0,1.5
+GRT001,Gerit,2,3.0,1.5
+KMR001,Kemiri ons,2,3.0,1.5
+KPG01,Kue kuping gajah,2,3.0,1.5
+LDK002,Ladaku,2,3.0,1.5
+MKB001,Malkist besar,2,3.0,1.5
+MMJ001,Mie menjangan,2,3.0,1.5
+OKJ2,Okky Jelly 2,2,3.0,1.5
+RKY002,Roma kopyor,2,3.0,1.5
+TB001,Teh Bandoelan,2,3.0,1.5
+VLP001,Value pack,2,3.0,1.5
+VNP01,Vernipan,2,3.0,1.5
+BHN002,Bihun,2,2.0,1.0
+BJ001,Baygon jumbo,2,2.0,1.0
+BNJ001,Bihun Jagung,2,2.0,1.0
+BRS02,Beras 1/2,2,2.0,1.0
+BRT001,Barakat,2,2.0,1.0
+BS001,Bumbu soto,2,2.0,1.0
+CBB001,Coklat box besar,2,2.0,1.0
+CHR001,Charm softex,2,2.0,1.0
+CM001,Clevo milk,2,2.0,1.0
+GM02,Gula merah 1kg,2,2.0,1.0
+GTG001,Gentlegen,2,2.0,1.0
+INS001,Indosari,2,2.0,1.0
+KCP001,Kacang peyek,2,2.0,1.0
+KPG001,Kripik pisang,2,2.0,1.0
+KPP01,Kerupuk puli 1/2,2,2.0,1.0
+KPT002,K. tongkol 1kg,2,2.0,1.0
+KUS001,Kripik usus 1/2,2,2.0,1.0
+KYR002,Kopyor roma,2,2.0,1.0
+MPD001,Mie Panda,2,2.0,1.0
+MYK001,Minyak Kita,2,2.0,1.0
+PDK001,Pepsodent kecil,2,2.0,1.0
+PJR01,Permen jeruk,2,2.0,1.0
+RK001,Roma kelapa,2,2.0,1.0
+RKP001,Roma kopyor,2,2.0,1.0
+RMK001,Roma kelapa,2,2.0,1.0
+RY001,Roma Kopyor,2,2.0,1.0
+SBZ002,Sabun zen,2,2.0,1.0
+SC001,Soklin cair,2,2.0,1.0
+SCR01,Sabun carsen,2,2.0,1.0
+SK03,Sus kering 1kg,2,2.0,1.0
+SKN002,Soklin,2,2.0,1.0
+SST001,Sosoft,2,2.0,1.0
+SZ001,Super zet,2,2.0,1.0
+TGK001,Tepung Kanji,2,2.0,1.0
+TGS02,T. Segitiga 1/2,2,2.0,1.0
+TPJ001,Tepung Jempol,2,2.0,1.0
+TS001,Tisu Multi,2,2.0,1.0
+UBM001,Biskuit UBM,2,2.0,1.0
+KCG002,Kacang,2,1.75,0.875
+BPT002,Bawang putih,2,0.5,0.25
+GRA001,Garuda Atom,1,130.0,130.0
+DLC001,Dilan Cookies,1,24.0,24.0
+RSB001,Rinso Bubuk,1,20.0,20.0
+SBS001,Sabun Sayang,1,12.0,12.0
+DSO001,Desaku Opor,1,10.0,10.0
+KP001,Kopi k.a,1,10.0,10.0
+KPH1,Kopi hitam One,1,10.0,10.0
+SC001,Soklin Cair,1,10.0,10.0
+TSY001,Tisu pascoy,1,10.0,10.0
+MGG001,Maggi,1,9.0,9.0
+GSK002,Gary salut kecil,1,8.0,8.0
+PMB002,Permen bola,1,8.0,8.0
+CCS001,Chocholatos,1,7.0,7.0
+GGK001,Gentlegen kecil,1,7.0,7.0
+GSK001,Salut kecil,1,7.0,7.0
+DNT001,Donat ,1,6.0,6.0
+KPS001,Kerupuk seblak,1,6.0,6.0
+KPW001,Kopi white,1,6.0,6.0
+MBK002,Mie baket,1,6.0,6.0
+TTS001,Tingting Snack,1,6.0,6.0
+MBD001,Mie burung dara,1,5.0,5.0
+RST001,Rosta,1,5.0,5.0
+CKC001,Cokelat coin,1,4.0,4.0
+DNW01,Dancow,1,4.0,4.0
+GA001,Garang Asem,1,4.0,4.0
+GDL001,Good Day latte,1,4.0,4.0
+GPT001,Gery Potato,1,4.0,4.0
+GSL002,Gery salut,1,4.0,4.0
+MRC001,Merica 500,1,4.0,4.0
+RSC002,Rinso cair,1,4.0,4.0
+SPG001,Spagetti,1,4.0,4.0
+WTC002,White coffe,1,4.0,4.0
+ATN01,Antangin,1,3.0,3.0
+BBT001,Biskuit Better,1,3.0,3.0
+BLB001,Blueband,1,3.0,3.0
+BRS001,Beras 1kg,1,3.0,3.0
+CKC001,Coklat coin,1,3.0,3.0
+CLB001,Chocolatos Bubuk,1,3.0,3.0
+GRS001,Geri Salut,1,3.0,3.0
+GSK001,Garuda Selondok,1,3.0,3.0
+GTG001,Gentlegen kecil,1,3.0,3.0
+JJN001,Jajan,1,3.0,3.0
+MCN002,Micin,1,3.0,3.0
+MK002,Mie ekonomi,1,3.0,3.0
+OREO001,OREO,1,3.0,3.0
+SDB001,Sedaap Bumbu,1,3.0,3.0
+ABC001,Snack abc,1,2.0,2.0
+AMP01,Amplop,1,2.0,2.0
+ASM002,Asem,1,2.0,2.0
+BLB001,Blue Band,1,2.0,2.0
+BRT01,Beras tinta,1,2.0,2.0
+BYG001,Baygon cair,1,2.0,2.0
+CKS001,Chokky stick,1,2.0,2.0
+CS001,Cussion baby,1,2.0,2.0
+DNY002,Downy,1,2.0,2.0
+ELP001,Elite potato,1,2.0,2.0
+GGB001,Gentlegen besar,1,2.0,2.0
+GLK01,Gulaku,1,2.0,2.0
+GRC001,Garuda Crunchy,1,2.0,2.0
+GRD001,Garuda,1,2.0,2.0
+GSL001,Garuda Selondok,1,2.0,2.0
+HPD001,Happydent,1,2.0,2.0
+KCP001,kecap,1,2.0,2.0
+KCP002,Kecap,1,2.0,2.0
+KSK02,K. Singkong 1kg,1,2.0,2.0
+MKB001,Malkist Besar,1,2.0,2.0
+MKN001,Makaroni,1,2.0,2.0
+MYB002,Minyak kita besar,1,2.0,2.0
+MYK002,Minyak kita,1,2.0,2.0
+MYR01,Minyak risky,1,2.0,2.0
+MYS002,Minyak sunco,1,2.0,2.0
+NTR001,Nutrisari,1,2.0,2.0
+NTS002,Nutrisari + es,1,2.0,2.0
+PN002,Permen,1,2.0,2.0
+POK001,Permen Okky,1,2.0,2.0
+PYB001,Permen yupi besar,1,2.0,2.0
+QTL001,Qtela,1,2.0,2.0
+RSB001,Rinso bubuk,1,2.0,2.0
+SABC001,Snack ABC,1,2.0,2.0
+SBE001,Sabun Ekonomi,1,2.0,2.0
+SKC001,Soklin cair,1,2.0,2.0
+SN001,Sabun NUVO,1,2.0,2.0
+SPZ001,Super zet,1,2.0,2.0
+TGK001,Tango kecil,1,2.0,2.0
+TGK001,Tepung kanji,1,2.0,2.0
+TGP001,Tepung peyek,1,2.0,2.0
+TGV002,Tepung virgo,1,2.0,2.0
+TPL2,Tropical 2lt,1,2.0,2.0
+TSM01,Tisu mini,1,2.0,2.0
+YP001,Permen yupi,1,2.0,2.0
+KPP001,Kerupuk Puli,1,1.25,1.25
+0,Petis 1kg,1,1.0,1.0
+ADS001,Adem Sari,1,1.0,1.0
+BC001,Bio cair,1,1.0,1.0
+BDK001,Bumbu Desaku,1,1.0,1.0
+BHJ01,Bihun Jagung,1,1.0,1.0
+BHN001,Bihun,1,1.0,1.0
+BKB001,Biskuit better,1,1.0,1.0
+BLJ01,Belinjo 1kg,1,1.0,1.0
+BLJ04,Belinjo remah 1kg,1,1.0,1.0
+BMB001,Bambo rawon,1,1.0,1.0
+BR001,Bumbu Rendang,1,1.0,1.0
+BRK001,Biskuit Roma,1,1.0,1.0
+BRW001,Bumbu Rawon,1,1.0,1.0
+BRW001,Bumbu rawon,1,1.0,1.0
+BSB001,Biskuit better,1,1.0,1.0
+BYG002,Baygon isi ulang,1,1.0,1.0
+CD001,Cokelat dhella,1,1.0,1.0
+CLU001,Close up,1,1.0,1.0
+DSK002,Desaku,1,1.0,1.0
+DTK001,Detol kecil,1,1.0,1.0
+ENG001,Energen,1,1.0,1.0
+FM001,Fancy mineral,1,1.0,1.0
+FP001,Fernipan,1,1.0,1.0
+GC001,Garuda Corn,1,1.0,1.0
+GC001,Gery croissant,1,1.0,1.0
+GDY002,GoodDay,1,1.0,1.0
+GL002,Gula ,1,1.0,1.0
+GLM002,Gula merah,1,1.0,1.0
+GLR001,Gula Rosebrand,1,1.0,1.0
+GLR002,Gula rosebrand,1,1.0,1.0
+GRB001,Gula rosebrand,1,1.0,1.0
+GS002,Gery salut,1,1.0,1.0
+GSB001,Gery Salut Besar,1,1.0,1.0
+GSK002,Gery salut kecil,1,1.0,1.0
+GSL002,Garuda Slondok,1,1.0,1.0
+GSR002,Gery salut ring,1,1.0,1.0
+HSC001,Harmony cair,1,1.0,1.0
+INF001,Indofood sambal,1,1.0,1.0
+JS001,Jelly star,1,1.0,1.0
+KCA001,Kacang atom,1,1.0,1.0
+KCI001,Kacang Ijo 1/2,1,1.0,1.0
+KCK001,KRECEK 1/2,1,1.0,1.0
+KDM001,Kaldu mili,1,1.0,1.0
+KKG001,Kue kacang,1,1.0,1.0
+KKS002,Kukis,1,1.0,1.0
+KP001,Kerupuk panda,1,1.0,1.0
+KPM002,Krupuk mawar,1,1.0,1.0
+KPP001,Kerupuk pedas,1,1.0,1.0
+KPP001,Kerupuk puli,1,1.0,1.0
+KPP001,Krupuk puli,1,1.0,1.0
+KPP03,Kerupuk puli 1/4,1,1.0,1.0
+KPS001,Krupuk seblak,1,1.0,1.0
+KPT03,K. tongkol 1/2,1,1.0,1.0
+KRK001,Kerupuk,1,1.0,1.0
+KRK001,Kurma kasem,1,1.0,1.0
+KRS001,Kara Santan,1,1.0,1.0
+KSK001,K. Singkong,1,1.0,1.0
+KSK001,K. singkong,1,1.0,1.0
+KSM001,Samiler 1kg,1,1.0,1.0
+KSP001,Kispray,1,1.0,1.0
+KUG001,Kerupuk Udang,1,1.0,1.0
+KUS03,Kripik usus 1bal,1,1.0,1.0
+LDB001,Lada Bubuk,1,1.0,1.0
+LFY001,Lifebouy,1,1.0,1.0
+LML001,Le mineral,1,1.0,1.0
+LMR001,Le mineral,1,1.0,1.0
+MCN001,Micin,1,1.0,1.0
+MCN03,Micin 5000,1,1.0,1.0
+MKE02,Mie eko besar,1,1.0,1.0
+MKG002,Mie goreng,1,1.0,1.0
+MLK001,Milki,1,1.0,1.0
+MLK001,Milkita,1,1.0,1.0
+MLS001,Milo sashet,1,1.0,1.0
+MYK002,Minyak kita ,1,1.0,1.0
+MYS001,Minyak Sanco,1,1.0,1.0
+PPD001,Pepsodent,1,1.0,1.0
+PPD002,Pepsodent,1,1.0,1.0
+PT002,Petis 8ons,1,1.0,1.0
+PTT001,Potato,1,1.0,1.0
+RBC001,Rimba choco,1,1.0,1.0
+RCK001,Racik ,1,1.0,1.0
+RCK002,Racik,1,1.0,1.0
+RK001,Roma Kelapa,1,1.0,1.0
+RKL002,Roma kelapa,1,1.0,1.0
+RXN001,Rexona,1,1.0,1.0
+SB001,Stik bawang,1,1.0,1.0
+SBC001,Sabun colek,1,1.0,1.0
+SBW001,Sabun Wing,1,1.0,1.0
+SBZ001,Sabun zen,1,1.0,1.0
+SC002,Soklin cair gen,1,1.0,1.0
+SCB002,Scoth Brite,1,1.0,1.0
+SCR005,Sabun Carsen,1,1.0,1.0
+SG001,Sagon,1,1.0,1.0
+SK2,Sus Kering 200,1,1.0,1.0
+SKG001,Sikat gigi,1,1.0,1.0
+SKL001,Soklin Lantai,1,1.0,1.0
+SKL001,Soklin lantai,1,1.0,1.0
+SKN002,Soklin bubuk,1,1.0,1.0
+SNABC001,Snack ABC,1,1.0,1.0
+SNZ001,Sabun zen,1,1.0,1.0
+SOI002,Saori,1,1.0,1.0
+SOR001,Saori,1,1.0,1.0
+SPL001,Siiplah,1,1.0,1.0
+SSN001,Sasa santan,1,1.0,1.0
+STB001,Scotch brite,1,1.0,1.0
+STB001,Scoth brite,1,1.0,1.0
+STB001,ScothBrite,1,1.0,1.0
+STL001,Stella,1,1.0,1.0
+STN001,Santan,1,1.0,1.0
+SZ001,Super Zet,1,1.0,1.0
+TC001,Tortila chip,1,1.0,1.0
+TGB001,Tango Besar,1,1.0,1.0
+TGJ002,Tepung jempol,1,1.0,1.0
+TGK01,Tepung kriwul,1,1.0,1.0
+TGO001,Tango,1,1.0,1.0
+TGR001,Tango besar,1,1.0,1.0
+TGT001,Tepung terigu,1,1.0,1.0
+TGT002,Tepung terigu,1,1.0,1.0
+TJ001,Tisu jolly,1,1.0,1.0
+TKA001,Tolak angin,1,1.0,1.0
+TM001,Tisu Montis,1,1.0,1.0
+TOB001,Tango besar,1,1.0,1.0
+TOK001,Tango kecil,1,1.0,1.0
+TPB001,Tepung beras,1,1.0,1.0
+TPG001,Tepung Geprek,1,1.0,1.0
+TPG001,Tepung geprek,1,1.0,1.0
+TPJ001,Tepung jempol,1,1.0,1.0
+TPK001,Tas plastik,1,1.0,1.0
+TPY001,Tepung Peyek,1,1.0,1.0
+TSB001,Tisu Besar,1,1.0,1.0
+TSG001,Tisu green,1,1.0,1.0
+TSJ001,Tisu joli,1,1.0,1.0
+TSM001,Tisu multi,1,1.0,1.0
+TSO002,Tisu peony,1,1.0,1.0
+TSP001,Tisu Peony,1,1.0,1.0
+TSP002,Tisu panda,1,1.0,1.0
+Tidak ditemukan,Fruta Gummy,1,1.0,1.0
+PTS001,Petis,1,0.75,0.75
+PTS002,Petis,1,0.5,0.5
+TGS002,Tepung segitiga,1,0.5,0.5
+BPH001,Bawang putih,1,0.25,0.25
+BPT001,Bawang Putih,1,0.25,0.25
+BPT001,Bawang putih,1,0.25,0.25
+GM001,Gula merah,1,0.25,0.25
+TGS001,Tepung Segitiga,1,0.25,0.25
