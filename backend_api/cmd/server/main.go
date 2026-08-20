@@ -17,6 +17,7 @@ func main() {
 	config.DB.AutoMigrate(&user.User{}, product.Product{})
 
 	r := core.SetupRouter()
+	core.StartScheduler()	
 
 	port := os.Getenv("PORT")
 	if port == "" {
