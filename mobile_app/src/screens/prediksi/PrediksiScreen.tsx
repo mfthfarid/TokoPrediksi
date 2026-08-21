@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   TrendingDown,
   CheckCircle2,
   HelpCircle,
+  Package,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { Colors } from '../../styles';
@@ -34,7 +35,7 @@ const getUrgencyConfig = (urgency: UrgencyLevel, hasPrediction: boolean) => {
   if (!hasPrediction) {
     return {
       icon: HelpCircle,
-      color: '#9ca3af',
+      color: '#6b7280',
       bg: '#f3f4f6',
       label: 'Belum Diprediksi',
     };
@@ -50,9 +51,9 @@ const getUrgencyConfig = (urgency: UrgencyLevel, hasPrediction: boolean) => {
     case 'sedang':
       return {
         icon: TrendingDown,
-        color: '#f59e0b',
+        color: '#d97706',
         bg: '#fef3c7',
-        label: 'Perlu Diperhatikan',
+        label: 'Perhatian',
       };
     default:
       return {
@@ -89,6 +90,36 @@ const PrediksiScreen = () => {
     }, [fetchSummary]),
   );
 
+  const summaryStats = useMemo(() => {
+    const tinggi = items.filter(
+      i => i.has_prediction && i.urgency === 'tinggi',
+    ).length;
+    const sedang = items.filter(
+      i => i.has_prediction && i.urgency === 'sedang',
+    ).length;
+    const rendah = items.filter(
+      i => i.has_prediction && i.urgency === 'rendah',
+    ).length;
+    return { tinggi, sedang, rendah };
+  }, [items]);
+
+  const renderHeader = () => (
+    <View style={styles.summaryContainer}>
+      <View style={[styles.summaryBox, styles.summaryDanger]}>
+        <Text style={styles.summaryValue}>{summaryStats.tinggi}</Text>
+        <Text style={styles.summaryLabel}>Kritis</Text>
+      </View>
+      <View style={[styles.summaryBox, styles.summaryWarning]}>
+        <Text style={styles.summaryValue}>{summaryStats.sedang}</Text>
+        <Text style={styles.summaryLabel}>Waspada</Text>
+      </View>
+      <View style={[styles.summaryBox, styles.summarySafe]}>
+        <Text style={styles.summaryValue}>{summaryStats.rendah}</Text>
+        <Text style={styles.summaryLabel}>Aman</Text>
+      </View>
+    </View>
+  );
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -98,15 +129,12 @@ const PrediksiScreen = () => {
   }
 
   return (
-    <ScreenLayout
-      title="Prediksi"
-      subtitle="Rekomendasi Restock"
-      scrollable={false}
-    >
+    <ScreenLayout title="Prediksi" scrollable={false} paddingVertical={0}>
       <FlatList
         data={items}
         keyExtractor={item => String(item.product_id)}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={items.length > 0 ? renderHeader : null}
         renderItem={({ item }) => {
           const config = getUrgencyConfig(item.urgency, item.has_prediction);
           const Icon = config.icon;
@@ -121,21 +149,17 @@ const PrediksiScreen = () => {
                 })
               }
             >
-              <View style={[styles.iconCircle, { backgroundColor: config.bg }]}>
-                <Icon size={20} color={config.color} />
-              </View>
-
-              <View style={styles.cardContent}>
-                <Text style={styles.productName} numberOfLines={1}>
-                  {item.product_name}
-                </Text>
-                <Text style={styles.stockText}>
-                  Stok: {item.current_stock} • Terjual{' '}
-                  {item.average_daily_sales}/hari
-                </Text>
-              </View>
-
-              <View style={styles.cardRight}>
+              <View style={styles.cardHeader}>
+                <View style={styles.productInfo}>
+                  <View
+                    style={[styles.iconCircle, { backgroundColor: config.bg }]}
+                  >
+                    <Icon size={20} color={config.color} />
+                  </View>
+                  <Text style={styles.productName} numberOfLines={1}>
+                    {item.product_name}
+                  </Text>
+                </View>
                 <View
                   style={[styles.urgencyBadge, { backgroundColor: config.bg }]}
                 >
@@ -145,18 +169,51 @@ const PrediksiScreen = () => {
                     {config.label}
                   </Text>
                 </View>
-                {item.days_remaining != null && (
-                  <Text style={styles.daysText}>
-                    Habis ~{Math.round(item.days_remaining)} hari
+              </View>
+
+              <View style={styles.cardMetrics}>
+                <View style={styles.metricItem}>
+                  <Text style={styles.metricLabel}>Stok Saat Ini</Text>
+                  <Text style={styles.metricValue}>{item.current_stock}</Text>
+                </View>
+                <View style={styles.metricDivider} />
+                <View style={styles.metricItem}>
+                  <Text style={styles.metricLabel}>Rata-rata Terjual</Text>
+                  <Text style={styles.metricValue}>
+                    {item.average_daily_sales}/hari
                   </Text>
-                )}
+                </View>
+                <View style={styles.metricDivider} />
+                <View style={styles.metricItem}>
+                  <Text style={styles.metricLabel}>Estimasi Habis</Text>
+                  <Text
+                    style={[
+                      styles.metricValue,
+                      item.days_remaining && item.days_remaining <= 7
+                        ? styles.textDanger
+                        : null,
+                    ]}
+                  >
+                    {item.days_remaining != null
+                      ? `~${Math.round(item.days_remaining)} hari`
+                      : '-'}
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           );
         }}
         ListEmptyComponent={
           <View style={styles.emptyState}>
+            <Package
+              size={48}
+              color={Colors.border}
+              style={{ marginBottom: 16 }}
+            />
             <Text style={styles.emptyText}>Belum ada data produk</Text>
+            <Text style={styles.emptySubtext}>
+              Data prediksi akan muncul di sini
+            </Text>
           </View>
         }
       />

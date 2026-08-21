@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
   },
   searchContainer: {
     flex: 1,
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   // Filter kategori
   categoryList: {
     flexGrow: 0,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   categoryListContent: {
     gap: 8,

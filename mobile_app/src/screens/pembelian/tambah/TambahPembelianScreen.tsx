@@ -74,6 +74,7 @@ const calculateGrandTotal = (items: PurchaseItemRow[]): number =>
 
 const TambahPembelianScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<TambahPembelianRouteProp>();
   const toast = useToast();
 
   const [loadingOptions, setLoadingOptions] = useState(true);
@@ -87,7 +88,6 @@ const TambahPembelianScreen = () => {
 
   // Prefill dari Prediksi (kalau dibuka lewat tombol "Restock" di Detail Prediksi)
   useEffect(() => {
-    const route = useRoute<TambahPembelianRouteProp>();
     const prefillProductId = route.params?.prefillProductId;
     const prefillQuantity = route.params?.prefillQuantity;
     if (!prefillProductId || products.length === 0) return;
@@ -226,6 +226,7 @@ const TambahPembelianScreen = () => {
     <ScreenLayout
       title="Catat Pembelian"
       subtitle="Restok Barang"
+      // paddingVertical={0}
       scrollable={false}
       footer={
         <View style={styles.footer}>

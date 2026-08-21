@@ -4,7 +4,6 @@ import { Colors, Spacing } from '../../styles';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   centerContainer: {
     flex: 1,
@@ -18,7 +17,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E7EB',
-    marginHorizontal: 12,
     marginTop: 10,
     marginBottom: 10,
     padding: 4,
@@ -58,8 +56,6 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
   },
 
   // Search + scan
@@ -67,7 +63,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   searchContainer: {
     flex: 1,
@@ -99,7 +95,7 @@ const styles = StyleSheet.create({
   // Filter kategori
   categoryList: {
     flexGrow: 0,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   categoryListContent: {
     gap: 8,
@@ -212,8 +208,8 @@ const styles = StyleSheet.create({
   // Floating cart bar
   cartBar: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: 1,
+    right: 1,
     bottom: 16,
     height: 52,
     borderRadius: 14,

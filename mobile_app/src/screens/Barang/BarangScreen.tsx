@@ -120,6 +120,7 @@ const BarangScreen = () => {
       title="Barang"
       // subtitle="Kelola Data Barang"
       scrollable={false}
+      paddingVertical={0}
     >
       {/* Search + Tambah */}
       <View style={styles.searchRow}>
