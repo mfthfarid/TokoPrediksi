@@ -22,9 +22,15 @@ import { getProducts, ProductApi } from '../../../services/productService';
 import { createPurchase } from '../../../services/purchaseService';
 import { DashboardStackParamList } from '../../../navigation/types';
 import { useToast } from '../../../contexts/ToastContext';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { BottomTabParamList } from './../../../navigation/types';
 import styles from './styles';
 
 type NavigationProp = NativeStackNavigationProp<
+  DashboardStackParamList,
+  'TambahPembelian'
+>;
+type TambahPembelianRouteProp = RouteProp<
   DashboardStackParamList,
   'TambahPembelian'
 >;
@@ -78,6 +84,32 @@ const TambahPembelianScreen = () => {
   const [purchaseDate, setPurchaseDate] = useState(formatDateToday());
   const [items, setItems] = useState<PurchaseItemRow[]>([createEmptyItem()]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Prefill dari Prediksi (kalau dibuka lewat tombol "Restock" di Detail Prediksi)
+  useEffect(() => {
+    const route = useRoute<TambahPembelianRouteProp>();
+    const prefillProductId = route.params?.prefillProductId;
+    const prefillQuantity = route.params?.prefillQuantity;
+    if (!prefillProductId || products.length === 0) return;
+
+    const product = products.find(p => p.id === prefillProductId);
+    if (!product) return;
+
+    const baseUnit =
+      product.units.find(u => u.is_base_unit) ?? product.units[0];
+    if (!baseUnit) return;
+
+    setItems([
+      {
+        key: Math.random().toString(36).slice(2),
+        productId: product.id,
+        productUnitId: baseUnit.id,
+        quantity: prefillQuantity ? String(prefillQuantity) : '',
+        purchasePrice: '',
+        expiryDate: '',
+      },
+    ]);
+  }, [products]);
 
   useEffect(() => {
     const loadOptions = async () => {

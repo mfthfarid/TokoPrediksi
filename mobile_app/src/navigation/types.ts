@@ -23,7 +23,10 @@ export type DashboardStackParamList = {
   Kategori: undefined;
   Supplier: undefined;
   Pembelian: undefined;
-  TambahPembelian: undefined;
+  TambahPembelian: {
+    prefillProductId?: number;
+    prefillQuantity?: number;
+  };
   DetailPembelian: { id: number };
   PenyesuaianStok: undefined;
   TambahPenyesuaian: {
