@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.xl,
+    // paddingBottom: Spacing.xl,
     maxHeight: '75%',
   },
   headerRow: {
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
 
   list: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   itemRow: {
     flexDirection: 'row',
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderTopWidth: 1,
+    paddingVertical: 5,
+    // borderTopWidth: 1,
     borderTopColor: '#eee',
     marginBottom: Spacing.sm,
   },

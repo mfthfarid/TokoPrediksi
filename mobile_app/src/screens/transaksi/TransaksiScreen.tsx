@@ -239,7 +239,7 @@ const TransaksiScreen = () => {
   return (
     <ScreenLayout
       title="Transaksi"
-      paddingHorizontal={0}
+      // paddingHorizontal={0}
       paddingVertical={0}
       scrollable={false}
     >

@@ -4,8 +4,8 @@ import { Colors, Spacing } from '../../../styles';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    paddingTop: 5,
+    // padding: 16,
+    // paddingTop: 5,
   },
   centerContainer: {
     flex: 1,
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 8,
-    marginBottom: Spacing.sm,
+    // marginBottom: Spacing.sm,
   },
   customRangeField: {
     flex: 1,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: Colors.textSecondary,
-    backgroundColor: Colors.background,
+    // backgroundColor: Colors.background,
     paddingVertical: 8,
   },
 
