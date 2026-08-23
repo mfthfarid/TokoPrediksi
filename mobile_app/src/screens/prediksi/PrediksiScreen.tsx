@@ -70,6 +70,10 @@ const PrediksiScreen = () => {
   const toast = useToast();
 
   const [items, setItems] = useState<PredictionSummaryApi[]>([]);
+  const [activeFilter, setActiveFilter] = useState<
+    'default' | 'tinggi' | 'sedang' | 'rendah' | 'belum' | 'semua'
+  >('default');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
   const fetchSummary = useCallback(async () => {
@@ -103,6 +107,46 @@ const PrediksiScreen = () => {
     const belum = items.filter(i => !i.has_prediction).length;
     return { tinggi, sedang, rendah, belum };
   }, [items]);
+
+  const filteredItems = useMemo(() => {
+    let result = items;
+
+    if (activeFilter === 'default') {
+      result = items.filter(
+        i =>
+          i.has_prediction &&
+          (i.urgency === 'tinggi' || i.urgency === 'sedang'),
+      );
+    } else if (
+      activeFilter === 'tinggi' ||
+      activeFilter === 'sedang' ||
+      activeFilter === 'rendah'
+    ) {
+      result = items.filter(
+        i => i.has_prediction && i.urgency === activeFilter,
+      );
+    } else if (activeFilter === 'belum') {
+      result = items.filter(i => !i.has_prediction);
+    }
+    // 'semua' -> tidak difilter sama sekali
+
+    if (searchQuery.trim()) {
+      result = result.filter(i =>
+        i.product_name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+      );
+    }
+
+    return result;
+  }, [items, activeFilter, searchQuery]);
+
+  const filterLabel = {
+    default: 'Perlu Perhatian',
+    tinggi: 'Segera Restock',
+    sedang: 'Perlu Diperhatikan',
+    rendah: 'Stok Aman',
+    belum: 'Belum Diprediksi',
+    semua: 'Semua Produk',
+  }[activeFilter];
 
   if (loading) {
     return (
