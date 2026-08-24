@@ -3,6 +3,7 @@ import {
   View,
   Text,
   FlatList,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
@@ -105,7 +106,7 @@ const PrediksiScreen = () => {
       i => i.has_prediction && i.urgency === 'rendah',
     ).length;
     const belum = items.filter(i => !i.has_prediction).length;
-    return { tinggi, sedang, rendah, belum };
+    return { tinggi, sedang, rendah, belum, semua: items.length };
   }, [items]);
 
   const filteredItems = useMemo(() => {
@@ -161,56 +162,114 @@ const PrediksiScreen = () => {
       title="Prediksi"
       subtitle="Rekomendasi Restock"
       scrollable={false}
-      paddingVertical={0}
     >
       <FlatList
-        data={items}
+        data={filteredItems}
         keyExtractor={item => String(item.product_id)}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
-          <View style={styles.summaryCard}>
-            <View style={styles.summaryHeaderRow}>
-              <Sparkles size={18} color={Colors.primary} />
-              <Text style={styles.summaryTitle}>Ringkasan Prediksi</Text>
+          <>
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryHeaderRow}>
+                <Sparkles size={18} color={Colors.primary} />
+                <Text style={styles.summaryTitle}>Ringkasan Prediksi</Text>
+              </View>
+
+              {summaryStats.tinggi > 0 ? (
+                <Text style={styles.summaryHighlight}>
+                  {summaryStats.tinggi} produk perlu segera direstock
+                </Text>
+              ) : (
+                <Text style={styles.summaryHighlightSafe}>
+                  Semua stok masih aman minggu ini 🎉
+                </Text>
+              )}
+
+              <View style={styles.summaryStatsRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.summaryStatBox,
+                    activeFilter === 'tinggi' && styles.summaryStatBoxActive,
+                  ]}
+                  onPress={() => setActiveFilter('tinggi')}
+                >
+                  <Text style={[styles.summaryStatValue, { color: '#dc2626' }]}>
+                    {summaryStats.tinggi}
+                  </Text>
+                  <Text style={styles.summaryStatLabel}>Segera</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.summaryStatBox,
+                    activeFilter === 'sedang' && styles.summaryStatBoxActive,
+                  ]}
+                  onPress={() => setActiveFilter('sedang')}
+                >
+                  <Text style={[styles.summaryStatValue, { color: '#f59e0b' }]}>
+                    {summaryStats.sedang}
+                  </Text>
+                  <Text style={styles.summaryStatLabel}>Perhatikan</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.summaryStatBox,
+                    activeFilter === 'rendah' && styles.summaryStatBoxActive,
+                  ]}
+                  onPress={() => setActiveFilter('rendah')}
+                >
+                  <Text style={[styles.summaryStatValue, { color: '#16a34a' }]}>
+                    {summaryStats.rendah}
+                  </Text>
+                  <Text style={styles.summaryStatLabel}>Aman</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.summaryStatBox,
+                    activeFilter === 'belum' && styles.summaryStatBoxActive,
+                  ]}
+                  onPress={() => setActiveFilter('belum')}
+                >
+                  <Text style={[styles.summaryStatValue, { color: '#9ca3af' }]}>
+                    {summaryStats.belum}
+                  </Text>
+                  <Text style={styles.summaryStatLabel}>Belum</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.summaryStatBox,
+                    activeFilter === 'semua' && styles.summaryStatBoxActive,
+                  ]}
+                  onPress={() => setActiveFilter('semua')}
+                >
+                  <Text
+                    style={[styles.summaryStatValue, { color: Colors.text }]}
+                  >
+                    {summaryStats.semua}
+                  </Text>
+                  <Text style={styles.summaryStatLabel}>Semua</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            {summaryStats.tinggi > 0 ? (
-              <Text style={styles.summaryHighlight}>
-                {summaryStats.tinggi} produk perlu segera direstock
-              </Text>
-            ) : (
-              <Text style={styles.summaryHighlightSafe}>
-                Semua stok masih aman minggu ini 🎉
-              </Text>
-            )}
-
-            <View style={styles.summaryStatsRow}>
-              <View style={styles.summaryStatBox}>
-                <Text style={[styles.summaryStatValue, { color: '#dc2626' }]}>
-                  {summaryStats.tinggi}
-                </Text>
-                <Text style={styles.summaryStatLabel}>Segera</Text>
-              </View>
-              <View style={styles.summaryStatBox}>
-                <Text style={[styles.summaryStatValue, { color: '#f59e0b' }]}>
-                  {summaryStats.sedang}
-                </Text>
-                <Text style={styles.summaryStatLabel}>Perhatikan</Text>
-              </View>
-              <View style={styles.summaryStatBox}>
-                <Text style={[styles.summaryStatValue, { color: '#16a34a' }]}>
-                  {summaryStats.rendah}
-                </Text>
-                <Text style={styles.summaryStatLabel}>Aman</Text>
-              </View>
-              <View style={styles.summaryStatBox}>
-                <Text style={[styles.summaryStatValue, { color: '#9ca3af' }]}>
-                  {summaryStats.belum}
-                </Text>
-                <Text style={styles.summaryStatLabel}>Belum Diprediksi</Text>
-              </View>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Cari nama barang..."
+                placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
             </View>
-          </View>
+
+            <Text style={styles.filterLabel}>
+              Menampilkan:{' '}
+              <Text style={styles.filterLabelBold}>{filterLabel}</Text>
+            </Text>
+          </>
         }
         renderItem={({ item }) => {
           const config = getUrgencyConfig(item.urgency, item.has_prediction);
