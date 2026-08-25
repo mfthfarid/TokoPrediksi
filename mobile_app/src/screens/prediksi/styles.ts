@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
 
   listContent: {
-    paddingVertical: Spacing.md,
+    paddingBottom: 20,
   },
 
   summaryCard: {
@@ -51,6 +51,11 @@ const styles = StyleSheet.create({
   summaryStatBox: {
     alignItems: 'center',
     flex: 1,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  summaryStatBoxActive: {
+    backgroundColor: '#f5f5f5',
   },
   summaryStatValue: {
     fontSize: 20,
@@ -61,6 +66,32 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 2,
     textAlign: 'center',
+  },
+
+  searchContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 44,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#eee',
+    marginBottom: Spacing.sm,
+  },
+  searchInput: {
+    fontSize: 14,
+    color: Colors.text,
+    padding: 0,
+  },
+
+  filterLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.sm,
+  },
+  filterLabelBold: {
+    fontWeight: '700',
+    color: Colors.text,
   },
   card: {
     flexDirection: 'row',
