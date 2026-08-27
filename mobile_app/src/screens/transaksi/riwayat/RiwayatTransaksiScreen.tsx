@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Receipt } from 'lucide-react-native';
 import { Colors } from '../../../styles';
 import DateField from '../../../components/ui/DateField';
@@ -15,8 +16,13 @@ import {
   TransactionApi,
 } from '../../../services/transactionService';
 import { useToast } from '../../../contexts/ToastContext';
+import { TransaksiStackParamList } from '../../../navigation/types';
 import styles from './styles';
 
+type NavigationProp = NativeStackNavigationProp<
+  TransaksiStackParamList,
+  'Transaksi'
+>;
 type FilterType = 'semua' | '7hari' | '30hari' | 'custom';
 
 const INDO_MONTHS = [
@@ -75,6 +81,7 @@ const getTodayQueryDate = (): string => getDateNDaysAgo(0);
 
 const RiwayatTransaksiView = () => {
   const toast = useToast();
+  const navigation = useNavigation<NavigationProp>();
 
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<TransactionApi[]>([]);
@@ -238,7 +245,16 @@ const RiwayatTransaksiView = () => {
             <Text style={styles.sectionHeader}>{section.title}</Text>
           )}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              activeOpacity={0.7}
+              onPress={() =>
+                navigation.navigate('DetailTransaksi', {
+                  id: item.id,
+                })
+              }
+            >
+              {/* <View style={styles.card}> */}
               <View style={styles.iconCircle}>
                 <Receipt size={18} color={Colors.primary} />
               </View>
@@ -256,7 +272,8 @@ const RiwayatTransaksiView = () => {
                   {item.total_quantity} item
                 </Text>
               </View>
-            </View>
+              {/* </View> */}
+            </TouchableOpacity>
           )}
           ListEmptyComponent={
             <View style={styles.emptyState}>
