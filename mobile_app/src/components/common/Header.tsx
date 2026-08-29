@@ -1,37 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
-import { Images } from '../../assets';
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
-  onNotificationPress,
-}) => {
+const ICON_BUTTON_SIZE = 38;
+
+const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
   const [notificationCount] = useState(3);
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const canGoBack = navigation.canGoBack();
 
   return (
-    <View style={[styles.headerContainer, { paddingTop: insets.top + 0 }]}>
+    <View style={[styles.headerContainer, { paddingTop: insets.top + 12 }]}>
       <View style={styles.headerContent}>
-        {/* Logo */}
-        <Image source={Images.logo} style={styles.logo} resizeMode="contain" />
+        <View style={styles.leftSection}>
+          {canGoBack && (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Icon name="arrow-left" size={22} color="#fff" />
+            </TouchableOpacity>
+          )}
 
-        {/* Bagian Judul */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>{title}</Text>
-          {/* {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>} */}
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {title}
+          </Text>
         </View>
 
-        {/* Tombol Notifikasi dengan Badge */}
         <TouchableOpacity
           style={styles.notificationButton}
           onPress={onNotificationPress}
           activeOpacity={0.7}
         >
-          <Icon name="bell" size={24} color="#fff" />
+          <Icon name="bell" size={20} color="#fff" />
 
           {notificationCount > 0 && (
             <View style={styles.badge}>
@@ -50,8 +57,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: '#35b5ffff',
     paddingHorizontal: 16,
-    // paddingTop sekarang diberikan dinamis lewat insets.top di atas
-    paddingBottom: 16,
+    paddingBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -65,31 +71,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  titleSection: {
-    width: '60%',
-    backgroundColor: '#fff',
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  leftSection: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginRight: 12,
+  },
+
+  backButton: {
+    width: ICON_BUTTON_SIZE,
+    height: ICON_BUTTON_SIZE,
+    borderRadius: ICON_BUTTON_SIZE / 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   title: {
-    color: '#000',
-    fontSize: 20,
+    flex: 1,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: '700',
   },
 
-  subtitle: {
-    color: '#555',
-    fontSize: 12,
-    marginTop: 2,
-  },
-
   notificationButton: {
-    width: 44,
-    height: 44,
+    width: ICON_BUTTON_SIZE,
+    height: ICON_BUTTON_SIZE,
     borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
@@ -103,8 +111,8 @@ const styles = StyleSheet.create({
     right: -4,
     backgroundColor: '#4CAF50',
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -113,16 +121,9 @@ const styles = StyleSheet.create({
 
   badgeText: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     textAlign: 'center',
-  },
-
-  logo: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
 });
 
