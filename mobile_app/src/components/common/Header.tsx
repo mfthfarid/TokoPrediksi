@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
 
 const ICON_BUTTON_SIZE = 38;
+const HEADER_BLUE = '#35b5ffff';
 
 const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
   const [notificationCount] = useState(3);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const canGoBack = navigation.canGoBack();
+  const canGoBack = useNavigationState(state => state.index > 0);
 
   return (
     <View style={[styles.headerContainer, { paddingTop: insets.top + 12 }]}>
@@ -24,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Icon name="arrow-left" size={22} color="#fff" />
+              <Icon name="arrow-left" size={22} color={HEADER_BLUE} />
             </TouchableOpacity>
           )}
 
@@ -55,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: '#35b5ffff',
+    backgroundColor: HEADER_BLUE,
     paddingHorizontal: 16,
     paddingBottom: 12,
     shadowColor: '#000',
@@ -83,9 +84,14 @@ const styles = StyleSheet.create({
     width: ICON_BUTTON_SIZE,
     height: ICON_BUTTON_SIZE,
     borderRadius: ICON_BUTTON_SIZE / 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
   },
 
   title: {
