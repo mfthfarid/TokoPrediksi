@@ -234,11 +234,12 @@ func parseRupiah(raw string) int {
 }
 
 func parseFlexibleDate(raw string) (string, error) {
-	formats := []string{"02/01/2006", "2006-01-02", "1/2/2006"}
-	for _, layout := range formats {
-		if t, err := time.Parse(layout, raw); err == nil {
-			return t.Format("2006-01-02"), nil
-		}
-	}
-	return "", fmt.Errorf("format tidak dikenali")
+    // Tambahkan "01-02-06" ke dalam array
+    formats := []string{"02/01/2006", "2006-01-02", "1/2/2006", "02-01-06", "01-02-06"}
+    for _, layout := range formats {
+        if t, err := time.Parse(layout, raw); err == nil {
+            return t.Format("2006-01-02"), nil
+        }
+    }
+    return "", fmt.Errorf("format tidak dikenali")
 }
