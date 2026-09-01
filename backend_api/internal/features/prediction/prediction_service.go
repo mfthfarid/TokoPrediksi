@@ -15,11 +15,13 @@ import (
 )
 
 const (
-	minHistoryPoints  = 14
-	modelVersion      = "prophet-v1"
-	defaultPeriods    = 7
-	urgencyHighDays   = 3
-	urgencyMediumDays = 7
+	minHistoryPoints   = 14
+	modelVersion       = "prophet-v1"
+	defaultPeriods     = 7
+	urgencyHighDays    = 3
+	urgencyMediumDays  = 7
+	maxPeriodsRatio    = 0.3 // maksimal 30% dari panjang data historis
+	absoluteMaxPeriods = 90  // batas atas mutlak, berapa pun panjang datanya
 )
 
 type PredictionService struct {
@@ -59,7 +61,6 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 				item.Urgency = "rendah"
 			}
 		}
-
 		items[i] = item
 	}
 
@@ -81,6 +82,17 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 	return items, nil
 }
 
+func calculateMaxPeriods(historyLength int) int {
+	max := int(float64(historyLength) * maxPeriodsRatio)
+	if max < defaultPeriods {
+		max = defaultPeriods // minimal tetap boleh prediksi 7 hari walau data historis pendek
+	}
+	if max > absoluteMaxPeriods {
+		max = absoluteMaxPeriods
+	}
+	return max
+}
+
 func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSummaryResponse, error) {
 	if periods <= 0 {
 		periods = defaultPeriods
@@ -94,6 +106,14 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 		return nil, fmt.Errorf(
 			"data histori penjualan belum cukup untuk prediksi (minimal %d hari ada transaksi, saat ini baru %d)",
 			minHistoryPoints, len(dailySales),
+		)
+	}
+
+	maxAllowedPeriods := calculateMaxPeriods(len(dailySales))
+	if periods > maxAllowedPeriods {
+		return nil, fmt.Errorf(
+			"periode prediksi maksimal %d hari untuk data historis sepanjang ini (diminta %d hari). Data historis yang lebih panjang memungkinkan prediksi jangka lebih jauh",
+			maxAllowedPeriods, periods,
 		)
 	}
 

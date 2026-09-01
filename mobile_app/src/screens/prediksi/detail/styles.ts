@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: Colors.text,
     alignSelf: 'flex-start',

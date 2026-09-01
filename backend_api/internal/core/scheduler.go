@@ -14,10 +14,11 @@ func StartScheduler() {
 	_, err := c.AddFunc("0 1 * * 0", func() {
 		log.Println("⏰ Menjalankan prediksi mingguan terjadwal...")
 		service := prediction.NewPredictionService()
-		if err := service.PredictAll(0); err != nil {
+		if err := service.PredictAll(14); err != nil { // prediksi 14 hari dari sekarang
 			log.Println("Gagal menjalankan prediksi terjadwal:", err)
 		}
 	})
+
 	if err != nil {
 		log.Println("Gagal mendaftarkan jadwal cron:", err)
 		return

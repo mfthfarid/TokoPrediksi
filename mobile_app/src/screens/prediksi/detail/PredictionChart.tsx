@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  useWindowDimensions,
   Pressable,
+  PanResponder,
+  GestureResponderEvent,
+  PanResponderGestureState,
 } from 'react-native';
 import Svg, {
   Polyline,
@@ -17,81 +18,88 @@ import Svg, {
 import { Colors } from '../../../styles';
 import { ChartPoint } from '../../../services/predictionService';
 
-type PeriodFilter = 'latest' | '3months' | '6months' | '1year' | 'all';
+type PeriodFilter = '3months' | '6months' | '1year' | 'all';
+type ChartMode = 'overview' | 'prediction';
 
 interface PredictionChartProps {
   actual: ChartPoint[];
   predicted: ChartPoint[];
   height?: number;
+  // width?: number;
 }
 
-const PADDING_LEFT = 42;
-const PADDING_RIGHT = 16;
-const PADDING_TOP = 20;
-const PADDING_BOTTOM = 42;
+interface ChartItem extends ChartPoint {
+  type: 'actual' | 'predicted';
+  timestamp: number;
+}
 
-const POINT_SPACING = 58;
-const MIN_CHART_WIDTH = 320;
+const CHART_HEIGHT = 270;
+const PADDING = {
+  top: 28,
+  right: 16,
+  bottom: 42,
+  left: 42,
+};
 
 const GRID_COUNT = 4;
-
 const FILTERS: {
   key: PeriodFilter;
   label: string;
 }[] = [
-  { key: 'latest', label: 'Terbaru' },
-  { key: '3months', label: '3 Bulan' },
-  { key: '6months', label: '6 Bulan' },
-  { key: '1year', label: '1 Tahun' },
-  { key: 'all', label: 'Semua' },
+  {
+    key: '3months',
+    label: '3 Bulan',
+  },
+  {
+    key: '6months',
+    label: '6 Bulan',
+  },
+  {
+    key: '1year',
+    label: '1 Tahun',
+  },
+  {
+    key: 'all',
+    label: 'Semua',
+  },
 ];
 
-/**
- * Mengubah DD/MM/YYYY menjadi Date.
- */
 const parseDate = (date: string): Date => {
   const [day, month, year] = date.split('/').map(Number);
-
   return new Date(year, month - 1, day);
 };
 
-/**
- * Menentukan tanggal terbaru dari seluruh data.
- */
-const getLatestDate = (
-  actual: ChartPoint[],
-  predicted: ChartPoint[],
-): Date | null => {
-  const allPoints = [...actual, ...predicted];
-
-  if (allPoints.length === 0) {
-    return null;
-  }
-
-  return allPoints.reduce((latest, point) => {
-    const currentDate = parseDate(point.date);
-
-    return currentDate > latest ? currentDate : latest;
-  }, parseDate(allPoints[0].date));
+const formatFullDate = (date: string): string => {
+  const parsedDate = parseDate(date);
+  return parsedDate.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 };
 
-const formatDate = (date: string, showYear: boolean): string => {
-  const [day, month, year] = date.split('/');
-
+const formatAxisDate = (timestamp: number, showYear: boolean): string => {
+  const date = new Date(timestamp);
   if (showYear) {
-    return `${day}/${month}/${year.slice(-2)}`;
+    return date.toLocaleDateString('id-ID', {
+      month: 'short',
+      year: '2-digit',
+    });
   }
 
-  return `${day}/${month}`;
+  return date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+  });
 };
 
 const getNiceMax = (value: number): number => {
+  if (value <= 5) return 5;
   if (value <= 10) return 10;
 
   const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
-
   const normalized = value / magnitude;
-  let niceNormalized = 1;
+  let niceNormalized;
 
   if (normalized <= 1) {
     niceNormalized = 1;
@@ -109,141 +117,151 @@ const getNiceMax = (value: number): number => {
 const PredictionChart = ({
   actual,
   predicted,
-  height = 260,
+  height = CHART_HEIGHT,
 }: PredictionChartProps) => {
-  const { width: screenWidth } = useWindowDimensions();
-  const [selectedFilter, setSelectedFilter] = useState<PeriodFilter>('latest');
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>('1year');
+  const [chartMode, setChartMode] = useState<ChartMode>('overview');
+  const [selectedPoint, setSelectedPoint] = useState<ChartItem | null>(null);
+  const [chartWidth, setChartWidth] = useState(0);
+  const normalizedActual = useMemo(() => {
+    return actual
+      .map(item => ({
+        ...item,
+        type: 'actual' as const,
+        timestamp: parseDate(item.date).getTime(),
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }, [actual]);
 
-  const filteredData = useMemo(() => {
-    if (actual.length === 0 && predicted.length === 0) {
-      return {
-        actual: [],
-        predicted: [],
-      };
+  const normalizedPredicted = useMemo(() => {
+    return predicted
+      .map(item => ({
+        ...item,
+        type: 'predicted' as const,
+        timestamp: parseDate(item.date).getTime(),
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }, [predicted]);
+
+  // Data overview berdasarkan periode.
+  const overviewData = useMemo(() => {
+    if (normalizedActual.length === 0 && normalizedPredicted.length === 0) {
+      return [];
     }
 
-    const filteredPredicted = predicted;
-    if (selectedFilter === 'all') {
-      return {
-        actual,
-        predicted: filteredPredicted,
-      };
+    const latestActual = normalizedActual[normalizedActual.length - 1];
+    if (!latestActual) {
+      return normalizedPredicted;
     }
 
-    if (selectedFilter === 'latest') {
-      return {
-        actual: actual.slice(-10),
-        predicted: filteredPredicted,
-      };
+    if (selectedPeriod === 'all') {
+      return [...normalizedActual, ...normalizedPredicted];
     }
 
-    const latestDate = getLatestDate(actual, predicted);
-    if (!latestDate) {
-      return {
-        actual: [],
-        predicted: filteredPredicted,
-      };
-    }
-
-    const startDate = new Date(latestDate);
-    switch (selectedFilter) {
+    const startDate = new Date(latestActual.timestamp);
+    switch (selectedPeriod) {
       case '3months':
         startDate.setMonth(startDate.getMonth() - 3);
         break;
-
       case '6months':
         startDate.setMonth(startDate.getMonth() - 6);
         break;
-
       case '1year':
         startDate.setFullYear(startDate.getFullYear() - 1);
         break;
     }
 
-    const filteredActual = actual.filter(point => {
-      const pointDate = parseDate(point.date);
-      return pointDate >= startDate;
-    });
+    const startTimestamp = startDate.getTime();
+    const filteredActual = normalizedActual.filter(
+      point => point.timestamp >= startTimestamp,
+    );
 
-    return {
-      actual: filteredActual,
-      predicted: filteredPredicted,
-    };
-  }, [actual, predicted, selectedFilter]);
+    return [...filteredActual, ...normalizedPredicted];
+  }, [normalizedActual, normalizedPredicted, selectedPeriod]);
 
-  const filteredActual = filteredData.actual;
-  const filteredPredicted = filteredData.predicted;
-  const allPoints = useMemo(
-    () => [...filteredActual, ...filteredPredicted],
-    [filteredActual, filteredPredicted],
+  // Data khusus Fokus Prediksi. Mengambil maksimal 5 data aktual terakhir
+  const predictionFocusData = useMemo(() => {
+    const recentActual = normalizedActual.slice(-5);
+    return [...recentActual, ...normalizedPredicted];
+  }, [normalizedActual, normalizedPredicted]);
+
+  // Menentukan dataset aktif.
+  const activeData =
+    chartMode === 'overview' ? overviewData : predictionFocusData;
+  const activeActual = activeData.filter(point => point.type === 'actual');
+  const activePredicted = activeData.filter(
+    point => point.type === 'predicted',
   );
 
-  if (allPoints.length === 0) {
+  // Reset selected point ketika mode/filter berubah.
+  React.useEffect(() => {
+    setSelectedPoint(null);
+  }, [selectedPeriod, chartMode]);
+
+  if (activeData.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Belum ada data untuk ditampilkan</Text>
+        <Text style={styles.emptyText}>
+          Belum ada data penjualan untuk ditampilkan
+        </Text>
       </View>
     );
   }
 
-  const chartWidth = Math.max(
-    screenWidth - 32,
-    MIN_CHART_WIDTH,
-    PADDING_LEFT +
-      PADDING_RIGHT +
-      Math.max(allPoints.length - 1, 1) * POINT_SPACING,
-  );
+  // Range waktu.
+  const timestamps = activeData.map(item => item.timestamp);
+  const minTimestamp = Math.min(...timestamps);
+  const maxTimestamp = Math.max(...timestamps);
+  const timeRange = maxTimestamp - minTimestamp || 1; // Mencegah pembagian 0 jika hanya ada satu tanggal.
 
-  const chartHeight = height - PADDING_TOP - PADDING_BOTTOM;
-  const allValues = [
-    ...allPoints.map(point => point.quantity),
+  // Semua nilai untuk skala Y.
+  const allValues = activeData.flatMap(point => {
+    const values = [point.quantity];
 
-    ...filteredPredicted
-      .filter(point => point.lower !== undefined)
-      .map(point => point.lower as number),
+    if (point.type === 'predicted') {
+      if (point.lower !== undefined) {
+        values.push(point.lower);
+      }
 
-    ...filteredPredicted
-      .filter(point => point.upper !== undefined)
-      .map(point => point.upper as number),
-  ];
+      if (point.upper !== undefined) {
+        values.push(point.upper);
+      }
+    }
+    return values;
+  });
 
-  const rawMaxValue = Math.max(...allValues, 1);
-  const maxValue = getNiceMax(rawMaxValue);
-  const getX = (index: number) => {
-    return PADDING_LEFT + index * POINT_SPACING;
+  const maxValue = getNiceMax(Math.max(...allValues, 1));
+
+  // Area chart sebenarnya.
+  const plotWidth = Math.max(chartWidth - PADDING.left - PADDING.right, 1);
+  const plotHeight = height - PADDING.top - PADDING.bottom;
+
+  // Posisi X berdasarkan waktu.
+  const getX = (timestamp: number) => {
+    return PADDING.left + ((timestamp - minTimestamp) / timeRange) * plotWidth;
   };
 
+  // Posisi Y berdasarkan nilai.
   const getY = (value: number) => {
-    return PADDING_TOP + chartHeight - (value / maxValue) * chartHeight;
+    return PADDING.top + plotHeight - (value / maxValue) * plotHeight;
   };
 
-  const actualLinePoints = filteredActual
-    .map((point, index) => {
-      return `${getX(index)},${getY(point.quantity)}`;
-    })
+  // Garis aktual.
+  const actualLinePoints = activeActual
+    .map(point => `${getX(point.timestamp)},${getY(point.quantity)}`)
     .join(' ');
 
-  const predictedLinePoints = filteredPredicted
-    .map((point, index) => {
-      const position = filteredActual.length + index;
-      return `${getX(position)},${getY(point.quantity)}`;
-    })
+  // Garis prediksi.
+  const predictedLinePoints = [
+    ...(activeActual.length > 0 ? [activeActual[activeActual.length - 1]] : []),
+    ...activePredicted,
+  ]
+    .map(point => `${getX(point.timestamp)},${getY(point.quantity)}`)
     .join(' ');
 
-  const bridgePoint =
-    filteredActual.length > 0
-      ? `${getX(filteredActual.length - 1)},${getY(
-          filteredActual[filteredActual.length - 1].quantity,
-        )}`
-      : '';
-
-  const predictionPolylinePoints =
-    bridgePoint && predictedLinePoints
-      ? `${bridgePoint} ${predictedLinePoints}`
-      : predictedLinePoints;
-
-  const predictionRangePoints = (() => {
-    const hasRange = filteredPredicted.some(
+  // Area rentang prediksi.
+  const predictionRangePoints = useMemo(() => {
+    const hasRange = activePredicted.some(
       point =>
         point.lower !== undefined &&
         point.upper !== undefined &&
@@ -254,221 +272,365 @@ const PredictionChart = ({
       return '';
     }
 
-    const upperPoints = filteredPredicted.map((point, index) => {
-      const position = filteredActual.length + index;
+    const upperPoints = activePredicted.map(point => {
       const upper = point.upper ?? point.quantity;
-      return `${getX(position)},${getY(upper)}`;
+      return `${getX(point.timestamp)},${getY(upper)}`;
     });
 
-    const lowerPoints = [...filteredPredicted]
-      .reverse()
-      .map((point, reverseIndex) => {
-        const originalIndex = filteredPredicted.length - 1 - reverseIndex;
-        const position = filteredActual.length + originalIndex;
-        const lower = point.lower ?? point.quantity;
-        return `${getX(position)},${getY(lower)}`;
-      });
+    const lowerPoints = [...activePredicted].reverse().map(point => {
+      const lower = point.lower ?? point.quantity;
+      return `${getX(point.timestamp)},${getY(lower)}`;
+    });
+
     return [...upperPoints, ...lowerPoints].join(' ');
-  })();
+  }, [activePredicted, plotWidth, maxValue, minTimestamp, timeRange]);
 
-  const years = new Set(
-    allPoints.map(point => {
-      const [, , year] = point.date.split('/');
-      return year;
-    }),
-  );
-
-  const showYear = years.size > 1;
-  const hasPredictionRange = filteredPredicted.some(
+  // Apakah rentang prediksi tersedia.
+  const hasPredictionRange = activePredicted.some(
     point =>
       point.lower !== undefined &&
       point.upper !== undefined &&
       point.lower !== point.upper,
   );
 
+  //  Menentukan jumlah label X.
+  const axisTickCount =
+    chartMode === 'prediction' ? Math.min(activeData.length, 6) : 5;
+
+  // Membuat tick X berdasarkan waktu.
+  const xAxisTicks = useMemo(() => {
+    if (axisTickCount <= 1) {
+      return [minTimestamp];
+    }
+
+    return Array.from({ length: axisTickCount }, (_, index) => {
+      return minTimestamp + (timeRange / (axisTickCount - 1)) * index;
+    });
+  }, [axisTickCount, minTimestamp, timeRange]);
+
+  const showYear =
+    new Date(minTimestamp).getFullYear() !==
+    new Date(maxTimestamp).getFullYear();
+
+  const findNearestPoint = (touchX: number) => {
+    if (activeData.length === 0) {
+      return null;
+    }
+
+    let nearestPoint = activeData[0];
+    let nearestDistance = Math.abs(getX(activeData[0].timestamp) - touchX);
+    activeData.forEach(point => {
+      const distance = Math.abs(getX(point.timestamp) - touchX);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestPoint = point;
+      }
+    });
+    return nearestPoint;
+  };
+
+  const handleTouch = (event: GestureResponderEvent) => {
+    const touchX = event.nativeEvent.locationX;
+    const nearestPoint = findNearestPoint(touchX);
+    if (nearestPoint) {
+      setSelectedPoint(nearestPoint);
+    }
+  };
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: event => {
+          handleTouch(event);
+        },
+        onPanResponderMove: event => {
+          handleTouch(event);
+        },
+        onPanResponderRelease: () => {},
+      }),
+    [activeData, plotWidth, minTimestamp, timeRange],
+  );
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Aktual vs Prediksi</Text>
-        <Text style={styles.subtitle}>Riwayat penjualan dan proyeksi</Text>
+        <View>
+          {/* <Text style={styles.title}>Aktual vs Prediksi</Text> */}
+          <Text style={styles.subtitle}>
+            {chartMode === 'overview'
+              ? 'Perkembangan penjualan'
+              : 'Fokus hasil prediksi'}
+          </Text>
+        </View>
       </View>
 
-      {/* Filter */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterContainer}
-      >
-        {FILTERS.map(filter => {
-          const isActive = selectedFilter === filter.key;
-          return (
-            <Pressable
-              key={filter.key}
-              onPress={() => setSelectedFilter(filter.key)}
-              style={[
-                styles.filterButton,
-                isActive && styles.filterButtonActive,
-              ]}
-            >
-              <Text
-                style={[styles.filterText, isActive && styles.filterTextActive]}
-              >
-                {filter.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      {/* Tab Mode */}
+      <View style={styles.modeContainer}>
+        {/* Grafik Semua */}
+        <Pressable
+          onPress={() => setChartMode('overview')}
+          style={[
+            styles.modeButton,
+            chartMode === 'overview' && styles.modeButtonActive,
+          ]}
+        >
+          <Text
+            style={[
+              styles.modeText,
+              chartMode === 'overview' && styles.modeTextActive,
+            ]}
+          >
+            Grafik Tren
+          </Text>
+        </Pressable>
 
-      {/* Scroll hint */}
-      {allPoints.length > 6 && (
-        <Text style={styles.scrollHint}>
-          Geser grafik untuk melihat data lainnya
-        </Text>
+        {/* Grafik Prediksi */}
+        <Pressable
+          onPress={() => setChartMode('prediction')}
+          style={[
+            styles.modeButton,
+            chartMode === 'prediction' && styles.modeButtonActive,
+          ]}
+        >
+          <Text
+            style={[
+              styles.modeText,
+              chartMode === 'prediction' && styles.modeTextActive,
+            ]}
+          >
+            Fokus Prediksi
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* Filter hanya untuk overview */}
+      {chartMode === 'overview' && (
+        <View style={styles.filterContainer}>
+          {FILTERS.map(filter => {
+            const isActive = selectedPeriod === filter.key;
+            return (
+              <Pressable
+                key={filter.key}
+                onPress={() => setSelectedPeriod(filter.key)}
+                style={[
+                  styles.filterButton,
+                  isActive && styles.filterButtonActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    isActive && styles.filterTextActive,
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       )}
 
+      {/* Informasi per tanggal */}
+      <View style={styles.tooltip}>
+        <Text style={styles.tooltipTitle}>Informasi per tanggal</Text>
+        {selectedPoint ? (
+          <>
+            <Text style={styles.tooltipDate}>
+              {formatFullDate(selectedPoint.date)}
+            </Text>
+            {selectedPoint.type === 'actual' ? (
+              <Text style={styles.tooltipValue}>
+                Aktual: {selectedPoint.quantity} unit
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.tooltipValue}>
+                  Prediksi: {selectedPoint.quantity} unit{' '}
+                </Text>
+                {selectedPoint.lower !== undefined &&
+                  selectedPoint.upper !== undefined && (
+                    <Text style={styles.tooltipRange}>
+                      Rentang: {selectedPoint.lower}–{selectedPoint.upper} unit
+                    </Text>
+                  )}
+              </>
+            )}
+          </>
+        ) : (
+          <Text style={styles.tooltipPlaceholder}>
+            Sentuh grafik untuk melihat informasi
+          </Text>
+        )}
+      </View>
+
       {/* Chart */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chartScrollContainer}
+      <View
+        style={styles.chartContainer}
+        onLayout={event => {
+          setChartWidth(event.nativeEvent.layout.width);
+        }}
+        {...panResponder.panHandlers}
       >
-        <Svg width={chartWidth} height={height}>
-          {/* Grid horizontal + label Y */}
-          {Array.from({
-            length: GRID_COUNT + 1,
-          }).map((_, index) => {
-            const value = (maxValue / GRID_COUNT) * (GRID_COUNT - index);
-            const y = getY(value);
-            return (
-              <React.Fragment key={`grid-${index}`}>
-                <Line
-                  x1={PADDING_LEFT}
-                  y1={y}
-                  x2={chartWidth - PADDING_RIGHT}
-                  y2={y}
-                  stroke="#E5E7EB"
-                  strokeWidth={1}
-                />
-                <SvgText
-                  x={PADDING_LEFT - 8}
-                  y={y + 4}
-                  fontSize="10"
-                  fill={Colors.textSecondary}
-                  textAnchor="end"
-                >
-                  {Math.round(value)}
-                </SvgText>
-              </React.Fragment>
-            );
-          })}
+        {chartWidth > 0 && (
+          <Svg width="100%" height={height}>
+            {/* Grid horizontal */}
+            {Array.from({
+              length: GRID_COUNT + 1,
+            }).map((_, index) => {
+              const value = (maxValue / GRID_COUNT) * (GRID_COUNT - index);
+              const y = getY(value);
+              return (
+                <React.Fragment key={`grid-${index}`}>
+                  <Line
+                    x1={PADDING.left}
+                    y1={y}
+                    x2={chartWidth - PADDING.right}
+                    y2={y}
+                    stroke="#E5E7EB"
+                    strokeWidth={1}
+                  />
 
-          {/* Sumbu Y */}
-          <Line
-            x1={PADDING_LEFT}
-            y1={PADDING_TOP}
-            x2={PADDING_LEFT}
-            y2={height - PADDING_BOTTOM}
-            stroke="#D1D5DB"
-            strokeWidth={1}
-          />
+                  <SvgText
+                    x={PADDING.left - 8}
+                    y={y + 4}
+                    fontSize={10}
+                    fill={Colors.textSecondary}
+                    textAnchor="end"
+                  >
+                    {Math.round(value)}
+                  </SvgText>
+                </React.Fragment>
+              );
+            })}
 
-          {/* Sumbu X */}
-          <Line
-            x1={PADDING_LEFT}
-            y1={height - PADDING_BOTTOM}
-            x2={chartWidth - PADDING_RIGHT}
-            y2={height - PADDING_BOTTOM}
-            stroke="#D1D5DB"
-            strokeWidth={1}
-          />
-
-          {/* Rentang Prediksi */}
-          {predictionRangePoints !== '' && (
-            <Polygon
-              points={predictionRangePoints}
-              fill="#F59E0B"
-              fillOpacity={0.15}
+            {/* Sumbu Y */}
+            <Line
+              x1={PADDING.left}
+              y1={PADDING.top}
+              x2={PADDING.left}
+              y2={height - PADDING.bottom}
+              stroke="#D1D5DB"
+              strokeWidth={1}
             />
-          )}
 
-          {/* Garis Aktual */}
-          {filteredActual.length > 1 && (
-            <Polyline
-              points={actualLinePoints}
-              fill="none"
-              stroke={Colors.primary}
-              strokeWidth={2.5}
-              strokeLinejoin="round"
-              strokeLinecap="round"
+            {/* Sumbu X */}
+            <Line
+              x1={PADDING.left}
+              y1={height - PADDING.bottom}
+              x2={chartWidth - PADDING.right}
+              y2={height - PADDING.bottom}
+              stroke="#D1D5DB"
+              strokeWidth={1}
             />
-          )}
 
-          {/* Jika hanya ada satu data aktual */}
-          {filteredActual.length === 1 && (
-            <Circle
-              cx={getX(0)}
-              cy={getY(filteredActual[0].quantity)}
-              r={4}
-              fill={Colors.primary}
-            />
-          )}
+            {/* Area Rentang Prediksi */}
+            {predictionRangePoints !== '' && (
+              <Polygon
+                points={predictionRangePoints}
+                fill="#F59E0B"
+                fillOpacity={0.14}
+              />
+            )}
 
-          {/* Garis Prediksi */}
-          {filteredPredicted.length > 0 && (
-            <Polyline
-              points={predictionPolylinePoints}
-              fill="none"
-              stroke="#F59E0B"
-              strokeWidth={2.5}
-              strokeDasharray="7,5"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-          )}
+            {/* Garis Aktual */}
+            {activeActual.length > 1 && (
+              <Polyline
+                points={actualLinePoints}
+                fill="none"
+                stroke={Colors.primary}
+                strokeWidth={2.5}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            )}
 
-          {/* Titik Aktual */}
-          {filteredActual.map((point, index) => (
-            <Circle
-              key={`actual-${index}`}
-              cx={getX(index)}
-              cy={getY(point.quantity)}
-              r={3.5}
-              fill={Colors.primary}
-            />
-          ))}
+            {/* Garis Prediksi */}
+            {activePredicted.length > 0 && (
+              <Polyline
+                points={predictedLinePoints}
+                fill="none"
+                stroke="#F59E0B"
+                strokeWidth={2.5}
+                strokeDasharray="7,5"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            )}
 
-          {/* Titik Prediksi */}
-          {filteredPredicted.map((point, index) => {
-            const position = filteredActual.length + index;
-
-            return (
+            {/* Titik Aktual */}
+            {activeActual.map(point => (
               <Circle
-                key={`predicted-${index}`}
-                cx={getX(position)}
+                key={`actual-${point.date}`}
+                cx={getX(point.timestamp)}
                 cy={getY(point.quantity)}
-                r={3.5}
+                r={3}
+                fill={Colors.primary}
+              />
+            ))}
+
+            {/* Titik Prediksi */}
+            {activePredicted.map(point => (
+              <Circle
+                key={`predicted-${point.date}`}
+                cx={getX(point.timestamp)}
+                cy={getY(point.quantity)}
+                r={3}
                 fill="#F59E0B"
               />
-            );
-          })}
+            ))}
 
-          {/* Label tanggal */}
-          {allPoints.map((point, index) => (
-            <SvgText
-              key={`date-${index}`}
-              x={getX(index)}
-              y={height - 12}
-              fontSize="9"
-              fill={Colors.textSecondary}
-              textAnchor="middle"
-            >
-              {formatDate(point.date, showYear)}
-            </SvgText>
-          ))}
-        </Svg>
-      </ScrollView>
+            {/* Crosshair */}
+            {selectedPoint && (
+              <>
+                <Line
+                  x1={getX(selectedPoint.timestamp)}
+                  y1={PADDING.top}
+                  x2={getX(selectedPoint.timestamp)}
+                  y2={height - PADDING.bottom}
+                  stroke="#94A3B8"
+                  strokeWidth={1}
+                  strokeDasharray="4,4"
+                />
+
+                {/* Highlight selected point */}
+                <Circle
+                  cx={getX(selectedPoint.timestamp)}
+                  cy={getY(selectedPoint.quantity)}
+                  r={6}
+                  fill="#FFFFFF"
+                  stroke={
+                    selectedPoint.type === 'actual' ? Colors.primary : '#F59E0B'
+                  }
+                  strokeWidth={2.5}
+                />
+              </>
+            )}
+
+            {/* Label X */}
+            {xAxisTicks.map((timestamp, index) => (
+              <SvgText
+                key={`tick-${index}`}
+                x={getX(timestamp)}
+                y={height - 14}
+                fontSize={9}
+                fill={Colors.textSecondary}
+                textAnchor="middle"
+              >
+                {formatAxisDate(timestamp, showYear)}
+              </SvgText>
+            ))}
+          </Svg>
+        )}
+      </View>
+
+      {/* Hint */}
+      <Text style={styles.touchHint}>
+        Sentuh dan geser pada grafik untuk melihat detail
+      </Text>
 
       {/* Legend */}
       <View style={styles.legendContainer}>
@@ -480,16 +642,15 @@ const PredictionChart = ({
         </View>
         <View style={styles.legendItem}>
           <View style={styles.legendDashed}>
-            <View style={[styles.dash, { backgroundColor: '#F59E0B' }]} />
-            <View style={[styles.dash, { backgroundColor: '#F59E0B' }]} />
+            <View style={styles.legendDash} />
+            <View style={styles.legendDash} />
           </View>
           <Text style={styles.legendText}>Prediksi</Text>
         </View>
-
         {hasPredictionRange && (
           <View style={styles.legendItem}>
-            <View style={styles.rangeBox} />
-            <Text style={styles.legendText}>Rentang</Text>
+            <View style={styles.rangeLegend} />
+            <Text style={styles.legendText}>Rentang Prediksi</Text>
           </View>
         )}
       </View>
@@ -505,63 +666,130 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 14,
   },
-
   title: {
     fontSize: 16,
     fontWeight: '700',
     color: Colors.text,
   },
-
   subtitle: {
     marginTop: 3,
     fontSize: 12,
     color: Colors.textSecondary,
   },
 
-  filterContainer: {
-    paddingBottom: 12,
-    gap: 8,
+  modeContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 14,
   },
-
-  filterButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
+  modeButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
   },
-
-  filterButtonActive: {
-    backgroundColor: Colors.primary,
+  modeButtonActive: {
+    backgroundColor: '#FFFFFF',
   },
-
-  filterText: {
+  modeText: {
     fontSize: 12,
     fontWeight: '500',
     color: Colors.textSecondary,
   },
+  modeTextActive: {
+    color: Colors.primary,
+    fontWeight: '700',
+  },
 
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 6,
+    marginBottom: 14,
+  },
+  filterButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 7,
+    paddingHorizontal: 4,
+    borderRadius: 16,
+    backgroundColor: '#F1F5F9',
+  },
+  filterButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  filterText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
   filterTextActive: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
-  scrollHint: {
-    marginBottom: 6,
+  tooltip: {
+    width: '100%',
+    marginBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#000000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    elevation: 2,
+  },
+  tooltipTitle: {
+    marginBottom: 8,
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  tooltipDate: {
+    marginBottom: 4,
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  tooltipValue: {
+    fontSize: 12,
+    color: Colors.text,
+  },
+  tooltipRange: {
+    marginTop: 2,
     fontSize: 11,
     color: Colors.textSecondary,
-    fontStyle: 'italic',
+  },
+  tooltipPlaceholder: {
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
 
-  chartScrollContainer: {
-    paddingRight: 16,
+  chartContainer: {
+    width: '100%',
+  },
+
+  touchHint: {
+    marginTop: 4,
+    textAlign: 'center',
+    fontSize: 10,
+    color: Colors.textSecondary,
   },
 
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 14,
     marginTop: 10,
   },
 
@@ -574,7 +802,7 @@ const styles = StyleSheet.create({
   legendLine: {
     width: 20,
     height: 3,
-    borderRadius: 2,
+    borderRadius: 3,
   },
 
   legendDashed: {
@@ -583,17 +811,18 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 
-  dash: {
+  legendDash: {
     width: 8,
     height: 3,
     borderRadius: 2,
+    backgroundColor: '#F59E0B',
   },
 
-  rangeBox: {
+  rangeLegend: {
     width: 16,
     height: 10,
     borderRadius: 2,
-    backgroundColor: 'rgba(245, 158, 11, 0.18)',
+    backgroundColor: 'rgba(245, 158, 11, 0.14)',
   },
 
   legendText: {

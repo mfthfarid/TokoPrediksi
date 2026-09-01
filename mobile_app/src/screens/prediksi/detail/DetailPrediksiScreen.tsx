@@ -203,7 +203,7 @@ const DetailPrediksiScreen = () => {
           <PredictionChart
             actual={data.chart_data.actual}
             predicted={data.chart_data.predicted}
-            width={screenWidth - 64}
+            // width={screenWidth - 64}
           />
         </View>
 
