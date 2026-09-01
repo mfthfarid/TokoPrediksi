@@ -11,6 +11,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/notification"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
 )
 
@@ -169,25 +170,19 @@ func (s *PredictionService) PredictAll(periods int) error {
 		periods = defaultPeriods
 	}
 
-	// 1. Ambil seluruh ID Produk aktif dari repository
-    // (Anda perlu membuat fungsi GetAllProductIDs di PredictionRepository)
 	productIDs, err := s.repo.GetAllProductIDs()
 	if err != nil {
 		return err
 	}
 
-	// 2. Jalankan proses di background menggunakan Goroutine
-    // Agar API langsung membalas "Proses dimulai" tanpa membuat klien menunggu lama
 	go func() {
 		fmt.Println("Memulai prediksi massal untuk", len(productIDs), "produk...")
 		successCount := 0
 		failCount := 0
 
 		for _, id := range productIDs {
-			// Memanfaatkan fungsi Predict yang sudah Anda buat!
 			_, err := s.Predict(id, periods)
 			if err != nil {
-				// Log error, tapi TETAP LANJUT ke produk berikutnya
 				fmt.Printf("❌ [Produk ID: %d] Gagal: %v\n", id, err)
 				failCount++
 				continue
@@ -197,8 +192,33 @@ func (s *PredictionService) PredictAll(periods int) error {
 		}
 
 		fmt.Printf("🏁 Prediksi massal selesai! Berhasil: %d, Gagal: %d\n", successCount, failCount)
-        // Opsional: Di sini Anda bisa menambahkan kode untuk mengirim notifikasi
-        // ke aplikasi (misal via Firebase Cloud Messaging/FCM) bahwa "Prediksi Mingguan Selesai!"
+
+		// Kirim notifikasi ringkasan setelah semua selesai
+		summary, err := s.GetSummary()
+		notifService := notification.NewService()
+
+		if err != nil {
+			notifService.Broadcast(
+				"Prediksi Mingguan Selesai",
+				fmt.Sprintf("%d produk berhasil diprediksi.", successCount),
+				"prediction_complete",
+			)
+			return
+		}
+
+		urgentCount := 0
+		for _, item := range summary {
+			if item.Urgency == "tinggi" {
+				urgentCount++
+			}
+		}
+
+		body := fmt.Sprintf("%d produk berhasil diprediksi.", successCount)
+		if urgentCount > 0 {
+			body = fmt.Sprintf("%s %d produk perlu segera direstok!", body, urgentCount)
+		}
+
+		notifService.Broadcast("Prediksi Mingguan Selesai", body, "prediction_complete")
 	}()
 
 	return nil

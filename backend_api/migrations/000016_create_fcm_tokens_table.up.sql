@@ -1,0 +1,10 @@
+CREATE TABLE fcm_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_fcmtokens_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+);
