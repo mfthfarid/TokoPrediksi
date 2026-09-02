@@ -15,12 +15,12 @@ import {
 } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
-  Sparkles,
   RefreshCw,
   ShoppingCart,
   AlertTriangle,
   TrendingDown,
   CheckCircle2,
+  LineChart,
 } from 'lucide-react-native';
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
@@ -43,6 +43,11 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 const screenWidth = Dimensions.get('window').width;
+const predictionPeriods = [
+  { label: '7 Hari', value: 7 },
+  { label: '14 Hari', value: 14 },
+  { label: '1 Bulan', value: 30 },
+] as const;
 
 const getUrgencyConfig = (urgency: UrgencyLevel) => {
   switch (urgency) {
@@ -75,10 +80,10 @@ const DetailPrediksiScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { productId } = route.params;
   const toast = useToast();
-
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [data, setData] = useState<PredictionDetailApi | null>(null);
+  const [predictionPeriod, setPredictionPeriod] = useState<7 | 14 | 30>(7);
 
   const fetchData = useCallback(async () => {
     try {
@@ -101,7 +106,7 @@ const DetailPrediksiScreen = () => {
   const handleRunPrediction = async () => {
     setRunning(true);
     try {
-      const response = await runPrediction(productId);
+      const response = await runPrediction(productId, predictionPeriod);
       setData(response.data);
       toast.success('Prediksi berhasil dijalankan');
     } catch (error: any) {
@@ -143,22 +148,59 @@ const DetailPrediksiScreen = () => {
     );
   }
 
+  // Tampilan belum dilakukan prediksi
   if (!data.has_prediction) {
     return (
-      <ScreenLayout title={data.product_name} subtitle="Belum Ada Prediksi">
+      <ScreenLayout
+        title={data.product_name}
+        subtitle="Siapkan Prediksi Penjualan"
+      >
         <View style={styles.ctaCard}>
-          <Sparkles size={40} color={Colors.primary} />
-          <Text style={styles.ctaTitle}>Belum Ada Prediksi</Text>
+          <View style={styles.ctaIconContainer}>
+            <LineChart size={36} color={Colors.primary} />
+          </View>
+          <Text style={styles.ctaTitle}>Belum Ada Hasil Prediksi</Text>
           <Text style={styles.ctaText}>
-            Jalankan prediksi AI buat lihat proyeksi penjualan & rekomendasi
-            restock produk ini.
+            Pilih periode prediksi untuk melihat estimasi penjualan dan
+            rekomendasi restock produk.
           </Text>
-          <PrimaryButton
-            title="Jalankan Prediksi"
-            loadingTitle="Memproses..."
-            loading={running}
-            onPress={handleRunPrediction}
-          />
+          <View style={styles.periodSection}>
+            <Text style={styles.periodLabel}>Periode Prediksi</Text>
+            <View style={styles.periodSelector}>
+              {predictionPeriods.map(period => {
+                const isActive = predictionPeriod === period.value;
+                return (
+                  <TouchableOpacity
+                    key={period.value}
+                    style={[
+                      styles.periodButton,
+                      isActive && styles.periodButtonActive,
+                    ]}
+                    onPress={() => setPredictionPeriod(period.value)}
+                    disabled={running}
+                  >
+                    <Text
+                      style={[
+                        styles.periodButtonText,
+                        isActive && styles.periodButtonTextActive,
+                      ]}
+                    >
+                      {period.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+          {/* Tombol */}
+          <View style={styles.predictionButtonWrapper}>
+            <PrimaryButton
+              title="Jalankan Prediksi"
+              loadingTitle="Memproses..."
+              loading={running}
+              onPress={handleRunPrediction}
+            />
+          </View>
         </View>
       </ScreenLayout>
     );
@@ -223,20 +265,51 @@ const DetailPrediksiScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.rerunButton}
-          onPress={handleRunPrediction}
-          disabled={running}
-        >
-          {running ? (
-            <ActivityIndicator size="small" color={Colors.primary} />
-          ) : (
-            <RefreshCw size={16} color={Colors.primary} />
-          )}
-          <Text style={styles.rerunButtonText}>
-            {running ? 'Memproses...' : 'Jalankan Ulang Prediksi'}
-          </Text>
-        </TouchableOpacity>
+        {/* Pilihan hari */}
+        <View style={styles.predictionActionCard}>
+          <View style={styles.predictionActionHeader}>
+            <Text style={styles.predictionActionTitle}>Perbarui Prediksi</Text>
+            <Text style={styles.predictionActionSubtitle}>
+              Pilih periode untuk membuat prediksi terbaru
+            </Text>
+          </View>
+          <View style={styles.periodSection}>
+            <Text style={styles.periodLabel}>Periode Prediksi</Text>
+            <View style={styles.periodSelector}>
+              {predictionPeriods.map(period => {
+                const isActive = predictionPeriod === period.value;
+                return (
+                  <TouchableOpacity
+                    key={period.value}
+                    style={[
+                      styles.periodButton,
+                      isActive && styles.periodButtonActive,
+                    ]}
+                    onPress={() => setPredictionPeriod(period.value)}
+                    disabled={running}
+                  >
+                    <Text
+                      style={[
+                        styles.periodButtonText,
+                        isActive && styles.periodButtonTextActive,
+                      ]}
+                    >
+                      {period.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Tombol */}
+          <PrimaryButton
+            title="Jalankan Prediksi"
+            loadingTitle="Memproses..."
+            loading={running}
+            onPress={handleRunPrediction}
+          />
+        </View>
       </ScrollView>
     </ScreenLayout>
   );

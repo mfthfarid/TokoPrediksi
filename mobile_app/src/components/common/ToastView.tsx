@@ -67,7 +67,10 @@ const ToastView = ({ message, type, duration, onHide }: ToastViewProps) => {
     >
       <View style={styles.row}>
         <Icon size={20} color="#fff" />
-        <Text style={styles.message} numberOfLines={2}>
+        <Text
+          style={styles.message}
+          // numberOfLines={2}
+        >
           {message}
         </Text>
       </View>
