@@ -23,7 +23,8 @@ const TYPE_CONFIG: Record<
 
 const ToastView = ({ message, type, duration, onHide }: ToastViewProps) => {
   const insets = useSafeAreaInsets();
-  const translateY = useRef(new Animated.Value(-80)).current;
+  const TOAST_OFFSET = -200;
+  const translateY = useRef(new Animated.Value(TOAST_OFFSET)).current;
   const progress = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -36,12 +37,12 @@ const ToastView = ({ message, type, duration, onHide }: ToastViewProps) => {
     Animated.timing(progress, {
       toValue: 0,
       duration,
-      useNativeDriver: false, // animasi width tidak bisa pakai native driver
+      useNativeDriver: false,
     }).start();
 
     const timer = setTimeout(() => {
       Animated.timing(translateY, {
-        toValue: -80,
+        toValue: TOAST_OFFSET,
         duration: 1000,
         useNativeDriver: true,
       }).start(() => onHide());
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
     marginBottom: 8,
   },
@@ -118,6 +119,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
+    lineHeight: 19,
+    flexShrink: 1,
   },
   progressTrack: {
     height: 3,

@@ -30,6 +30,7 @@ func main() {
 	seedProductUnits()
 }
 
+// user
 func seedOwner() {
 	email := os.Getenv("OWNER_EMAIL")
 	password := os.Getenv("OWNER_PASSWORD")
@@ -57,8 +58,9 @@ func seedOwner() {
 	log.Println("✅ User owner berhasil dibuat:", email)
 }
 
+// Satuan
 func seedUnits() {
-	defaultUnits := []string{"Pcs", "Renteng", "Pack", "Dus", "Lusin", "Kg"}
+	defaultUnits := []string{"Pcs", "Renteng", "Pack", "Dus", "Lusin", "Ikat", "Kg"}
 
 	for _, name := range defaultUnits {
 		var existing unit.Unit
@@ -70,6 +72,7 @@ func seedUnits() {
 	log.Println("✅ Satuan default berhasil di-seed")
 }
 
+// Kategroi
 func seedCategories() {
 	defaultCategories := []string{"Minuman Sachet", "Makanan Ringan", "Bumbu Dapur"}
 
@@ -83,6 +86,7 @@ func seedCategories() {
 	log.Println("✅ Kategori default berhasil di-seed")
 }
 
+// Supplier
 func seedSuppliers() {
 	defaultSuppliers := []string{"PT Sumber Makmur Sejahtera"}
 
@@ -102,6 +106,7 @@ func seedSuppliers() {
 	log.Println("✅ Supplier default berhasil di-seed")
 }
 
+// Produk
 func seedProducts() {
 	productName := "Kopi Kapal Api 1000"
 	var existing product.Product
@@ -128,6 +133,7 @@ func seedProducts() {
 	log.Println("✅ Produk Kopi Kapal Api 1000 berhasil dibuat")
 }
 
+// Satuan produk
 func seedProductUnits() {
 	// Cari produk "Kopi Kapal Api 1000" untuk mendapatkan ID-nya (biasanya ID = 1 jika baru pertama kali)
 	var prod product.Product
