@@ -180,6 +180,23 @@ const DashboardScreen = () => {
         </View>
       </View>
 
+      {/* Prediksi */}
+      {(summary?.predicted_stockout_count ?? 0) > 0 && (
+        <TouchableOpacity
+          style={styles.stockoutBanner}
+          onPress={() =>
+            navigation.getParent()?.navigate('PrediksiTab' as never)
+          }
+        >
+          <Sparkles size={16} color="#fff" />
+          <Text style={styles.stockoutBannerText}>
+            {summary?.predicted_stockout_count} produk berpotensi kehabisan
+            stok, cek Prediksi
+          </Text>
+          <Text style={styles.stockoutBannerArrow}>→</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Card Stok Menipis */}
       <View style={styles.card}>
         <View style={styles.cardHeaderRow}>
@@ -264,23 +281,6 @@ const DashboardScreen = () => {
           </>
         )}
       </View>
-
-      {/* Prediksi */}
-      {(summary?.predicted_stockout_count ?? 0) > 0 && (
-        <TouchableOpacity
-          style={styles.stockoutBanner}
-          onPress={() =>
-            navigation.getParent()?.navigate('PrediksiTab' as never)
-          }
-        >
-          <Sparkles size={16} color="#fff" />
-          <Text style={styles.stockoutBannerText}>
-            {summary?.predicted_stockout_count} produk berpotensi kehabisan
-            stok, cek Prediksi
-          </Text>
-          <Text style={styles.stockoutBannerArrow}>→</Text>
-        </TouchableOpacity>
-      )}
 
       {/* Menu Lainnya */}
       <Text style={styles.menuSectionTitle}>Menu Lainnya</Text>

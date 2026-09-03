@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Pressable,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import { Pressable, Text, ActivityIndicator, View } from 'react-native';
 import styles from './styles';
 import { Colors } from '../../../styles';
 
@@ -29,19 +24,18 @@ const PrimaryButton = ({
     <Pressable
       style={({ pressed }) => [
         styles.container,
-        pressed && { opacity: 0.8 },
+        pressed && !isDisabled && { opacity: 0.8 },
         isDisabled && styles.disabled,
       ]}
       disabled={isDisabled}
       onPress={onPress}
     >
-      {loading ? (
-        <ActivityIndicator color={Colors.white} />
-      ) : (
+      <View style={styles.content}>
+        {loading && <ActivityIndicator size="small" color={Colors.white} />}
         <Text style={styles.text}>
           {loading ? loadingTitle ?? 'Memproses...' : title}
         </Text>
-      )}
+      </View>
     </Pressable>
   );
 };

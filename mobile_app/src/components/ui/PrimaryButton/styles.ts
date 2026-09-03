@@ -3,22 +3,26 @@ import { Colors, Spacing } from '../../../styles';
 
 const styles = StyleSheet.create({
   container: {
-    height: 52,
-    borderRadius: 14,
+    width: '100%',
+    minHeight: 48,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    marginVertical: Spacing.sm,
   },
-
-  disabled: {
-    backgroundColor: '#BDBDBD',
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
-
   text: {
     color: Colors.white,
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  disabled: {
+    backgroundColor: '#9ca3af',
   },
 });
 

@@ -23,6 +23,16 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     marginTop: Spacing.lg,
+    width: '100%',
+  },
+  ctaIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   ctaTitle: {
     fontSize: 16,
@@ -37,6 +47,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: Spacing.lg,
     lineHeight: 18,
+  },
+  predictionButtonWrapper: {
+    width: '100%',
   },
 
   urgencyCard: {
@@ -136,21 +149,63 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  rerunButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
+  predictionActionCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: '#eee',
+    padding: 16,
     marginBottom: Spacing.xl,
   },
-  rerunButtonText: {
-    color: Colors.primary,
-    fontSize: 13,
+  predictionActionHeader: {
+    marginBottom: Spacing.md,
+  },
+  predictionActionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 3,
+  },
+  predictionActionSubtitle: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 17,
+  },
+
+  periodSection: {
+    width: '100%',
+    marginBottom: Spacing.md,
+  },
+  periodLabel: {
+    fontSize: 12,
     fontWeight: '600',
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f6f8',
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
+  },
+  periodButton: {
+    flex: 1,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 9,
+  },
+  periodButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  periodButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  periodButtonTextActive: {
+    color: '#fff',
   },
 });
 
