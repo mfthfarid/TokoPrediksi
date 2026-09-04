@@ -15,6 +15,7 @@ const TextField = ({
   leftIcon,
   rightIcon,
   editable = true,
+  multiline = false,
   ...props
 }: Props) => {
   const [focused, setFocused] = useState(false);
@@ -22,33 +23,42 @@ const TextField = ({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-
       <View
         style={[
           styles.inputContainer,
+          multiline && styles.multilineContainer,
           focused && styles.focused,
-          // Tambahan efek abu-abu saat terkunci
-          !editable && { backgroundColor: '#F5F5F5', borderColor: '#E0E0E0' },
+          !editable && {
+            backgroundColor: '#F5F5F5',
+            borderColor: '#E0E0E0',
+          },
         ]}
       >
-        {leftIcon}
-
+        {leftIcon && (
+          <View
+            style={[
+              styles.iconContainer,
+              multiline && styles.multilineIconContainer,
+            ]}
+          >
+            {leftIcon}
+          </View>
+        )}
         <TextInput
           {...props}
-          editable={editable} // Pastikan properti ini diteruskan ke TextInput
+          editable={editable}
+          multiline={multiline}
           style={[
             styles.input,
-            // Tambahan warna teks memudar saat terkunci
+            multiline && styles.multilineInput,
             !editable && { color: '#9E9E9E' },
           ]}
           placeholderTextColor={editable ? '#999' : '#BDBDBD'}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
-
-        {rightIcon}
+        {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
       </View>
-
       {!!error && <Text style={styles.error}>{error}</Text>}
     </View>
   );

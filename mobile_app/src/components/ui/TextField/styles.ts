@@ -5,14 +5,12 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: Spacing.md,
   },
-
   label: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.text,
     marginBottom: Spacing.xs,
   },
-
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -23,21 +21,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     height: 52,
   },
-
   input: {
     flex: 1,
     color: Colors.text,
     fontSize: 16,
   },
-
   error: {
     color: Colors.error,
     marginTop: 6,
     fontSize: 12,
   },
-
   focused: {
     borderColor: Colors.primary,
+  },
+  multilineContainer: {
+    height: 'auto',
+    minHeight: 64,
+    paddingVertical: 6,
+  },
+  multilineInput: {
+    minHeight: 50,
+    paddingVertical: 0,
+    textAlignVertical: 'top',
+  },
+  multilineIcon: {
+    marginTop: 2,
+  },
+  iconContainer: {
+    marginRight: 8,
+  },
+  multilineIconContainer: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
   },
 });
 

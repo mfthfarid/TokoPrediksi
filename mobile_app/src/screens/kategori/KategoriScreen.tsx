@@ -10,6 +10,8 @@ import {
   Alert,
   TextInput,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Plus, Pencil, Trash2, Tag, Search, X } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -257,7 +259,10 @@ const KategoriScreen = () => {
         animationType="fade"
         onRequestClose={closeModal}
       >
-        <View style={styles.backdrop}>
+        <KeyboardAvoidingView
+          style={styles.backdrop}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <Pressable style={StyleSheet.absoluteFill} onPress={closeModal} />
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>
@@ -270,7 +275,6 @@ const KategoriScreen = () => {
               onChangeText={setName}
               leftIcon={<Tag size={18} color={Colors.textSecondary} />}
             />
-
             {/* Tombol */}
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -289,7 +293,7 @@ const KategoriScreen = () => {
               </View>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </ScreenLayout>
   );
