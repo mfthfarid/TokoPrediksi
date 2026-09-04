@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { ChevronDown, Check, Search } from 'lucide-react-native';
+import { ChevronDown, Check, Search, X } from 'lucide-react-native';
 import styles from './styles';
 import { Colors } from '../../../styles';
 
@@ -45,12 +45,17 @@ const SelectField = ({
   const [searchQuery, setSearchQuery] = useState('');
   const selected = options.find(o => o.value === value);
 
-  const filteredOptions =
-    searchable && searchQuery.trim()
-      ? options.filter(o =>
-          o.label.toLowerCase().includes(searchQuery.trim().toLowerCase()),
-        )
-      : options;
+  const filteredOptions = useMemo(() => {
+    const keyword = searchQuery.trim().toLowerCase();
+
+    if (!searchable || !keyword) {
+      return options;
+    }
+
+    return options.filter(option =>
+      option.label.toLowerCase().includes(keyword),
+    );
+  }, [searchQuery, searchable, options]);
 
   const handleClose = () => {
     setVisible(false);
@@ -89,6 +94,7 @@ const SelectField = ({
               {searchable && (
                 <View style={styles.searchBox}>
                   <Search size={16} color={Colors.textSecondary} />
+
                   <TextInput
                     style={styles.searchInput}
                     placeholder={searchPlaceholder}
@@ -97,6 +103,20 @@ const SelectField = ({
                     onChangeText={setSearchQuery}
                     autoFocus
                   />
+
+                  {searchQuery.length > 0 && (
+                    <TouchableOpacity
+                      onPress={() => setSearchQuery('')}
+                      hitSlop={{
+                        top: 10,
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                      }}
+                    >
+                      <X size={17} color="#999" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
 
@@ -108,11 +128,15 @@ const SelectField = ({
                   <TouchableOpacity
                     style={styles.option}
                     onPress={() => {
-                      onSelect(item.value);
                       handleClose();
+
+                      requestAnimationFrame(() => {
+                        onSelect(item.value);
+                      });
                     }}
                   >
                     <Text style={styles.optionText}>{item.label}</Text>
+
                     {item.value === value && (
                       <Check size={18} color={Colors.primary} />
                     )}

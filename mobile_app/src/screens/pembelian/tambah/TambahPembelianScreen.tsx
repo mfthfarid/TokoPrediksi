@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -118,33 +118,46 @@ const TambahPembelianScreen = () => {
           getSuppliers(),
           getProducts(),
         ]);
+
         setSupplierOptions(
-          suppliersRes.data.map(s => ({ label: s.name, value: s.id })),
+          suppliersRes.data
+            .map(s => ({
+              label: s.name,
+              value: s.id,
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label, 'id')),
         );
+
         setProducts(productsRes.data);
       } catch (error) {
         toast.error('Gagal memuat data supplier/produk');
       } finally {
         setLoadingOptions(false);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     };
+
     loadOptions();
   }, []);
 
-  const productOptions: SelectOption[] = products.map(p => ({
-    label: p.name,
-    value: p.id,
-  }));
+  const productOptions = useMemo<SelectOption[]>(() => {
+    return products
+      .map(product => ({
+        label: product.name,
+        value: product.id,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'id'));
+  }, [products]);
 
   const getUnitOptionsForProduct = (
     productId: number | null,
   ): SelectOption[] => {
     const product = products.find(p => p.id === productId);
+
     if (!product) return [];
+
     return product.units.map(u => ({
       label: u.unit.name,
-      value: u.id, // product_unit_id, BUKAN unit_id
+      value: u.id,
     }));
   };
 
@@ -202,7 +215,6 @@ const TambahPembelianScreen = () => {
           tanggal_kadaluwarsa: item.expiryDate || undefined,
         })),
       });
-
       toast.success('Pembelian berhasil dicatat');
       navigation.goBack();
     } catch (error: any) {
@@ -225,7 +237,6 @@ const TambahPembelianScreen = () => {
   return (
     <ScreenLayout
       title="Catat Pembelian"
-      subtitle="Restok Barang"
       // paddingVertical={0}
       scrollable={false}
       footer={
@@ -256,6 +267,8 @@ const TambahPembelianScreen = () => {
             options={supplierOptions}
             onSelect={value => setSupplierId(Number(value))}
             leftIcon={<Truck size={18} color={Colors.textSecondary} />}
+            searchable
+            searchPlaceholder="Cari supplier..."
           />
 
           <DateField
@@ -276,7 +289,6 @@ const TambahPembelianScreen = () => {
         {items.map((item, index) => {
           const unitOptions = getUnitOptionsForProduct(item.productId);
           const subtotal = calculateItemSubtotal(item);
-
           return (
             <View key={item.key} style={styles.itemCard}>
               <View style={styles.itemCardHeader}>
@@ -300,6 +312,8 @@ const TambahPembelianScreen = () => {
                   })
                 }
                 leftIcon={<Package size={18} color={Colors.textSecondary} />}
+                searchable
+                searchPlaceholder="Cari produk..."
               />
 
               <SelectField
