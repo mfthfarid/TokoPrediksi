@@ -101,7 +101,6 @@ const PengaturanScreen = () => {
         <Text style={PengaturanStyles.settingsSectionTitle}>
           Preferensi Notifikasi
         </Text>
-
         <View style={PengaturanStyles.settingItem}>
           <Icon name="bell-alert-outline" size={24} color="#666" />
           <Text style={PengaturanStyles.settingText}>
@@ -109,7 +108,6 @@ const PengaturanScreen = () => {
           </Text>
           <Switch value={notifStok} onValueChange={setNotifStok} />
         </View>
-
         <View style={PengaturanStyles.settingItem}>
           <Icon name="calendar-alert" size={24} color="#666" />
           <Text style={PengaturanStyles.settingText}>
