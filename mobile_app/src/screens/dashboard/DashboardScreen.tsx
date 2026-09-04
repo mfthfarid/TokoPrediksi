@@ -21,6 +21,8 @@ import {
   ShoppingBag,
   FileText,
   PackageMinus,
+  Ruler,
+  Tags,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { Colors } from '../../styles';
@@ -291,9 +293,20 @@ const DashboardScreen = () => {
           onPress={() => navigation.navigate('Kategori')}
         >
           <View style={styles.menuIconBox}>
-            <LayoutGrid size={22} color={Colors.primary} />
+            <Tags size={22} color={Colors.primary} />
           </View>
           <Text style={styles.menuItemText}>Kategori</Text>
+        </TouchableOpacity>
+
+        {/* Satuan */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Satuan')}
+        >
+          <View style={styles.menuIconBox}>
+            <Ruler size={22} color={Colors.primary} />
+          </View>
+          <Text style={styles.menuItemText}>Satuan</Text>
         </TouchableOpacity>
 
         {/* Supplier */}

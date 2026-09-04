@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+
 import { Colors, Spacing } from '../../styles';
 
 const styles = StyleSheet.create({
@@ -9,7 +10,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  // SEARCH
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
   },
+
   addButton: {
     height: 46,
     flexDirection: 'row',
@@ -41,16 +42,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 14,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.success,
     borderRadius: 12,
   },
   addButtonText: {
     color: '#fff',
-    fontWeight: '700',
     fontSize: 14,
+    fontWeight: '700',
   },
 
-  // LIST HEADER
   listHeader: {
     marginBottom: Spacing.sm,
   },
@@ -66,54 +66,36 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  // SUPPLIER CARD
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#edf0f2',
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     marginBottom: 8,
     gap: 10,
   },
   rowIcon: {
-    width: 38,
-    height: 38,
+    width: 36,
+    height: 36,
     borderRadius: 10,
     backgroundColor: '#eff6ff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowContent: {
-    flex: 1,
-    paddingTop: 1,
-  },
   rowText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-    lineHeight: 20,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 5,
-    marginTop: 5,
-  },
-  rowSubText: {
     flex: 1,
-    fontSize: 12,
-    color: Colors.textSecondary,
-    lineHeight: 17,
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
   },
-  actionContainer: {
-    gap: 6,
-  },
+
   rowAction: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
@@ -125,7 +107,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
   },
 
-  // EMPTY STATE
   emptyState: {
     flex: 1,
     alignItems: 'center',
@@ -154,6 +135,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+
   resetSearchButton: {
     marginTop: Spacing.md,
     paddingHorizontal: 16,
@@ -167,23 +149,15 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
 
-  // MODAL
   modalWrapper: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
   },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.md,
-  },
   modalCard: {
-    width: '100%',
     backgroundColor: '#fff',
-    borderRadius: 18,
+    borderRadius: 16,
     padding: Spacing.lg,
   },
   modalTitle: {
@@ -192,42 +166,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: Spacing.md,
   },
-
-  // ADDRESS FIELD
-  addressField: {
-    marginBottom: Spacing.sm,
-  },
-  fieldLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 7,
-  },
-  addressInputContainer: {
-    minHeight: 90,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 10,
-  },
-  addressIcon: {
-    marginTop: 2,
-  },
-  addressInput: {
-    flex: 1,
-    minHeight: 68,
-    fontSize: 14,
-    color: Colors.text,
-    padding: 0,
-    lineHeight: 20,
-  },
-
-  // MODAL ACTIONS
   modalActions: {
     flexDirection: 'row',
     alignItems: 'center',
