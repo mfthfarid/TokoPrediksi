@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
+import { useNotificationCount } from '../../contexts/NotificationContext';
 
 const ICON_BUTTON_SIZE = 38;
 const HEADER_BLUE = '#35b5ffff';
