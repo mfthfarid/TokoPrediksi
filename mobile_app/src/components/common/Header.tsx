@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
-import { useNotificationCount } from '../../contexts/NotificationContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const ICON_BUTTON_SIZE = 38;
 const HEADER_BLUE = '#35b5ffff';
 
 const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
-  const [notificationCount] = useState(3);
+  const { unreadCount } = useNotification();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const canGoBack = useNavigationState(state => state.index > 0);
@@ -29,7 +29,6 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
               <Icon name="arrow-left" size={22} color={HEADER_BLUE} />
             </TouchableOpacity>
           )}
-
           <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
             {title}
           </Text>
@@ -41,11 +40,10 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
           activeOpacity={0.7}
         >
           <Icon name="bell" size={20} color="#fff" />
-
-          {notificationCount > 0 && (
+          {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
-                {notificationCount > 9 ? '9+' : notificationCount}
+                {unreadCount > 9 ? '9+' : unreadCount}
               </Text>
             </View>
           )}

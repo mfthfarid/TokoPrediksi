@@ -1,11 +1,10 @@
 import api from './api';
 
-// PERINGATAN: field title/message/type di sini masih TEBAKAN,
-// belum divalidasi ke response asli backend - sesuaikan kalau meleset.
 export interface NotificationApi {
   id: number;
   title: string;
-  message: string;
+  body: string;
+  type: string;
   is_read: boolean;
   created_at: string;
 }

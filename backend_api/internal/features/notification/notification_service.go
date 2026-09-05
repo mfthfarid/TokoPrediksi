@@ -34,24 +34,35 @@ func (s *Service) CountUnread() (int64, error) {
 // single-owner, semua token dianggap milik owner yang sama), sekaligus
 // menyimpan riwayatnya di tabel notifications untuk ditampilkan di in-app history.
 func (s *Service) Broadcast(title, body, notifType string) {
-	if err := s.repo.CreateNotification(&Notification{
-		Title: title,
-		Body:  body,
-		Type:  notifType,
-	}); err != nil {
-		log.Println("Gagal menyimpan riwayat notifikasi:", err)
-	}
+    if err := s.repo.CreateNotification(&Notification{
+        Title: title,
+        Body:  body,
+        Type:  notifType,
+    }); err != nil {
+        log.Println("Gagal menyimpan riwayat notifikasi:", err)
+        return
+    }
 
-	tokens, err := s.repo.FindAllTokens()
-	if err != nil {
-		log.Println("Gagal ambil daftar token FCM:", err)
-		return
-	}
+    tokens, err := s.repo.FindAllTokens()
+    if err != nil {
+        log.Println("Gagal ambil daftar token FCM:", err)
+        return
+    }
 
-	for _, t := range tokens {
-		if err := pushnotification.SendToToken(t.Token, title, body); err != nil {
-			log.Printf("Gagal kirim push ke token %s: %v (kemungkinan token sudah tidak valid, dihapus)\n", t.Token, err)
-			s.repo.DeleteToken(t.Token) // bersihkan token yang sudah mati
-		}
-	}
+    for _, t := range tokens {
+    if err := pushnotification.SendToToken(t.Token, title, body); err != nil {
+        log.Printf(
+            "Gagal kirim push ke token %s: %v\n",
+            t.Token,
+            err,
+        )
+
+        s.repo.DeleteToken(t.Token)
+    } else {
+        log.Printf(
+            "Push notification berhasil dikirim ke token: %s\n",
+            t.Token,
+        )
+    }
+}
 }

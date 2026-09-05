@@ -593,6 +593,7 @@ import { RootStack } from './src/navigation';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ToastProvider } from './src/contexts/ToastContext';
 import { ConfirmProvider } from './src/contexts/ConfirmContext';
+import { NotificationProvider } from './src/contexts/NotificationContext';
 
 export default function App() {
   return (
@@ -602,9 +603,11 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <ConfirmProvider>
-              <NavigationContainer>
-                <RootStack />
-              </NavigationContainer>
+              <NotificationProvider>
+                <NavigationContainer>
+                  <RootStack />
+                </NavigationContainer>
+              </NotificationProvider>
             </ConfirmProvider>
           </ToastProvider>
         </AuthProvider>

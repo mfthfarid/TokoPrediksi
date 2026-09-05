@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNotification } from '../../contexts/NotificationContext';
 import { PengaturanStackParamList } from '../../navigation/types';
 import { PengaturanStyles } from './PengaturanStyles';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,18 +24,22 @@ type NavigationProp = NativeStackNavigationProp<
 const PengaturanScreen = () => {
   const { isBiometricEnabled, enableBiometric, disableBiometric, logout } =
     useAuth();
-  const [toggling, setToggling] = useState(false);
+  const { isNotificationEnabled, enableNotifications, disableNotifications } =
+    useNotification();
+  // const [toggling, setToggling] = useState(false);
+  const [isBiometricToggling, setIsBiometricToggling] = useState(false);
+  const [isNotificationToggling, setIsNotificationToggling] = useState(false);
   const navigation = useNavigation<NavigationProp>();
-
-  // State sementara untuk toggle notifikasi (Nanti bisa dihubungkan ke AsyncStorage/Backend)
   const [notifStok, setNotifStok] = useState(true);
   const [notifExpired, setNotifExpired] = useState(true);
 
+  // Aktifkan sidik jari
   const handleToggleBiometric = async (value: boolean) => {
-    setToggling(true);
+    setIsBiometricToggling(true);
     try {
       if (value) {
         const success = await enableBiometric();
+
         if (!success) {
           Alert.alert(
             'Gagal Mengaktifkan',
@@ -45,7 +50,27 @@ const PengaturanScreen = () => {
         await disableBiometric();
       }
     } finally {
-      setToggling(false);
+      setIsBiometricToggling(false);
+    }
+  };
+
+  // Aktifkan notifikasi
+  const handleNotificationToggle = async (value: boolean) => {
+    setIsNotificationToggling(true);
+    try {
+      if (value) {
+        const success = await enableNotifications();
+        if (!success) {
+          Alert.alert(
+            'Notifikasi tidak diaktifkan',
+            'Izin notifikasi diperlukan untuk menerima pemberitahuan.',
+          );
+        }
+        return;
+      }
+      await disableNotifications();
+    } finally {
+      setIsNotificationToggling(false);
     }
   };
 
@@ -65,13 +90,10 @@ const PengaturanScreen = () => {
       {/* Bagian Akun & Profil */}
       <View style={PengaturanStyles.settingsSection}>
         <Text style={PengaturanStyles.settingsSectionTitle}>Akun & Profil</Text>
-
         <TouchableOpacity
           style={PengaturanStyles.settingItem}
           onPress={() => {
             navigation.navigate('Profil');
-            // Arahkan ke halaman edit profil / ubah password
-            // navigation.navigate('EditProfil' as never);
           }}
         >
           <Icon name="account-cog-outline" size={24} color="#666" />
@@ -91,7 +113,7 @@ const PengaturanScreen = () => {
           <Switch
             value={isBiometricEnabled}
             onValueChange={handleToggleBiometric}
-            disabled={toggling}
+            disabled={isBiometricToggling}
           />
         </View>
       </View>
@@ -106,7 +128,11 @@ const PengaturanScreen = () => {
           <Text style={PengaturanStyles.settingText}>
             Peringatan Stok Menipis
           </Text>
-          <Switch value={notifStok} onValueChange={setNotifStok} />
+          <Switch
+            value={isNotificationEnabled}
+            onValueChange={handleNotificationToggle}
+            disabled={isNotificationToggling}
+          />
         </View>
         <View style={PengaturanStyles.settingItem}>
           <Icon name="calendar-alert" size={24} color="#666" />

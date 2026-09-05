@@ -8,4 +8,5 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	rg.POST("/fcm-token", handler.RegisterToken)
 	rg.GET("", handler.GetAll)
 	rg.PUT("/:id/read", handler.MarkAsRead)
+	rg.POST("/test-push", handler.TestPush)
 }
