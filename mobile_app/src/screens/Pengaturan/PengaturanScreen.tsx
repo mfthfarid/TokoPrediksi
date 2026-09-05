@@ -118,28 +118,17 @@ const PengaturanScreen = () => {
         </View>
       </View>
 
-      {/* Bagian Notifikasi (Poin 3) */}
+      {/* Bagian Notifikasi */}
       <View style={PengaturanStyles.settingsSection}>
-        <Text style={PengaturanStyles.settingsSectionTitle}>
-          Preferensi Notifikasi
-        </Text>
+        <Text style={PengaturanStyles.settingsSectionTitle}>Notifikasi</Text>
         <View style={PengaturanStyles.settingItem}>
-          <Icon name="bell-alert-outline" size={24} color="#666" />
-          <Text style={PengaturanStyles.settingText}>
-            Peringatan Stok Menipis
-          </Text>
+          <Icon name="bell-outline" size={24} color="#666" />
+          <Text style={PengaturanStyles.settingText}>Aktifkan Notifikasi</Text>
           <Switch
             value={isNotificationEnabled}
             onValueChange={handleNotificationToggle}
             disabled={isNotificationToggling}
           />
-        </View>
-        <View style={PengaturanStyles.settingItem}>
-          <Icon name="calendar-alert" size={24} color="#666" />
-          <Text style={PengaturanStyles.settingText}>
-            Peringatan Kedaluwarsa
-          </Text>
-          <Switch value={notifExpired} onValueChange={setNotifExpired} />
         </View>
       </View>
 

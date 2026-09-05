@@ -18,7 +18,7 @@ interface ScreenLayoutProps {
 
 export default function ScreenLayout({
   title,
-  subtitle,
+  // subtitle,
   children,
   scrollable = true,
   paddingHorizontal = 16,
@@ -53,7 +53,7 @@ export default function ScreenLayout({
       {showHeader && (
         <Header
           title={title}
-          subtitle={subtitle}
+          // subtitle={subtitle}
           onNotificationPress={onNotificationPress}
         />
       )}

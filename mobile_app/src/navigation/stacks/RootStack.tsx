@@ -1,10 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import SplashScreen from '../../screens/splash/SplashScreen';
 import AuthStack from './AuthStack';
 import BottomTabs from '../tabs/BottomTabs';
-
 import { useAuth } from '../../contexts/AuthContext';
 import { RootStackParamList } from '../types';
 
