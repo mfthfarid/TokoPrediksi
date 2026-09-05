@@ -19,15 +19,7 @@ export default function DashboardStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      {/* Notifikasi pakai header bawaan karena screen sederhana tanpa
-          ScreenLayout. Kategori TIDAK - dia sudah pakai ScreenLayout
-          sendiri (ada Header di dalamnya), jadi headerShown harus false
-          di sini supaya tidak dobel. */}
-      <Stack.Screen
-        name="Notifikasi"
-        component={NotifikasiScreen}
-        options={{ headerShown: true, title: 'Notifikasi' }}
-      />
+      <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
       <Stack.Screen name="Kategori" component={KategoriScreen} />
       <Stack.Screen name="Satuan" component={SatuanScreen} />
       <Stack.Screen name="Supplier" component={SupplierScreen} />
