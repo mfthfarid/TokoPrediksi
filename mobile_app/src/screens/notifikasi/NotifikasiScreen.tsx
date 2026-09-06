@@ -80,16 +80,27 @@ const NotifikasiScreen = () => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'stock':
-      case 'low_stock':
-        return 'package-variant-closed';
-      case 'expired':
-      case 'expiration':
-        return 'calendar-alert';
-      case 'prediction':
+      case 'stock_out':
+        return 'close-circle-outline';
+      case 'stock_low':
+        return 'alert-outline';
+      case 'prediction_complete':
         return 'chart-line';
       default:
         return 'bell-outline';
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case 'stock_out':
+        return '#F44336';
+      case 'stock_low':
+        return '#F59E0B';
+      case 'prediction_complete':
+        return Colors.primary;
+      default:
+        return '#8E8E93';
     }
   };
 
@@ -106,6 +117,7 @@ const NotifikasiScreen = () => {
 
   const renderNotification = ({ item }: { item: NotificationApi }) => {
     const isUnread = !item.is_read;
+    const notificationColor = getNotificationColor(item.type);
 
     return (
       <TouchableOpacity
@@ -114,12 +126,15 @@ const NotifikasiScreen = () => {
         activeOpacity={0.7}
       >
         <View
-          style={[Styles.iconContainer, isUnread && Styles.iconContainerUnread]}
+          style={[
+            Styles.iconContainer,
+            isUnread && { backgroundColor: `${notificationColor}15` },
+          ]}
         >
           <Icon
             name={getNotificationIcon(item.type)}
             size={22}
-            color={isUnread ? Colors.primary : '#8E8E93'}
+            color={isUnread ? notificationColor : '#8E8E93'}
           />
         </View>
         <View style={Styles.notificationContent}>
@@ -134,16 +149,18 @@ const NotifikasiScreen = () => {
             >
               {item.title}
             </Text>
-            {isUnread && <View style={Styles.unreadDot} />}
+            {isUnread && (
+              <View
+                style={[
+                  Styles.unreadDot,
+                  { backgroundColor: notificationColor },
+                ]}
+              />
+            )}
           </View>
 
           {/* Body */}
-          <Text
-            style={Styles.notificationBody}
-            //  numberOfLines={2}
-          >
-            {item.body}
-          </Text>
+          <Text style={Styles.notificationBody}>{item.body}</Text>
 
           {/* Tanggal */}
           <Text style={Styles.notificationDate}>

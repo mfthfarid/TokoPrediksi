@@ -22,9 +22,7 @@ func getClient() (*messaging.Client, error) {
 }
 
 // SendToToken mengirim push notification ke 1 device tertentu.
-// Return error khusus kalau token sudah tidak valid (device uninstall app, dll)
-// supaya bisa dibersihkan dari database oleh pemanggilnya.
-func SendToToken(token, title, body string) error {
+func SendToToken(token, title, body, color string) error {
 	client, err := getClient()
 	if err != nil {
 		return err
@@ -34,6 +32,11 @@ func SendToToken(token, title, body string) error {
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
+		},
+		Android: &messaging.AndroidConfig{
+			Notification: &messaging.AndroidNotification{
+				Color: color,
+			},
 		},
 		Token: token,
 	}
