@@ -15,18 +15,6 @@ func NewHandler() *Handler {
 	return &Handler{service: NewService()}
 }
 
-func (h *Handler) TestPush(c *gin.Context) {
-    h.service.Broadcast(
-        "Test Notifikasi",
-        "Push notification berhasil diterima!",
-        "test",
-    )
-
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Test push notification dikirim",
-    })
-}
-
 func (h *Handler) RegisterToken(c *gin.Context) {
 	var input RegisterTokenInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -74,4 +62,22 @@ func (h *Handler) MarkAsRead(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Notifikasi ditandai sudah dibaca"})
+}
+
+// testing push notifikasi
+func (h *Handler) TestPush(c *gin.Context) {
+    h.service.Broadcast(
+        "Test Notifikasi",
+        "Push notification berhasil diterima!",
+        "test",
+    )
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Test push notification dikirim",
+    })
+}
+
+func (h *Handler) TestStockCheck(c *gin.Context) {
+	h.service.CheckStockAndNotify()
+	c.JSON(http.StatusOK, gin.H{"message": "Pengecekan stok dijalankan manual"})
 }
