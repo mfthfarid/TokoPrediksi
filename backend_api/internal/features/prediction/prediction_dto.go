@@ -5,7 +5,6 @@ type PredictRequestInput struct {
 	Periods int `json:"periods" binding:"omitempty,gt=0"`
 }
 
-// Struct untuk komunikasi Go → Python (sesuai kontrak yang sudah divalidasi)
 type pythonHistoryPoint struct {
 	DS string  `json:"ds"`
 	Y  float64 `json:"y"`
@@ -49,14 +48,20 @@ type ChartData struct {
 type PredictionSummaryResponse struct {
 	ProductID                  uint       `json:"product_id"`
 	ProductName                string     `json:"product_name"`
-	HasPrediction               bool       `json:"has_prediction"`
-	CurrentStock                float64    `json:"current_stock"`
-	AverageDailySales            float64    `json:"average_daily_sales"`
-	DaysRemaining                 *float64   `json:"days_remaining"` // null kalau rata-rata penjualan 0 (gak bisa dihitung)
-	Urgency                       string     `json:"urgency"`         // "tinggi" | "sedang" | "rendah"
-	RecommendedRestockQuantity    int        `json:"recommended_restock_quantity"`
-	ChartData                     ChartData  `json:"chart_data"`
-	Predictions                   []Prediction `json:"predictions"`
+	HasPrediction              bool       `json:"has_prediction"`
+	CurrentStock               float64    `json:"current_stock"`
+	AverageDailySales          float64    `json:"average_daily_sales"`
+	DaysRemaining              *float64   `json:"days_remaining"`
+	Urgency                    string     `json:"urgency"`
+	RecommendedRestockQuantity int        `json:"recommended_restock_quantity"`
+	ChartData                  ChartData  `json:"chart_data"`
+	Predictions                []Prediction `json:"predictions"`
+
+	// konversi sesuai satuan dasar produk
+	DisplayUnit                string `json:"display_unit"`                // "Kg", "Pcs", "Liter", dst
+	CurrentStockDisplay        string `json:"current_stock_display"`       // "2.5"
+	AverageDailySalesDisplay   string `json:"average_daily_sales_display"` // "0.8"
+	RecommendedRestockDisplay  string `json:"recommended_restock_display"` // "15"
 }
 
 type PredictionSummaryItem struct {
@@ -67,4 +72,8 @@ type PredictionSummaryItem struct {
 	DaysRemaining     *float64 `json:"days_remaining"`
 	Urgency           string   `json:"urgency"` // "tinggi" | "sedang" | "rendah"
 	HasPrediction     bool     `json:"has_prediction"`
+
+	DisplayUnit            	 string `json:"display_unit"`
+	CurrentStockDisplay      string `json:"current_stock_display"`
+	AverageDailySalesDisplay string `json:"average_daily_sales_display"`
 }

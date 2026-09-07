@@ -15,6 +15,7 @@ type summaryRawRow struct {
 	CurrentStock      float64
 	AverageDailySales float64
 	HasPrediction     bool
+	BaseUnitName      string
 }
 
 func (r *PredictionRepository) GetSummaryRaw() ([]summaryRawRow, error) {
@@ -24,8 +25,11 @@ func (r *PredictionRepository) GetSummaryRaw() ([]summaryRawRow, error) {
 			p.name as product_name,
 			p.stock as current_stock,
 			COALESCE(sales.avg_daily, 0) as average_daily_sales,
-			EXISTS(SELECT 1 FROM predictions pr WHERE pr.product_id = p.id) as has_prediction
+			EXISTS(SELECT 1 FROM predictions pr WHERE pr.product_id = p.id) as has_prediction,
+			COALESCE(u.name, '') as base_unit_name
 		FROM products p
+		LEFT JOIN product_units pu ON pu.product_id = p.id AND pu.is_base_unit = true
+		LEFT JOIN units u ON u.id = pu.unit_id
 		LEFT JOIN (
 			SELECT product_id, AVG(y) as avg_daily FROM (
 				SELECT transaction_items.product_id,
@@ -114,15 +118,18 @@ func (r *PredictionRepository) FindByProductID(productID uint) ([]Prediction, er
 	return predictions, nil
 }
 
-func (r *PredictionRepository) GetProductInfo(productID uint) (string, float64, error) {
+func (r *PredictionRepository) GetProductInfo(productID uint) (string, float64, string, error) {
 	type row struct {
-		Name  string
-		Stock float64
+		Name     string
+		Stock    float64
+		UnitName string
 	}
 	var res row
 	err := config.DB.Table("products").
-		Select("name, stock").
-		Where("id = ?", productID).
+		Select("products.name, products.stock, units.name as unit_name").
+		Joins("LEFT JOIN product_units ON product_units.product_id = products.id AND product_units.is_base_unit = true").
+		Joins("LEFT JOIN units ON units.id = product_units.unit_id").
+		Where("products.id = ?", productID).
 		Scan(&res).Error
-	return res.Name, res.Stock, err
+	return res.Name, res.Stock, res.UnitName, err
 }

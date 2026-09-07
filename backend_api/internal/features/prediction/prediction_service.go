@@ -62,6 +62,12 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 				item.Urgency = "rendah"
 			}
 		}
+
+		stockDisplay, displayUnit := formatQuantity(row.CurrentStock, row.BaseUnitName)
+		avgSalesDisplay, _ := formatQuantity(row.AverageDailySales, row.BaseUnitName)
+		item.DisplayUnit = displayUnit
+		item.CurrentStockDisplay = stockDisplay
+		item.AverageDailySalesDisplay = avgSalesDisplay
 		items[i] = item
 	}
 
@@ -79,7 +85,6 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 		}
 		return *items[i].DaysRemaining < *items[j].DaysRemaining
 	})
-
 	return items, nil
 }
 
@@ -239,7 +244,7 @@ func (s *PredictionService) GetByProductID(productID uint) (*PredictionSummaryRe
 }
 
 func (s *PredictionService) buildSummary(productID uint, predictions []Prediction, dailySales []DailySales) (*PredictionSummaryResponse, error) {
-	name, stock, err := s.repo.GetProductInfo(productID)
+	name, stock, baseUnitName, err := s.repo.GetProductInfo(productID)
 	if err != nil {
 		return nil, errors.New("produk tidak ditemukan")
 	}
@@ -293,6 +298,10 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
+	stockDisplay, displayUnit := formatQuantity(stock, baseUnitName)
+	avgSalesDisplay, _ := formatQuantity(avgSales, baseUnitName)
+	restockDisplay, _ := formatQuantity(float64(recommendedRestock), baseUnitName)
+
 	return &PredictionSummaryResponse{
 		ProductID:                  productID,
 		ProductName:                name,
@@ -306,7 +315,11 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 			Actual:    actualPoints,
 			Predicted: predictedPoints,
 		},
-		Predictions: predictions,
+		Predictions:               predictions,
+		DisplayUnit:               displayUnit,
+		CurrentStockDisplay:       stockDisplay,
+		AverageDailySalesDisplay:  avgSalesDisplay,
+		RecommendedRestockDisplay: restockDisplay,
 	}, nil
 }
 
