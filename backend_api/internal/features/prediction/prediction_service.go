@@ -33,6 +33,31 @@ func NewPredictionService() *PredictionService {
 	return &PredictionService{repo: &PredictionRepository{}}
 }
 
+// fillMissingDates mengisi celah tanggal dengan y=0, TANPA menyimpan apa pun
+// ke database — murni diproses di memori, cuma untuk 1 produk yang sedang diminta.
+func fillMissingDates(sparse []DailySales) []DailySales {
+	if len(sparse) == 0 {
+		return sparse
+	}
+
+	existing := make(map[string]float64, len(sparse))
+	for _, d := range sparse {
+		existing[d.DS] = d.Y
+	}
+
+	startDate, _ := time.Parse("2006-01-02", sparse[0].DS)
+	endDate, _ := time.Parse("2006-01-02", sparse[len(sparse)-1].DS)
+
+	var filled []DailySales
+	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+		dateStr := d.Format("2006-01-02")
+		y := existing[dateStr] // otomatis 0 kalau tidak ketemu di map
+		filled = append(filled, DailySales{DS: dateStr, Y: y})
+	}
+
+	return filled
+}
+
 func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 	rows, err := s.repo.GetSummaryRaw()
 	if err != nil {
@@ -108,6 +133,8 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	if err != nil {
 		return nil, err
 	}
+
+	dailySales = fillMissingDates(dailySales)
 	if len(dailySales) < minHistoryPoints {
 		return nil, fmt.Errorf(
 			"data histori penjualan belum cukup untuk prediksi (minimal %d hari ada transaksi, saat ini baru %d)",
@@ -239,6 +266,7 @@ func (s *PredictionService) GetByProductID(productID uint) (*PredictionSummaryRe
 	if err != nil {
 		return nil, err
 	}
+	dailySales = fillMissingDates(dailySales)
 
 	return s.buildSummary(productID, predictions, dailySales)
 }

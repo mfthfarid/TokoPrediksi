@@ -193,20 +193,28 @@ func processBarangSheet(f *excelize.File, commit bool) (map[string]unitConversio
 	result := map[string]unitConversion{}
 
 	for nama, items := range groups {
-		if len(items) == 1 {
-			item := items[0]
-			fmt.Printf("[SIMPEL] %q → 1 produk, 1 satuan\n", nama)
-			productID := resolveSimpleProduct(nama, item, commit)
-			result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
-			continue
+	if len(items) == 1 {
+		item := items[0]
+		fmt.Printf("[SIMPEL] %q → 1 produk, 1 satuan\n", nama)
+		productID := resolveSimpleProduct(nama, item, commit)
+		if productID == 0 {
+			fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat (lihat error di atas)\n", nama)
+			continue // <-- PENTING: jangan masukkan ke result map
 		}
-
-		fmt.Printf("[MULTI-SATUAN] %q → 1 produk, %d varian jual + 1 satuan dasar tersembunyi\n", nama, len(items))
-		productID := resolveMultiUnitProduct(nama, items, commit)
-		for _, item := range items {
-			result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
-		}
+		result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
+		continue
 	}
+
+	fmt.Printf("[MULTI-SATUAN] %q → 1 produk, %d varian jual + 1 satuan dasar tersembunyi\n", nama, len(items))
+	productID := resolveMultiUnitProduct(nama, items, commit)
+	if productID == 0 {
+		fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat (lihat error di atas)\n", nama)
+		continue
+	}
+	for _, item := range items {
+		result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
+	}
+}
 
 	return result, nil
 }
@@ -222,8 +230,17 @@ func resolveSimpleProduct(nama string, item barangRow, commit bool) uint {
 	}
 
 	categoryID := findOrCreateCategory(item.Kategori)
-	config.DB.Exec(`INSERT INTO products (name, import_code, id_kategori, stock) VALUES (?, ?, ?, 0)`, nama, item.Kode, categoryID)
+	result := config.DB.Exec(`INSERT INTO products (name, import_code, id_kategori, stock) VALUES (?, ?, ?, 0)`, nama, item.Kode, categoryID)
+	if result.Error != nil {
+		log.Printf("❌ GAGAL buat produk %q (kode: %s): %v — kemungkinan Kode Barang duplikat\n", nama, item.Kode, result.Error)
+		return 0
+	}
+
 	config.DB.Table("products").Select("id").Where("name = ?", nama).Scan(&productID)
+	if productID == 0 {
+		log.Printf("❌ Produk %q berhasil di-insert tapi gagal ditemukan lagi (aneh, cek manual)\n", nama)
+		return 0
+	}
 
 	unitName := item.Varian
 	if unitName == "" {
@@ -248,8 +265,17 @@ func resolveMultiUnitProduct(nama string, items []barangRow, commit bool) uint {
 	}
 
 	categoryID := findOrCreateCategory(items[0].Kategori)
-	config.DB.Exec(`INSERT INTO products (name, id_kategori, stock) VALUES (?, ?, 0)`, nama, categoryID)
+	result := config.DB.Exec(`INSERT INTO products (name, import_code, id_kategori, stock) VALUES (?, ?, ?, 0)`, nama, items[0].Kode, categoryID)
+	if result.Error != nil {
+		log.Printf("❌ GAGAL buat produk %q (kode: %s): %v — kemungkinan Kode Barang duplikat\n", nama, items[0].Kode, result.Error)
+		return 0
+	}
+
 	config.DB.Table("products").Select("id").Where("name = ?", nama).Scan(&productID)
+	if productID == 0 {
+		log.Printf("❌ Produk %q berhasil di-insert tapi gagal ditemukan lagi (aneh, cek manual)\n", nama)
+		return 0
+	}
 
 	// Satuan dasar tersembunyi (gram), tidak dijual langsung — hanya penampung hitungan stok
 	gramUnitID := findOrCreateUnit("Gram")
