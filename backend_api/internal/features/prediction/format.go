@@ -6,32 +6,37 @@ import (
 	"strings"
 )
 
-// formatQuantity mengonversi angka mentah (dalam satuan dasar) ke satuan yang
-// lebih enak dibaca, tergantung jenis satuan dasarnya.
-func formatQuantity(raw float64, baseUnitName string) (value string, unit string) {
+// determineDisplayUnit menentukan 1 satuan tampilan yang konsisten untuk 1 produk,
+// berdasarkan angka PALING BESAR di antara stok dan rata-rata penjualan
+// (supaya tidak ada field yang "gram" sementara field lain "kg" untuk produk yang sama).
+func determineDisplayUnit(baseUnitName string, referenceValue float64) (divisor float64, unit string) {
 	lower := strings.ToLower(strings.TrimSpace(baseUnitName))
 
 	switch lower {
 	case "gram", "gr", "g":
-		if raw >= 1000 {
-			return trimDecimal(raw/1000, 2), "Kg"
+		if referenceValue >= 1000 {
+			return 1000, "Kg"
 		}
-		return trimDecimal(raw, 0), "Gram"
+		return 1, "Gram"
 	case "mililiter", "ml":
-		if raw >= 1000 {
-			return trimDecimal(raw/1000, 2), "Liter"
+		if referenceValue >= 1000 {
+			return 1000, "Liter"
 		}
-		return trimDecimal(raw, 0), "Ml"
+		return 1, "Ml"
 	default:
 		if baseUnitName == "" {
 			baseUnitName = "Unit"
 		}
-		return trimDecimal(raw, 0), baseUnitName
+		return 1, baseUnitName
 	}
 }
 
-// trimDecimal membulatkan ke sejumlah desimal, lalu buang trailing zero
-// (misal 2.50 → "2.5", 3.00 → "3")
+// formatWithDivisor memformat 1 angka pakai divisor & pembulatan yang SAMA
+// dengan field lain di produk yang sama — konsisten, tidak dibulatkan ke 0 desimal.
+func formatWithDivisor(raw, divisor float64) string {
+	return trimDecimal(raw/divisor, 2)
+}
+
 func trimDecimal(val float64, decimals int) string {
 	factor := math.Pow(10, float64(decimals))
 	rounded := math.Round(val*factor) / factor
