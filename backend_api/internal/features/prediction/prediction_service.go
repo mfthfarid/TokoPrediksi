@@ -88,11 +88,11 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 			}
 		}
 
-		stockDisplay, displayUnit := formatQuantity(row.CurrentStock, row.BaseUnitName)
-		avgSalesDisplay, _ := formatQuantity(row.AverageDailySales, row.BaseUnitName)
+		reference := math.Max(row.CurrentStock, row.AverageDailySales)
+		divisor, displayUnit := determineDisplayUnit(row.BaseUnitName, reference)
 		item.DisplayUnit = displayUnit
-		item.CurrentStockDisplay = stockDisplay
-		item.AverageDailySalesDisplay = avgSalesDisplay
+		item.CurrentStockDisplay = formatWithDivisor(row.CurrentStock, divisor)
+		item.AverageDailySalesDisplay = formatWithDivisor(row.AverageDailySales, divisor)
 		items[i] = item
 	}
 
@@ -326,9 +326,15 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
-	stockDisplay, displayUnit := formatQuantity(stock, baseUnitName)
-	avgSalesDisplay, _ := formatQuantity(avgSales, baseUnitName)
-	restockDisplay, _ := formatQuantity(float64(recommendedRestock), baseUnitName)
+		// Tentukan 1 satuan tampilan konsisten, berdasarkan angka terbesar
+	// (supaya stok, rata-rata, dan rekomendasi restock selalu 1 satuan yang sama)
+	reference := math.Max(stock, avgSales)
+	reference = math.Max(reference, float64(recommendedRestock))
+	divisor, displayUnit := determineDisplayUnit(baseUnitName, reference)
+
+	stockDisplay := formatWithDivisor(stock, divisor)
+	avgSalesDisplay := formatWithDivisor(avgSales, divisor)
+	restockDisplay := formatWithDivisor(float64(recommendedRestock), divisor)
 
 	return &PredictionSummaryResponse{
 		ProductID:                  productID,
