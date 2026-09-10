@@ -145,7 +145,7 @@ const NotifikasiScreen = () => {
                 Styles.notificationTitle,
                 isUnread && Styles.notificationTitleUnread,
               ]}
-              // numberOfLines={1}
+              numberOfLines={1}
             >
               {item.title}
             </Text>
