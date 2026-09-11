@@ -1,12 +1,13 @@
 import pandas as pd
 
 # 1. Baca data historical_sales.csv
-df = pd.read_csv("historical_sales.csv")
+df = pd.read_csv("data/historical_sales.csv")
 
 # Ensure kolom product_name ada (jika tidak, pakai product_id saja)
 group_cols = ["product_id"]
 if "product_name" in df.columns:
-    group_cols.append("product_name")
+    # group_cols.append("product_name")
+    group_cols.append("product_id")
 
 # 2. Hitung statistik per produk
 summary = df.groupby(group_cols).agg(
