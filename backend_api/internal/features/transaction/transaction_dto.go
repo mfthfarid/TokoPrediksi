@@ -14,7 +14,7 @@ type CreateTransactionInput struct {
 	Items         []CreateTransactionItemInput  `json:"items" binding:"required,min=1,dive"`
 }
 
-type TransactionQuery struct {
-	StartDate string `form:"start_date"`
-	EndDate   string `form:"end_date"`
+type TransactionListQuery struct {
+	StartDate *string `form:"start_date"`
+	EndDate   *string `form:"end_date"`
 }

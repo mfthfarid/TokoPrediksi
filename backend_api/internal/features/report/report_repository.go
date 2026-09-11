@@ -16,7 +16,7 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 		`).
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
 		Joins("JOIN products ON products.id = transaction_items.product_id").
-		Where("DATE(transactions.transaction_date) BETWEEN ? AND ?", startDate, endDate) // sebelumnya tanpa DATE(...)
+		Where("transactions.transaction_date BETWEEN ? AND ?", startDate, endDate)
 
 	if productID != nil {
 		query = query.Where("transaction_items.product_id = ?", *productID)
@@ -31,4 +31,31 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 		return nil, err
 	}
 	return rows, nil
+}
+
+// GetOverallTotals menghitung total keseluruhan tanpa peduli beda satuan produk —
+// aman dijumlah karena berbasis Rupiah & hitungan transaksi/baris, bukan quantity fisik.
+func (r *ReportRepository) GetOverallTotals(startDate, endDate string) (revenue, cost, profit, transactions, items int, err error) {
+	type result struct {
+		Revenue      int
+		Cost         int
+		Profit       int
+		Transactions int
+		Items        int
+	}
+	var res result
+
+	err = config.DB.Table("transaction_items").
+		Select(`
+			COALESCE(SUM(transaction_items.subtotal), 0) as revenue,
+			COALESCE(SUM(transaction_items.cost_price), 0) as cost,
+			COALESCE(SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price AS SIGNED)), 0) as profit,
+			COUNT(DISTINCT transaction_items.transaction_id) as transactions,
+			COUNT(*) as items
+		`).
+		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
+		Where("transactions.transaction_date BETWEEN ? AND ?", startDate, endDate).
+		Scan(&res).Error
+
+	return res.Revenue, res.Cost, res.Profit, res.Transactions, res.Items, err
 }

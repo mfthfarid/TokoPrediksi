@@ -17,23 +17,14 @@ func NewTransactionHandler() *TransactionHandler {
 }
 
 func (h *TransactionHandler) GetTransactions(c *gin.Context) {
-	var query TransactionQuery
+	var query TransactionListQuery
+	_ = c.ShouldBindQuery(&query)
 
-	if err := c.ShouldBindQuery(&query); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Parameter tanggal tidak valid",
-		})
-		return
-	}
-
-	transactions, err := h.service.GetAll(query)
+	transactions, err := h.service.GetAll(query.StartDate, query.EndDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data transaksi"})
 		return
 	}
-
 	c.JSON(http.StatusOK, transactions)
 }
 
