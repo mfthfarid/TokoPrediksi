@@ -5,6 +5,7 @@ import NotifikasiScreen from '../../screens/notifikasi/NotifikasiScreen';
 import KategoriScreen from '../../screens/kategori/KategoriScreen';
 import SatuanScreen from '../../screens/satuan/SatuanScreen';
 import SupplierScreen from '../../screens/supplier/SupplierScreen';
+import LaporanScreen from '../../screens/laporan/LaporanScreen';
 import PembelianScreen from '../../screens/pembelian/PembelianScreen';
 import TambahPembelianScreen from '../../screens/pembelian/tambah/TambahPembelianScreen';
 import DetailPembelianScreen from '../../screens/pembelian/detail/DetailPembelianScreen';
@@ -24,6 +25,7 @@ export default function DashboardStack() {
       <Stack.Screen name="Satuan" component={SatuanScreen} />
       <Stack.Screen name="Supplier" component={SupplierScreen} />
       <Stack.Screen name="Pembelian" component={PembelianScreen} />
+      <Stack.Screen name="Laporan" component={LaporanScreen} />
       <Stack.Screen name="TambahPembelian" component={TambahPembelianScreen} />
       <Stack.Screen name="DetailPembelian" component={DetailPembelianScreen} />
       <Stack.Screen name="PenyesuaianStok" component={PenyesuaianStokScreen} />
