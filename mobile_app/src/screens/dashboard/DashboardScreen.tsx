@@ -345,7 +345,8 @@ const DashboardScreen = () => {
         {/* Laporan */}
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => toast.info('Fitur ini akan segera hadir!')}
+          // onPress={() => toast.info('Fitur ini akan segera hadir!')}
+          onPress={() => navigation.navigate('Laporan')}
         >
           <View style={styles.menuIconBox}>
             <FileText size={22} color={Colors.primary} />
