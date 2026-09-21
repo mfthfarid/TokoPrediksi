@@ -385,3 +385,52 @@ func callPythonPredict(reqBody pythonPredictRequest) ([]pythonPredictionPoint, e
 	}
 	return result.Predictions, nil
 }
+
+type FilledPoint struct {
+	DS       string
+	Y        float64
+	IsFilled bool
+}
+
+// FillMissingDatesDetailed sama logikanya dengan fillMissingDates, tapi menandai
+// mana titik hasil pengisian otomatis. Dipakai KHUSUS untuk ekspor dokumentasi
+// before/after ke database, terpisah dari alur prediksi live yang tidak menyimpan apa pun.
+func FillMissingDatesDetailed(sparse []DailySales) []FilledPoint {
+	if len(sparse) == 0 {
+		return nil
+	}
+
+	existing := make(map[string]float64, len(sparse))
+	for _, d := range sparse {
+		existing[d.DS] = d.Y
+	}
+
+	startDate, _ := time.Parse("2006-01-02", sparse[0].DS)
+	endDate, _ := time.Parse("2006-01-02", sparse[len(sparse)-1].DS)
+
+	var filled []FilledPoint
+	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+		dateStr := d.Format("2006-01-02")
+		y, exists := existing[dateStr]
+		filled = append(filled, FilledPoint{DS: dateStr, Y: y, IsFilled: !exists})
+	}
+	return filled
+}
+
+// FillDateRange sama seperti FillMissingDatesDetailed, tapi rentang tanggalnya
+// DITENTUKAN DARI LUAR (startDate, endDate), bukan diambil dari data itu sendiri.
+// Dipakai supaya beberapa produk bisa dibandingkan dalam 1 rentang tanggal yang SAMA.
+func FillDateRange(sparse []DailySales, startDate, endDate time.Time) []FilledPoint {
+	existing := make(map[string]float64, len(sparse))
+	for _, d := range sparse {
+		existing[d.DS] = d.Y
+	}
+
+	var filled []FilledPoint
+	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+		dateStr := d.Format("2006-01-02")
+		y, exists := existing[dateStr]
+		filled = append(filled, FilledPoint{DS: dateStr, Y: y, IsFilled: !exists})
+	}
+	return filled
+}
