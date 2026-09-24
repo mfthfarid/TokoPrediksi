@@ -238,7 +238,7 @@ const TransaksiScreen = () => {
 
   return (
     <ScreenLayout
-      title="Transaksi"
+      title="Penjualan"
       // paddingHorizontal={0}
       paddingVertical={0}
       scrollable={false}
@@ -259,7 +259,7 @@ const TransaksiScreen = () => {
                 activeTab === 'transaksi' && styles.tabTextActive,
               ]}
             >
-              Transaksi
+              Penjualan
             </Text>
           </TouchableOpacity>
           <TouchableOpacity

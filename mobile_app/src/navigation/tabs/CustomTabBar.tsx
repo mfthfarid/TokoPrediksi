@@ -13,7 +13,7 @@ import { Colors } from '../../styles';
 const TAB_CONFIG: Record<string, { label: string; icon: typeof Home }> = {
   DashboardTab: { label: 'Dashboard', icon: Home },
   BarangTab: { label: 'Barang', icon: Package },
-  TransaksiTab: { label: 'Transaksi', icon: Receipt },
+  TransaksiTab: { label: 'Penjualan', icon: Receipt },
   PrediksiTab: { label: 'Prediksi', icon: LineChart },
   PengaturanTab: { label: 'Pengaturan', icon: Settings },
 };
