@@ -68,12 +68,12 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 	var created Transaction
 
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
-		// Generate Transaction Code
 		now := time.Now()
 		trxCode := fmt.Sprintf(
-			"TRX-%s-%d",
-			now.Format("20060102"),
-			now.Unix(),
+			"PJL-%s-%s",
+			now.Format("020106"), // DDMMYY (Hari, Bulan, Tahun 2 digit)
+    		now.Format("150405"), // HHMMSS / (Jam, Menit, Detik)
+			// now.Unix(),
 		)
 
 		header := &Transaction{
@@ -88,10 +88,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 		}
 
 		var totalAmount uint
-
-		// REVISI:
-		// Total quantity menggunakan decimal agar bisa menyimpan
-		// nilai pecahan seperti 1.5, 2.25, dan sebagainya.
 		var totalQuantity = decimal.Zero
 
 		for _, item := range input.Items {
@@ -170,10 +166,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 
 			// Total harga
 			totalAmount += subtotal
-
-			// REVISI:
-			// Tambahkan quantity menggunakan decimal.
-			// Jangan gunakan IntPart() karena akan membuang nilai pecahan.
 			totalQuantity = totalQuantity.Add(item.Quantity)
 		}
 
@@ -185,9 +177,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 
 		header.TotalAmount = totalAmount
 		header.FinalAmount = finalAmount
-
-		// REVISI:
-		// Sekarang TotalQuantity bertipe decimal.Decimal.
 		header.TotalQuantity = totalQuantity
 
 		if err := tx.Save(header).Error; err != nil {
@@ -195,7 +184,6 @@ func (s *TransactionService) Create(input CreateTransactionInput) (*Transaction,
 		}
 
 		created = *header
-
 		return nil
 	})
 
