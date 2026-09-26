@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +13,8 @@ import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 	"github.com/xuri/excelize/v2"
 )
+
+var featuredProductIDs = map[uint]bool{129: true, 158: true, 292: true, 259: true, 13: true}
 
 type barangRow struct {
 	Kode       string
@@ -26,6 +29,86 @@ type barangRow struct {
 type unitConversion struct {
 	ProductID        uint
 	ConversionToBase float64
+}
+
+type sparsePoint struct {
+	SaleDate string
+	Qty      float64
+}
+
+func cleanAllFeaturedProducts(productIDs map[uint]bool) {
+	globalStart, globalEnd := findGlobalDateRange(productIDs)
+	fmt.Printf("  Rentang tetap dipakai untuk semua produk: %s s/d %s\n\n",
+		globalStart.Format("2006-01-02"), globalEnd.Format("2006-01-02"))
+
+	for productID := range productIDs {
+		cleanHistoricalSales(productID, globalStart, globalEnd)
+	}
+}
+
+func findGlobalDateRange(productIDs map[uint]bool) (time.Time, time.Time) {
+	var minDate, maxDate time.Time
+	for productID := range productIDs {
+		var res struct {
+			MinDate string
+			MaxDate string
+		}
+		config.DB.Table("historical_sales").
+			Select("MIN(sale_date) as min_date, MAX(sale_date) as max_date").
+			Where("product_id = ?", productID).
+			Scan(&res)
+
+		if res.MinDate == "" {
+			continue
+		}
+		start, _ := time.Parse("2006-01-02", res.MinDate[:10])
+		end, _ := time.Parse("2006-01-02", res.MaxDate[:10])
+
+		if minDate.IsZero() || start.Before(minDate) {
+			minDate = start
+		}
+		if maxDate.IsZero() || end.After(maxDate) {
+			maxDate = end
+		}
+	}
+	return minDate, maxDate
+}
+
+func cleanHistoricalSales(productID uint, globalStart, globalEnd time.Time) {
+	var sparse []sparsePoint
+	config.DB.Table("historical_sales").
+		Select("DATE_FORMAT(sale_date, '%Y-%m-%d') as sale_date, SUM(quantity_sold) as qty").
+		Where("product_id = ?", productID).
+		Group("sale_date").
+		Order("sale_date ASC").
+		Scan(&sparse)
+
+	existing := make(map[string]float64, len(sparse))
+	for _, s := range sparse {
+		existing[s.SaleDate] = s.Qty
+	}
+
+	config.DB.Exec("DELETE FROM historical_sales WHERE product_id = ?", productID)
+
+	realCount, filledCount := 0, 0
+	for d := globalStart; !d.After(globalEnd); d = d.AddDate(0, 0, 1) {
+		dateStr := d.Format("2006-01-02")
+		y, exists := existing[dateStr]
+		isFilled := !exists
+
+		config.DB.Exec(
+			`INSERT INTO historical_sales (product_id, sale_date, quantity_sold, price_sold, is_filled) VALUES (?, ?, ?, 0, ?)`,
+			productID, dateStr, y, isFilled,
+		)
+		if isFilled {
+			filledCount++
+		} else {
+			realCount++
+		}
+	}
+
+	fmt.Printf("  Produk %d: %d hari total (%d data asli, %d hasil pengisian 0)\n",
+		productID, realCount+filledCount, realCount, filledCount)
 }
 
 func main() {
@@ -120,6 +203,9 @@ func main() {
 			}
 
 			quantityBase := qty * uc.ConversionToBase
+			if !featuredProductIDs[uc.ProductID] {
+				continue // lewati, bukan salah satu dari 5 produk unggulan
+			}
 
 			if commit {
 				err := config.DB.Exec(
@@ -133,6 +219,11 @@ func main() {
 			}
 			totalImported++
 		}
+	}
+
+	if commit {
+		fmt.Println("\n=== Tahap C: Membersihkan (zero-fill) data historis 5 produk unggulan ===")
+		cleanAllFeaturedProducts(featuredProductIDs)
 	}
 
 	fmt.Printf("\n=== HASIL ===\n")
@@ -156,6 +247,7 @@ func main() {
 	}
 }
 
+// Barang
 func processBarangSheet(f *excelize.File, commit bool) (map[string]unitConversion, error) {
 	rows, err := f.GetRows("Barang")
 	if err != nil {
@@ -190,31 +282,39 @@ func processBarangSheet(f *excelize.File, commit bool) (map[string]unitConversio
 		groups[br.NamaProduk] = append(groups[br.NamaProduk], br)
 	}
 
+	// Urutan nama produk alfabet
+	names := make([]string, 0, len(groups))
+	for nama := range groups {
+		names = append(names, nama)
+	}
+	sort.Strings(names)
+
 	result := map[string]unitConversion{}
 
-	for nama, items := range groups {
-	if len(items) == 1 {
-		item := items[0]
-		fmt.Printf("[SIMPEL] %q → 1 produk, 1 satuan\n", nama)
-		productID := resolveSimpleProduct(nama, item, commit)
-		if productID == 0 {
-			fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat (lihat error di atas)\n", nama)
-			continue // <-- PENTING: jangan masukkan ke result map
+	for _, nama := range names {
+		items := groups[nama]
+		if len(items) == 1 {
+			item := items[0]
+			fmt.Printf("[SIMPEL] %q → 1 produk, 1 satuan\n", nama)
+			productID := resolveSimpleProduct(nama, item, commit)
+			if productID == 0 {
+				fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat\n", nama)
+				continue
+			}
+			result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
+			continue
 		}
-		result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
-		continue
-	}
 
-	fmt.Printf("[MULTI-SATUAN] %q → 1 produk, %d varian jual + 1 satuan dasar tersembunyi\n", nama, len(items))
-	productID := resolveMultiUnitProduct(nama, items, commit)
-	if productID == 0 {
-		fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat (lihat error di atas)\n", nama)
-		continue
+		fmt.Printf("[MULTI-SATUAN] %q → 1 produk, %d varian jual + 1 satuan dasar tersembunyi\n", nama, len(items))
+		productID := resolveMultiUnitProduct(nama, items, commit)
+		if productID == 0 {
+			fmt.Printf("  ⚠️  dilewati, produk %q gagal dibuat\n", nama)
+			continue
+		}
+		for _, item := range items {
+			result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
+		}
 	}
-	for _, item := range items {
-		result[item.Kode] = unitConversion{ProductID: productID, ConversionToBase: item.Konversi}
-	}
-}
 
 	return result, nil
 }

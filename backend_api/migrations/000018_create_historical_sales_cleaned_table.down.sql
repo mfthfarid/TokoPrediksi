@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS historical_sales_cleaned;
