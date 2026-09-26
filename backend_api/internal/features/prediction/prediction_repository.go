@@ -47,7 +47,7 @@ func (r *PredictionRepository) GetSummaryRaw() ([]summaryRawRow, error) {
 			) combined
 			GROUP BY product_id
 		) sales ON sales.product_id = p.id
-		WHERE p.deleted_at IS NULL
+		WHERE p.deleted_at IS NULL AND p.is_prediction_enabled = true
 	`
 	var rows []summaryRawRow
 	err := config.DB.Raw(query).Scan(&rows).Error
@@ -83,16 +83,22 @@ func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, erro
 
 func (r *PredictionRepository) GetAllProductIDs() ([]uint, error) {
 	var ids []uint
-	
-	// Gunakan Pluck untuk efisiensi memori (hanya menarik kolom ID)
 	err := config.DB.Table("products").
-		Where("deleted_at IS NULL"). // (Opsional) Memastikan produk yang sudah di-soft-delete tidak ikut diprediksi
+		Where("deleted_at IS NULL AND is_prediction_enabled = true").
 		Pluck("id", &ids).Error
-
 	if err != nil {
 		return nil, err
 	}
 	return ids, nil
+}
+
+func (r *PredictionRepository) IsPredictionEnabled(productID uint) (bool, error) {
+	var enabled bool
+	err := config.DB.Table("products").
+		Select("is_prediction_enabled").
+		Where("id = ?", productID).
+		Scan(&enabled).Error
+	return enabled, err
 }
 
 func (r *PredictionRepository) DeleteByProductID(productID uint) error {

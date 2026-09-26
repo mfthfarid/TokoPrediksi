@@ -21,7 +21,6 @@ func main() {
 	repo := &prediction.PredictionRepository{}
 
 	// Tahap 1: ambil data mentah semua produk dulu, sekalian cari
-	// tanggal PALING AWAL dan PALING AKHIR di antara SEMUA produk (rentang gabungan)
 	allSales := map[uint][]prediction.DailySales{}
 	var globalStart, globalEnd time.Time
 

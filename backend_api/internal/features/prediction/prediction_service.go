@@ -125,6 +125,14 @@ func calculateMaxPeriods(historyLength int) int {
 }
 
 func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSummaryResponse, error) {
+	enabled, err := s.repo.IsPredictionEnabled(productID)
+	if err != nil {
+		return nil, errors.New("produk tidak ditemukan")
+	}
+	if !enabled {
+		return nil, errors.New("prediksi hanya tersedia untuk produk unggulan yang telah dianalisis")
+	}
+
 	if periods <= 0 {
 		periods = defaultPeriods
 	}

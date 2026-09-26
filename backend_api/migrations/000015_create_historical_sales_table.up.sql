@@ -4,6 +4,7 @@ CREATE TABLE historical_sales (
     sale_date DATE NOT NULL,
     quantity_sold DECIMAL(10,2) UNSIGNED NOT NULL,
     price_sold INT UNSIGNED NOT NULL,
+    is_filled BOOLEAN NOT NULL DEFAULT FALSE,
     imported_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_historicalsales_product
