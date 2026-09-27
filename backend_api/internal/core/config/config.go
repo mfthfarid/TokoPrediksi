@@ -13,9 +13,16 @@ var DB *gorm.DB
 // type GormDB = gorm.DB
 
 func ConnectDB() {
+	// Local
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
+
+	// Railway
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Peringatan: File .env tidak ditemukan, menggunakan variabel lingkungan Railway")
 	}
 
 	dsn := os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASS") + "@tcp(" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + ")/" + os.Getenv("DB_NAME") + "?charset=utf8mb4&parseTime=True&loc=Local"
