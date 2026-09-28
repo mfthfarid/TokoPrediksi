@@ -201,7 +201,16 @@ const LaporanScreen = () => {
     return 'minus';
   };
 
-  const renderComparison = (value: number) => {
+  const renderComparison = (value: number | null) => {
+    if (value === null || value === undefined) {
+      return (
+        <View style={Styles.comparisonContainer}>
+          <Text style={Styles.comparisonLabel}>
+            tidak ada data periode sebelumnya
+          </Text>
+        </View>
+      );
+    }
     const color = getComparisonColor(value);
     return (
       <View style={Styles.comparisonContainer}>
