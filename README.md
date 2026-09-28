@@ -64,6 +64,6 @@ Aplikasi mobile berkomunikasi dengan backend Go yang mengelola data dan bisnis l
 
 <div align="center">
 
-Dibuat oleh **Farid** · Proyek Skripsi
+Dibuat oleh **mfthfarid** · Proyek Skripsi
 
 </div>
