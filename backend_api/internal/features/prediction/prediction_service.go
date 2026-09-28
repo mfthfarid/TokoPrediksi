@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -366,32 +367,40 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 }
 
 func callPythonPredict(reqBody pythonPredictRequest) ([]pythonPredictionPoint, error) {
-	url := os.Getenv("PREDICTION_SERVICE_URL")
-	if url == "" {
-		url = "http://localhost:8000/predict"
-	}
+    url := os.Getenv("PREDICTION_SERVICE_URL")
+    if url == "" {
+        url = "http://localhost:8000/predict"
+    }
 
-	jsonData, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, err
-	}
+    // [TAMBAHAN] Cetak URL yang dipanggil di log Railway
+    log.Println("[ML Predict] Memanggil URL ML:", url)
 
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, errors.New("gagal menghubungi service prediksi, pastikan service Python sedang berjalan")
-	}
-	defer resp.Body.Close()
+    jsonData, err := json.Marshal(reqBody)
+    if err != nil {
+        return nil, err
+    }
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("service prediksi mengembalikan error (status %d)", resp.StatusCode)
-	}
+    client := &http.Client{Timeout: 30 * time.Second}
+    resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        // [TAMBAHAN] Cetak error detail ke log Railway untuk debugging
+        log.Println("[ML Predict Error] Gagal connect ke ML:", err)
+        return nil, fmt.Errorf("gagal menghubungi service prediksi (%s): %v", url, err)
+    }
+    defer resp.Body.Close()
 
-	var result pythonPredictResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errors.New("gagal membaca respons dari service prediksi")
-	}
-	return result.Predictions, nil
+    if resp.StatusCode != http.StatusOK {
+        log.Printf("[ML Predict Error] Service ML mengembalikan HTTP Status %d\n", resp.StatusCode)
+        return nil, fmt.Errorf("service prediksi mengembalikan error (status %d)", resp.StatusCode)
+    }
+
+    var result pythonPredictResponse
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        log.Println("[ML Predict Error] Gagal decode JSON dari ML:", err)
+        return nil, errors.New("gagal membaca respons dari service prediksi")
+    }
+    
+    return result.Predictions, nil
 }
 
 type FilledPoint struct {
