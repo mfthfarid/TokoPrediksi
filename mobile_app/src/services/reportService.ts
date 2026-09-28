@@ -20,8 +20,8 @@ export interface GrandTotal {
 }
 
 export interface Comparison {
-  revenue_change_percent: number;
-  profit_change_percent: number;
+  revenue_change_percent: number | null;
+  profit_change_percent: number | null;
 }
 
 export interface ProfitReportResponse {
