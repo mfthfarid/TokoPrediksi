@@ -1,6 +1,7 @@
 package report
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,12 @@ func (h *ReportHandler) GetProfitReport(c *gin.Context) {
 
 	report, err := h.service.GetProfitReport(query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil laporan laba"})
+		// TODO: hapus baris detail error ini setelah debugging selesai
+		log.Printf("[ReportHandler] GetProfitReport error: %v | query: %+v", err, query)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":  "Gagal mengambil laporan laba",
+			"detail": err.Error(),
+		})
 		return
 	}
 	c.JSON(http.StatusOK, report)
