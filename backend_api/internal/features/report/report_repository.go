@@ -30,10 +30,10 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 		Select(`
 			products.id as product_id,
 			products.name as product_name,
-			SUM(transaction_items.quantity_base) as total_qty,
-			SUM(transaction_items.subtotal) as total_revenue,
-			SUM(transaction_items.cost_price * transaction_items.quantity) as total_cost,
-			SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price * transaction_items.quantity AS SIGNED)) as total_profit
+			COALESCE(SUM(transaction_items.quantity_base), 0) as total_qty,
+			CAST(COALESCE(SUM(transaction_items.subtotal), 0) AS SIGNED) as total_revenue,
+			CAST(COALESCE(SUM(ROUND(transaction_items.cost_price * transaction_items.quantity)), 0) AS SIGNED) as total_cost,
+			CAST(COALESCE(SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price * transaction_items.quantity AS SIGNED)), 0) AS SIGNED) as total_profit
 		`).
 		Joins("JOIN transactions ON transactions.id = transaction_items.transaction_id").
 		Joins("JOIN products ON products.id = transaction_items.product_id").
@@ -70,9 +70,9 @@ func (r *ReportRepository) GetOverallTotals(startDate, endDate string) (revenue,
 
 	err = config.DB.Table("transaction_items").
 		Select(`
-			COALESCE(SUM(transaction_items.subtotal), 0) as revenue,
-			COALESCE(SUM(transaction_items.cost_price * transaction_items.quantity), 0) as cost,
-			COALESCE(SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price * transaction_items.quantity AS SIGNED)), 0) as profit,
+			CAST(COALESCE(SUM(transaction_items.subtotal), 0) AS SIGNED) as revenue,
+			CAST(COALESCE(SUM(ROUND(transaction_items.cost_price * transaction_items.quantity)), 0) AS SIGNED) as cost,
+			CAST(COALESCE(SUM(CAST(transaction_items.subtotal AS SIGNED) - CAST(transaction_items.cost_price * transaction_items.quantity AS SIGNED)), 0) AS SIGNED) as profit,
 			COUNT(DISTINCT transaction_items.transaction_id) as transactions,
 			COUNT(*) as items
 		`).
