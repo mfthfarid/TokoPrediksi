@@ -23,6 +23,7 @@ import {
   MapPin,
   Search,
   X,
+  Clock,
 } from 'lucide-react-native';
 import ScreenLayout from '../../layouts/ScreenLayout';
 import TextField from '../../components/ui/TextField';
@@ -34,6 +35,7 @@ import {
   updateSupplier,
   deleteSupplier,
   SupplierApi,
+  SupplierInput,
 } from '../../services/supplierService';
 import { useToast } from '../../contexts/ToastContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
@@ -52,6 +54,7 @@ const SupplierScreen = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [leadTimeDays, setLeadTimeDays] = useState('');
   const [saving, setSaving] = useState(false);
   const fetchSuppliers = useCallback(async () => {
     try {
@@ -86,6 +89,7 @@ const SupplierScreen = () => {
     setName('');
     setPhone('');
     setAddress('');
+    setLeadTimeDays('');
     setModalVisible(true);
   };
 
@@ -94,6 +98,9 @@ const SupplierScreen = () => {
     setName(supplier.name);
     setPhone(supplier.phone ?? '');
     setAddress(supplier.address ?? '');
+    setLeadTimeDays(
+      supplier.lead_time_days != null ? String(supplier.lead_time_days) : '',
+    );
     setModalVisible(true);
   };
 
@@ -103,6 +110,7 @@ const SupplierScreen = () => {
     setName('');
     setPhone('');
     setAddress('');
+    setLeadTimeDays('');
   };
 
   const handleSave = async () => {
@@ -110,13 +118,30 @@ const SupplierScreen = () => {
       Alert.alert('Periksa Kembali', 'Nama supplier wajib diisi');
       return;
     }
+
+    let parsedLeadTime: number | null | undefined = undefined;
+    if (leadTimeDays.trim() !== '') {
+      const num = parseInt(leadTimeDays.trim(), 10);
+      if (isNaN(num) || num < 0) {
+        Alert.alert(
+          'Periksa Kembali',
+          'Waktu pengiriman harus berupa angka minimal 0',
+        );
+        return;
+      }
+      parsedLeadTime = num;
+    } else if (editingSupplier) {
+      parsedLeadTime = null;
+    }
+
     setSaving(true);
 
     try {
-      const payload = {
+      const payload: SupplierInput = {
         name: name.trim(),
         phone: phone.trim() || undefined,
         address: address.trim() || undefined,
+        lead_time_days: parsedLeadTime,
       };
 
       if (editingSupplier) {
@@ -244,6 +269,14 @@ const SupplierScreen = () => {
                   </Text>
                 </View>
               ) : null}
+              {item.lead_time_days != null ? (
+                <View style={styles.infoRow}>
+                  <Clock size={13} color={Colors.textSecondary} />
+                  <Text style={styles.rowSubText} numberOfLines={1}>
+                    {item.lead_time_days} hari pengiriman (lead time)
+                  </Text>
+                </View>
+              ) : null}
             </View>
             {/* tombol */}
             <View style={styles.actionContainer}>
@@ -343,6 +376,16 @@ const SupplierScreen = () => {
                 />
               </View>
             </View>
+            <TextField
+              label="Waktu Pengiriman / Lead Time (Hari, opsional)"
+              placeholder="Contoh: 3 (estimasi barang sampai setelah dipesan)"
+              value={leadTimeDays}
+              onChangeText={text =>
+                setLeadTimeDays(text.replace(/[^0-9]/g, ''))
+              }
+              keyboardType="number-pad"
+              leftIcon={<Clock size={18} color={Colors.textSecondary} />}
+            />
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.modalCancelButton}

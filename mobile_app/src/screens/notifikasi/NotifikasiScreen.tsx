@@ -82,6 +82,10 @@ const NotifikasiScreen = () => {
     switch (type) {
       case 'stock_out':
         return 'close-circle-outline';
+      case 'safety_stock':
+        return 'shield-alert-outline';
+      case 'reorder_point':
+        return 'truck-fast-outline';
       case 'stock_low':
         return 'alert-outline';
       case 'prediction_complete':
@@ -95,6 +99,10 @@ const NotifikasiScreen = () => {
     switch (type) {
       case 'stock_out':
         return '#F44336';
+      case 'safety_stock':
+        return '#DC2626';
+      case 'reorder_point':
+        return '#F59E0B';
       case 'stock_low':
         return '#F59E0B';
       case 'prediction_complete':

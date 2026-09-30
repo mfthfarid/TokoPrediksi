@@ -15,9 +15,16 @@ func (r *StockAlertRepository) GetOutOfStock() ([]string, error) {
 }
 
 func (r *StockAlertRepository) GetLowStock() ([]string, error) {
+	return r.GetLowStockExcluding(nil)
+}
+
+func (r *StockAlertRepository) GetLowStockExcluding(excludedIDs []uint) ([]string, error) {
 	var names []string
-	err := config.DB.Table("products").
-		Where("stock > 0 AND stock <= ? AND deleted_at IS NULL", lowStockThreshold).
-		Pluck("name", &names).Error
+	query := config.DB.Table("products").
+		Where("stock > 0 AND stock <= ? AND deleted_at IS NULL", lowStockThreshold)
+	if len(excludedIDs) > 0 {
+		query = query.Where("id NOT IN ?", excludedIDs)
+	}
+	err := query.Pluck("name", &names).Error
 	return names, err
 }

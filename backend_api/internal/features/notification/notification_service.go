@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/reorder"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/pushnotification"
 )
 
 func colorForType(notifType string) string {
 	switch notifType {
 	case "stock_out":
-		return "#F44336"
+		return "#F44336" // Merah
+	case "safety_stock":
+		return "#DC2626" // Merah Darurat
+	case "reorder_point":
+		return "#F59E0B" // Kuning / Amber
 	case "stock_low":
-		return "#FFC107"
+		return "#FFC107" // Kuning Terang
 	default:
 		return "" // warna default aplikasi
 	}
@@ -83,28 +88,59 @@ func formatProductList(names []string) string {
 	}
 }
 
-// CheckStockAndNotify dipanggil cron harian — cek stok habis & menipis,
-// kirim MAKSIMAL 2 notifikasi (bukan per-produk), sesuai urgensinya masing-masing.
+// CheckStockAndNotify dipanggil cron harian & setelah prediksi — cek stok habis,
+// safety stock, reorder point, dan stok menipis.
+// Mengelompokkan produk menjadi ringkasan (maksimal 1 notifikasi per kategori urgensi).
 func (s *Service) CheckStockAndNotify() {
 	alertRepo := &StockAlertRepository{}
 
-    // stok habis
-    outOfStock, err := alertRepo.GetOutOfStock()
-    if err == nil && len(outOfStock) > 0 {
-        body := fmt.Sprintf(
-            "Stok %s habis!",
-            formatProductList(outOfStock),
-        )
-        s.Broadcast("⛔ Stok Habis", body, "stock_out")
-    }
+	// 1. Stok habis
+	outOfStock, err := alertRepo.GetOutOfStock()
+	if err == nil && len(outOfStock) > 0 {
+		body := fmt.Sprintf(
+			"Stok %s habis!",
+			formatProductList(outOfStock),
+		)
+		s.Broadcast("⛔ Stok Habis", body, "stock_out")
+	}
 
-    // stok menipis
-    lowStock, err := alertRepo.GetLowStock()
-    if err == nil && len(lowStock) > 0 {
-        body := fmt.Sprintf(
-            "Stok %s hampir habis.",
-            formatProductList(lowStock),
-        )
-        s.Broadcast("⚠️ Stok Menipis", body, "stock_low")
-    }
+	// 2. Cek Reorder Point & Safety Stock berbasis Prediksi
+	reorderService := reorder.NewService()
+	safetyStockAlerts, reorderPointAlerts, checkedIDs, _ := reorderService.GetAllReorderAlerts()
+
+	// Notifikasi masuk zona Safety Stock (Kritis - buffer stock terpakai)
+	if len(safetyStockAlerts) > 0 {
+		var names []string
+		for _, a := range safetyStockAlerts {
+			names = append(names, a.ProductName)
+		}
+		body := fmt.Sprintf(
+			"Stok %s telah menyentuh batas aman (safety stock). Segera lakukan pemesanan ulang!",
+			formatProductList(names),
+		)
+		s.Broadcast("🚨 Kritis: Masuk Safety Stock", body, "safety_stock")
+	}
+
+	// Notifikasi mencapai Reorder Point (Waktunya pesan kembali)
+	if len(reorderPointAlerts) > 0 {
+		var names []string
+		for _, a := range reorderPointAlerts {
+			names = append(names, a.ProductName)
+		}
+		body := fmt.Sprintf(
+			"Stok %s telah mencapai Reorder Point. Waktunya memesan kembali ke supplier!",
+			formatProductList(names),
+		)
+		s.Broadcast("📦 Waktunya Reorder (ROP)", body, "reorder_point")
+	}
+
+	// 3. Stok menipis konvensional (khusus produk yang BELUM punya data prediksi)
+	lowStock, err := alertRepo.GetLowStockExcluding(checkedIDs)
+	if err == nil && len(lowStock) > 0 {
+		body := fmt.Sprintf(
+			"Stok %s hampir habis.",
+			formatProductList(lowStock),
+		)
+		s.Broadcast("⚠️ Stok Menipis", body, "stock_low")
+	}
 }
