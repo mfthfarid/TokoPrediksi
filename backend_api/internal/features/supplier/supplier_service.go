@@ -23,7 +23,7 @@ func (s *SupplierService) GetByID(id uint) (*Supplier, error) {
 }
 
 func (s *SupplierService) Create(input CreateSupplierInput) (*Supplier, error) {
-	sup := &Supplier{Name: input.Name, Phone: input.Phone, Address: input.Address}
+	sup := &Supplier{Name: input.Name, Phone: input.Phone, Address: input.Address, LeadTimeDays: input.LeadTimeDays}
 	if err := s.repo.Create(sup); err != nil {
 		return nil, err
 	}
@@ -45,6 +45,9 @@ func (s *SupplierService) Update(id uint, input UpdateSupplierInput) (*Supplier,
 	if input.Address != nil {
 		sup.Address = input.Address
 	}
+	if input.LeadTimeDays != nil {
+		sup.LeadTimeDays = input.LeadTimeDays
+	}
 
 	if err := s.repo.Update(sup); err != nil {
 		return nil, err
@@ -56,7 +59,5 @@ func (s *SupplierService) Delete(id uint) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return errors.New("supplier tidak ditemukan")
 	}
-	// Aman dihapus meski masih dipakai purchases lama,
-	// karena FK purchases.supplier_id sudah ON DELETE SET NULL
 	return s.repo.Delete(id)
 }

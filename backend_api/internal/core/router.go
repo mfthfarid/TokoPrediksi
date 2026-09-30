@@ -10,6 +10,7 @@ import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/prediction"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/product"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/purchase"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/reorder"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/report"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/stockhistory"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/supplier"
@@ -34,6 +35,7 @@ func SetupRouter() *gin.Engine {
 		product.RegisterRoutes(productGroup)
 
 		prediction.RegisterRoutes(protected)
+		reorder.RegisterRoutes(protected)
 		// predictionHandler := prediction.NewPredictionHandler()
 		// productGroup.POST("/:id/predict", predictionHandler.Predict)
 		// productGroup.GET("/:id/predictions", predictionHandler.GetPredictions)

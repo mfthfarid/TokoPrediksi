@@ -5,12 +5,14 @@ export interface SupplierApi {
   name: string;
   phone: string | null;
   address: string | null;
+  lead_time_days?: number | null;
 }
 
 export interface SupplierInput {
   name: string;
   phone?: string;
   address?: string;
+  lead_time_days?: number | null;
 }
 
 export const getSuppliers = () => api.get<SupplierApi[]>('/api/suppliers');

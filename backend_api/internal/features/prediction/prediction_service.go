@@ -260,6 +260,7 @@ func (s *PredictionService) PredictAll(periods int) error {
 		}
 
 		notifService.Broadcast("Prediksi Mingguan Selesai", body, "prediction_complete")
+		notifService.CheckStockAndNotify()
 	}()
 
 	return nil
