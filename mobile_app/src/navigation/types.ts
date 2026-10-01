@@ -1,3 +1,5 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
 export type RootStackParamList = {
   Splash: undefined;
   Auth: undefined;
@@ -10,10 +12,10 @@ export type AuthStackParamList = {
 };
 
 export type BottomTabParamList = {
-  DashboardTab: undefined;
+  DashboardTab: NavigatorScreenParams<DashboardStackParamList>;
   BarangTab: undefined;
   TransaksiTab: undefined;
-  PrediksiTab: undefined;
+  PrediksiTab: NavigatorScreenParams<PrediksiStackParamList>;
   PengaturanTab: undefined;
 };
 
@@ -28,7 +30,7 @@ export type DashboardStackParamList = {
   TambahPembelian: {
     prefillProductId?: number;
     prefillQuantity?: number;
-  };
+  } | undefined;
   DetailPembelian: { id: number };
   PenyesuaianStok: undefined;
   TambahPenyesuaian: {

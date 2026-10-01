@@ -13,6 +13,7 @@ import {
   useRoute,
   RouteProp,
 } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   RefreshCw,
@@ -37,7 +38,10 @@ import {
   UrgencyLevel,
 } from '../../../services/predictionService';
 import { useToast } from '../../../contexts/ToastContext';
-import { PrediksiStackParamList } from '../../../navigation/types';
+import {
+  BottomTabParamList,
+  PrediksiStackParamList,
+} from '../../../navigation/types';
 import PredictionChart from './PredictionChart';
 import styles from './styles';
 
@@ -48,6 +52,9 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 const screenWidth = Dimensions.get('window').width;
+const formatNumber = (value: number): string =>
+  value.toLocaleString('id-ID');
+
 const predictionPeriods = [
   { label: '7 Hari', value: 7 },
   { label: '14 Hari', value: 14 },
@@ -142,16 +149,16 @@ const DetailPrediksiScreen = () => {
 
   const handleRestock = () => {
     if (!data) return;
-    // navigation.getParent()?.navigate(
-    //   'DashboardTab' as never,
-    //   {
-    //     screen: 'TambahPembelian',
-    //     params: {
-    //       prefillProductId: data.product_id,
-    //       prefillQuantity: Math.ceil(data.recommended_restock_quantity),
-    //     },
-    //   } as never,
-    // );
+
+    navigation
+      .getParent<BottomTabNavigationProp<BottomTabParamList>>()
+      ?.navigate('DashboardTab', {
+        screen: 'TambahPembelian',
+        params: {
+          prefillProductId: data.product_id,
+          prefillQuantity: Math.ceil(data.recommended_restock_quantity),
+        },
+      });
   };
 
   if (loading) {
@@ -252,12 +259,14 @@ const DetailPrediksiScreen = () => {
         <View style={styles.statsGrid}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Stok Saat Ini</Text>
-            <Text style={styles.statValue}>{data.current_stock}</Text>
+            <Text style={styles.statValue}>
+              {formatNumber(data.current_stock)}
+            </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Rata-rata Terjual</Text>
             <Text style={styles.statValue}>
-              {data.average_daily_sales}/hari
+              {formatNumber(data.average_daily_sales)}/hari
             </Text>
           </View>
         </View>
@@ -285,7 +294,7 @@ const DetailPrediksiScreen = () => {
                 <ShieldAlert size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Safety Stock</Text>
                 <Text style={styles.reorderStatValue}>
-                  {Math.round(reorderInfo.safety_stock)}
+                  {formatNumber(Math.round(reorderInfo.safety_stock))}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -293,7 +302,7 @@ const DetailPrediksiScreen = () => {
                 <PackageSearch size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Reorder Point</Text>
                 <Text style={styles.reorderStatValue}>
-                  {Math.round(reorderInfo.reorder_point)}
+                  {formatNumber(Math.round(reorderInfo.reorder_point))}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -330,7 +339,7 @@ const DetailPrediksiScreen = () => {
           <View style={styles.restockInfo}>
             <Text style={styles.restockLabel}>Rekomendasi Restock</Text>
             <Text style={styles.restockValue}>
-              {data.recommended_restock_quantity} unit
+              {formatNumber(data.recommended_restock_quantity)} unit
             </Text>
           </View>
           <TouchableOpacity

@@ -63,6 +63,34 @@ const formatDateToday = (): string => {
 const formatRupiah = (value: number): string =>
   `Rp ${value.toLocaleString('id-ID')}`;
 
+const formatQuantity = (value: string): string => {
+  const [integerPart, decimalPart] = value.split('.');
+  const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return decimalPart === undefined
+    ? groupedInteger
+    : `${groupedInteger},${decimalPart}`;
+};
+
+const parseQuantityInput = (value: string): string => {
+  const normalized = value.replace(/[^\d,.]/g, '');
+  let decimalSeparator = normalized.lastIndexOf(',');
+  if (decimalSeparator < 0) {
+    const dotSeparator = normalized.lastIndexOf('.');
+    const digitsAfterDot = normalized.length - dotSeparator - 1;
+    if (dotSeparator >= 0 && digitsAfterDot !== 3) {
+      decimalSeparator = dotSeparator;
+    }
+  }
+
+  if (decimalSeparator < 0) {
+    return normalized.replace(/\D/g, '');
+  }
+
+  const integerPart = normalized.slice(0, decimalSeparator).replace(/\D/g, '');
+  const decimalPart = normalized.slice(decimalSeparator + 1).replace(/\D/g, '');
+  return decimalPart ? `${integerPart}.${decimalPart}` : `${integerPart}.`;
+};
+
 const calculateItemSubtotal = (item: PurchaseItemRow): number => {
   const qty = parseFloat(item.quantity) || 0;
   const price = parseFloat(item.purchasePrice) || 0;
@@ -340,9 +368,11 @@ const TambahPembelianScreen = () => {
                   <TextField
                     label="Jumlah"
                     placeholder="0"
-                    value={item.quantity}
-                    onChangeText={v => updateItem(item.key, { quantity: v })}
-                    keyboardType="numeric"
+                    value={formatQuantity(item.quantity)}
+                    onChangeText={v =>
+                      updateItem(item.key, { quantity: parseQuantityInput(v) })
+                    }
+                    keyboardType="decimal-pad"
                   />
                 </View>
                 <View style={styles.rowInlineItem}>
