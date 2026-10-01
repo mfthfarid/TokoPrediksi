@@ -38,7 +38,7 @@ const PADDING = {
   top: 28,
   right: 16,
   bottom: 42,
-  left: 42,
+  left: 58,
 };
 
 const GRID_COUNT = 4;
@@ -92,6 +92,9 @@ const formatAxisDate = (timestamp: number, showYear: boolean): string => {
     month: 'short',
   });
 };
+
+const formatQuantity = (value: number): string =>
+  value.toLocaleString('id-ID');
 
 const getNiceMax = (value: number): number => {
   if (value <= 5) return 5;
@@ -444,17 +447,18 @@ const PredictionChart = ({
             </Text>
             {selectedPoint.type === 'actual' ? (
               <Text style={styles.tooltipValue}>
-                Aktual: {selectedPoint.quantity} unit
+                Aktual: {formatQuantity(selectedPoint.quantity)} unit
               </Text>
             ) : (
               <>
                 <Text style={styles.tooltipValue}>
-                  Prediksi: {selectedPoint.quantity} unit{' '}
+                  Prediksi: {formatQuantity(selectedPoint.quantity)} unit{' '}
                 </Text>
                 {selectedPoint.lower !== undefined &&
                   selectedPoint.upper !== undefined && (
                     <Text style={styles.tooltipRange}>
-                      Rentang: {selectedPoint.lower}–{selectedPoint.upper} unit
+                      Rentang: {formatQuantity(selectedPoint.lower)}–
+                      {formatQuantity(selectedPoint.upper)} unit
                     </Text>
                   )}
               </>
@@ -501,7 +505,7 @@ const PredictionChart = ({
                     fill={Colors.textSecondary}
                     textAnchor="end"
                   >
-                    {Math.round(value)}
+                    {formatQuantity(Math.round(value))}
                   </SvgText>
                 </React.Fragment>
               );

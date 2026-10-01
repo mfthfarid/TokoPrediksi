@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HeaderProps } from '../../types/types';
 import { useNotification } from '../../contexts/NotificationContext';
+import { BottomTabParamList } from '../../navigation/types';
 import { Colors } from '../../styles';
 
 const ICON_BUTTON_SIZE = 38;
@@ -14,7 +16,21 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
   const { unreadCount } = useNotification();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const tabNavigation = navigation.getParent<
+    BottomTabNavigationProp<BottomTabParamList>
+  >();
   const canGoBack = useNavigationState(state => state.index > 0);
+
+  const handleNotificationPress = () => {
+    if (onNotificationPress) {
+      onNotificationPress();
+      return;
+    }
+
+    tabNavigation?.navigate('DashboardTab', {
+      screen: 'Notifikasi',
+    });
+  };
 
   return (
     <View style={[styles.headerContainer, { paddingTop: insets.top + 12 }]}>
@@ -37,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ title, onNotificationPress }) => {
 
         <TouchableOpacity
           style={styles.notificationButton}
-          onPress={onNotificationPress}
+          onPress={handleNotificationPress}
           activeOpacity={0.7}
         >
           <Icon name="bell" size={20} color="#fff" />

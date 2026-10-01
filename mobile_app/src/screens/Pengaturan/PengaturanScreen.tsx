@@ -15,6 +15,8 @@ import { useNotification } from '../../contexts/NotificationContext';
 import { PengaturanStackParamList } from '../../navigation/types';
 import { PengaturanStyles } from './PengaturanStyles';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 type NavigationProp = NativeStackNavigationProp<
   PengaturanStackParamList,
@@ -26,6 +28,8 @@ const PengaturanScreen = () => {
     useAuth();
   const { isNotificationEnabled, enableNotifications, disableNotifications } =
     useNotification();
+  const toast = useToast();
+  const confirm = useConfirm();
   // const [toggling, setToggling] = useState(false);
   const [isBiometricToggling, setIsBiometricToggling] = useState(false);
   const [isNotificationToggling, setIsNotificationToggling] = useState(false);
@@ -74,15 +78,23 @@ const PengaturanScreen = () => {
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Keluar Aplikasi',
-      'Apakah kamu yakin ingin keluar? Kamu perlu login ulang untuk masuk lagi.',
-      [
-        { text: 'Batal', style: 'cancel' },
-        { text: 'Keluar', style: 'destructive', onPress: () => logout() },
-      ],
-    );
+  const handleLogout = async () => {
+    const confirmed = await confirm({
+      title: 'Keluar Aplikasi',
+      message:
+        'Apakah kamu yakin ingin keluar? Kamu perlu login ulang untuk masuk lagi.',
+      confirmText: 'Keluar',
+      danger: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await logout();
+      toast.success('Berhasil keluar dari aplikasi');
+    } catch {
+      toast.error('Gagal keluar dari aplikasi');
+    }
   };
 
   return (
