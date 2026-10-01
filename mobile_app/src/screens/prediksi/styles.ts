@@ -136,6 +136,21 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
+  reorderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 999,
+    marginBottom: 4,
+  },
+  reorderBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   daysText: {
     fontSize: 10,
     color: Colors.textSecondary,

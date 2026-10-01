@@ -10,6 +10,9 @@ export interface PredictionSummaryApi {
   days_remaining: number | null;
   urgency: UrgencyLevel;
   has_prediction: boolean;
+  display_unit?: string;
+  current_stock_display?: string;
+  average_daily_sales_display?: string;
 }
 
 export const getPredictionSummary = () =>
@@ -56,3 +59,17 @@ export const runPrediction = (productId: number, periods?: number) =>
     `/api/products/${productId}/predict`,
     periods ? { periods } : {},
   );
+
+/** Data reorder point dan safety stock untuk 1 produk */
+export interface ReorderInfoApi {
+  product_id: number;
+  lead_time_days: number;
+  lead_time_source: 'supplier' | 'default';
+  safety_stock: number;
+  reorder_point: number;
+  current_stock: number;
+  needs_reorder: boolean;
+}
+
+export const getReorderInfo = (productId: number) =>
+  api.get<ReorderInfoApi>(`/api/products/${productId}/reorder-info`);

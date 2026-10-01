@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 	"github.com/xuri/excelize/v2"
+	"gorm.io/gorm"
 )
 
 var featuredProductIDs = map[uint]bool{129: true, 158: true, 292: true, 259: true, 13: true}
@@ -92,6 +93,29 @@ func cleanHistoricalSalesForRange(productID uint, start, end time.Time, label st
 
 	fmt.Printf("  Produk %d [%s]: %d hari (%d data asli, %d hasil pengisian 0)\n",
 		productID, label, realCount+filledCount, realCount, filledCount)
+}
+
+// Keep prediction enabled only for the five products imported by this tool.
+// This runs only with --commit, alongside the import operation.
+func setFeaturedProductsPredictionEnabled(productIDs map[uint]bool) error {
+	ids := make([]uint, 0, len(productIDs))
+	for id := range productIDs {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+	return config.DB.Transaction(func(tx *gorm.DB) error {
+		// GORM menolak global update tanpa kondisi WHERE. Semua produk memiliki id.
+		if err := tx.Table("products").Where("id IS NOT NULL").
+			Update("is_prediction_enabled", false).Error; err != nil {
+			return err
+		}
+		if len(ids) == 0 {
+			return nil
+		}
+		return tx.Table("products").Where("id IN ?", ids).
+			Update("is_prediction_enabled", true).Error
+	})
 }
 
 // func findGlobalDateRange(productIDs map[uint]bool) (time.Time, time.Time) {
@@ -233,6 +257,11 @@ func main() {
 	}
 
 	if commit {
+		if err := setFeaturedProductsPredictionEnabled(featuredProductIDs); err != nil {
+			log.Fatal("Gagal mengatur produk unggulan untuk prediksi:", err)
+		}
+		fmt.Println("Field is_prediction_enabled diaktifkan untuk 5 produk unggulan.")
+
 		fmt.Println("\n=== Tahap C: Membersihkan (zero-fill) data historis 5 produk unggulan ===")
 		cleanAllFeaturedProducts(featuredProductIDs)
 	}
@@ -457,7 +486,7 @@ func parseFlexibleDate(raw string) (string, error) {
 	for _, layout := range formats {
 		if t, err := time.Parse(layout, raw); err == nil {
 			parsedDate := t.Format("2006-01-02")
-			
+
 			if t.Year() == 2026 && t.Month() > 6 {
 				continue
 			}

@@ -207,6 +207,68 @@ const styles = StyleSheet.create({
   periodButtonTextActive: {
     color: '#fff',
   },
+
+  // Kartu Reorder Point
+  reorderCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fde68a', // kuning default (reorder point belum terlewati)
+    padding: 14,
+    marginBottom: Spacing.md,
+  },
+  reorderCardAlert: {
+    borderColor: '#fca5a5', // merah jika needs_reorder=true
+    backgroundColor: '#fff5f5',
+  },
+  reorderCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  reorderCardTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  reorderStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reorderStatItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  reorderStatDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 8,
+  },
+  reorderStatLabel: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  reorderStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  reorderStatHint: {
+    fontSize: 11,
+    color: '#f59e0b',
+    fontWeight: '400',
+  },
+  reorderCardHint: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    marginTop: 10,
+    fontStyle: 'italic',
+    lineHeight: 14,
+  },
 });
 
 export default styles;
