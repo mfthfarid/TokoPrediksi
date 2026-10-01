@@ -12,7 +12,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/notification"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
 )
 
@@ -233,34 +232,8 @@ func (s *PredictionService) PredictAll(periods int) error {
 		}
 
 		fmt.Printf("🏁 Prediksi massal selesai! Berhasil: %d, Gagal: %d\n", successCount, failCount)
-
-		// Kirim notifikasi ringkasan setelah semua selesai
-		summary, err := s.GetSummary()
-		notifService := notification.NewService()
-
-		if err != nil {
-			notifService.Broadcast(
-				"Prediksi Mingguan Selesai",
-				fmt.Sprintf("%d produk berhasil diprediksi.", successCount),
-				"prediction_complete",
-			)
-			return
-		}
-
-		urgentCount := 0
-		for _, item := range summary {
-			if item.Urgency == "tinggi" {
-				urgentCount++
-			}
-		}
-
-		body := fmt.Sprintf("%d produk berhasil diprediksi.", successCount)
-		if urgentCount > 0 {
-			body = fmt.Sprintf("%s %d produk perlu segera direstok!", body, urgentCount)
-		}
-
-		notifService.Broadcast("Prediksi Mingguan Selesai", body, "prediction_complete")
-		notifService.CheckStockAndNotify()
+		// Notifikasi & cek reorder ditangani oleh checkReorderAndNotify() di scheduler.go
+		// setelah goroutine ini selesai, agar bisa memakai needs_reorder yang lebih presisi.
 	}()
 
 	return nil

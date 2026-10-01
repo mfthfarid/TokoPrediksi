@@ -21,14 +21,19 @@ import {
   TrendingDown,
   CheckCircle2,
   LineChart,
+  PackageSearch,
+  ShieldAlert,
+  Clock,
 } from 'lucide-react-native';
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
 import { Colors } from '../../../styles';
 import {
   getProductPredictions,
+  getReorderInfo,
   runPrediction,
   PredictionDetailApi,
+  ReorderInfoApi,
   UrgencyLevel,
 } from '../../../services/predictionService';
 import { useToast } from '../../../contexts/ToastContext';
@@ -83,19 +88,34 @@ const DetailPrediksiScreen = () => {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [data, setData] = useState<PredictionDetailApi | null>(null);
+  const [reorderInfo, setReorderInfo] = useState<ReorderInfoApi | null>(null);
   const [predictionPeriod, setPredictionPeriod] = useState<7 | 14 | 30>(7);
+
+  const fetchReorderInfo = useCallback(async () => {
+    try {
+      const res = await getReorderInfo(productId);
+      setReorderInfo(res.data);
+    } catch {
+      // belum ada prediksi → tidak ditampilkan, bukan error kritis
+      setReorderInfo(null);
+    }
+  }, [productId]);
 
   const fetchData = useCallback(async () => {
     try {
       const response = await getProductPredictions(productId);
       setData(response.data);
+      // Fetch reorder info paralel setelah dapat data prediksi
+      if (response.data.has_prediction) {
+        fetchReorderInfo();
+      }
     } catch (error) {
       toast.error('Gagal memuat data prediksi');
     } finally {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [productId, fetchReorderInfo]);
 
   useFocusEffect(
     useCallback(() => {
@@ -109,6 +129,8 @@ const DetailPrediksiScreen = () => {
       const response = await runPrediction(productId, predictionPeriod);
       setData(response.data);
       toast.success('Prediksi berhasil dijalankan');
+      // Refresh reorder info setelah prediksi baru
+      fetchReorderInfo();
     } catch (error: any) {
       const message =
         error.response?.data?.error || 'Gagal menjalankan prediksi';
@@ -239,6 +261,61 @@ const DetailPrediksiScreen = () => {
             </Text>
           </View>
         </View>
+
+        {/* Kartu Reorder Point — muncul jika data reorder tersedia */}
+        {reorderInfo && (
+          <View style={[
+            styles.reorderCard,
+            reorderInfo.needs_reorder && styles.reorderCardAlert,
+          ]}>
+            <View style={styles.reorderCardHeader}>
+              <PackageSearch size={16} color={reorderInfo.needs_reorder ? '#dc2626' : '#f59e0b'} />
+              <Text style={[
+                styles.reorderCardTitle,
+                { color: reorderInfo.needs_reorder ? '#dc2626' : '#f59e0b' },
+              ]}>
+                {reorderInfo.needs_reorder
+                  ? '⚠️ Sudah Melewati Titik Reorder!'
+                  : 'Titik Pemesanan Ulang (ROP)'}
+              </Text>
+            </View>
+
+            <View style={styles.reorderStatsRow}>
+              <View style={styles.reorderStatItem}>
+                <ShieldAlert size={14} color="#6b7280" />
+                <Text style={styles.reorderStatLabel}>Safety Stock</Text>
+                <Text style={styles.reorderStatValue}>
+                  {Math.round(reorderInfo.safety_stock)}
+                </Text>
+              </View>
+              <View style={styles.reorderStatDivider} />
+              <View style={styles.reorderStatItem}>
+                <PackageSearch size={14} color="#6b7280" />
+                <Text style={styles.reorderStatLabel}>Reorder Point</Text>
+                <Text style={styles.reorderStatValue}>
+                  {Math.round(reorderInfo.reorder_point)}
+                </Text>
+              </View>
+              <View style={styles.reorderStatDivider} />
+              <View style={styles.reorderStatItem}>
+                <Clock size={14} color="#6b7280" />
+                <Text style={styles.reorderStatLabel}>Lead Time</Text>
+                <Text style={styles.reorderStatValue}>
+                  {reorderInfo.lead_time_days}h
+                  {reorderInfo.lead_time_source === 'default' && (
+                    <Text style={styles.reorderStatHint}> *</Text>
+                  )}
+                </Text>
+              </View>
+            </View>
+
+            {reorderInfo.lead_time_source === 'default' && (
+              <Text style={styles.reorderCardHint}>
+                * Lead time menggunakan nilai default (7 hari). Atur di master Supplier untuk hasil lebih akurat.
+              </Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.chartCard}>
           <Text style={styles.sectionTitle}>Aktual vs Prediksi</Text>
