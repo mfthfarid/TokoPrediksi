@@ -36,49 +36,28 @@ type sparsePoint struct {
 	Qty      float64
 }
 
+var (
+	trainingStart = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	trainingEnd   = time.Date(2025, 12, 31, 0, 0, 0, 0, time.UTC)
+	testingStart  = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+	testingEnd    = time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC)
+)
+
 func cleanAllFeaturedProducts(productIDs map[uint]bool) {
-	globalStart, globalEnd := findGlobalDateRange(productIDs)
-	fmt.Printf("  Rentang tetap dipakai untuk semua produk: %s s/d %s\n\n",
-		globalStart.Format("2006-01-02"), globalEnd.Format("2006-01-02"))
+	fmt.Printf("  Era training : %s s/d %s\n", trainingStart.Format("2006-01-02"), trainingEnd.Format("2006-01-02"))
+	fmt.Printf("  Era testing  : %s s/d %s\n\n", testingStart.Format("2006-01-02"), testingEnd.Format("2006-01-02"))
 
 	for productID := range productIDs {
-		cleanHistoricalSales(productID, globalStart, globalEnd)
+		cleanHistoricalSalesForRange(productID, trainingStart, trainingEnd, "training")
+		cleanHistoricalSalesForRange(productID, testingStart, testingEnd, "testing")
 	}
 }
 
-func findGlobalDateRange(productIDs map[uint]bool) (time.Time, time.Time) {
-	var minDate, maxDate time.Time
-	for productID := range productIDs {
-		var res struct {
-			MinDate string
-			MaxDate string
-		}
-		config.DB.Table("historical_sales").
-			Select("MIN(sale_date) as min_date, MAX(sale_date) as max_date").
-			Where("product_id = ?", productID).
-			Scan(&res)
-
-		if res.MinDate == "" {
-			continue
-		}
-		start, _ := time.Parse("2006-01-02", res.MinDate[:10])
-		end, _ := time.Parse("2006-01-02", res.MaxDate[:10])
-
-		if minDate.IsZero() || start.Before(minDate) {
-			minDate = start
-		}
-		if maxDate.IsZero() || end.After(maxDate) {
-			maxDate = end
-		}
-	}
-	return minDate, maxDate
-}
-
-func cleanHistoricalSales(productID uint, globalStart, globalEnd time.Time) {
+func cleanHistoricalSalesForRange(productID uint, start, end time.Time, label string) {
 	var sparse []sparsePoint
 	config.DB.Table("historical_sales").
 		Select("DATE_FORMAT(sale_date, '%Y-%m-%d') as sale_date, SUM(quantity_sold) as qty").
-		Where("product_id = ?", productID).
+		Where("product_id = ? AND sale_date BETWEEN ? AND ?", productID, start.Format("2006-01-02"), end.Format("2006-01-02")).
 		Group("sale_date").
 		Order("sale_date ASC").
 		Scan(&sparse)
@@ -88,10 +67,14 @@ func cleanHistoricalSales(productID uint, globalStart, globalEnd time.Time) {
 		existing[s.SaleDate] = s.Qty
 	}
 
-	config.DB.Exec("DELETE FROM historical_sales WHERE product_id = ?", productID)
+	// Hapus data lama KHUSUS rentang ini saja, tidak sentuh era lain
+	config.DB.Exec(
+		"DELETE FROM historical_sales WHERE product_id = ? AND sale_date BETWEEN ? AND ?",
+		productID, start.Format("2006-01-02"), end.Format("2006-01-02"),
+	)
 
 	realCount, filledCount := 0, 0
-	for d := globalStart; !d.After(globalEnd); d = d.AddDate(0, 0, 1) {
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
 		dateStr := d.Format("2006-01-02")
 		y, exists := existing[dateStr]
 		isFilled := !exists
@@ -107,9 +90,37 @@ func cleanHistoricalSales(productID uint, globalStart, globalEnd time.Time) {
 		}
 	}
 
-	fmt.Printf("  Produk %d: %d hari total (%d data asli, %d hasil pengisian 0)\n",
-		productID, realCount+filledCount, realCount, filledCount)
+	fmt.Printf("  Produk %d [%s]: %d hari (%d data asli, %d hasil pengisian 0)\n",
+		productID, label, realCount+filledCount, realCount, filledCount)
 }
+
+// func findGlobalDateRange(productIDs map[uint]bool) (time.Time, time.Time) {
+// 	var minDate, maxDate time.Time
+// 	for productID := range productIDs {
+// 		var res struct {
+// 			MinDate string
+// 			MaxDate string
+// 		}
+// 		config.DB.Table("historical_sales").
+// 			Select("MIN(sale_date) as min_date, MAX(sale_date) as max_date").
+// 			Where("product_id = ?", productID).
+// 			Scan(&res)
+
+// 		if res.MinDate == "" {
+// 			continue
+// 		}
+// 		start, _ := time.Parse("2006-01-02", res.MinDate[:10])
+// 		end, _ := time.Parse("2006-01-02", res.MaxDate[:10])
+
+// 		if minDate.IsZero() || start.Before(minDate) {
+// 			minDate = start
+// 		}
+// 		if maxDate.IsZero() || end.After(maxDate) {
+// 			maxDate = end
+// 		}
+// 	}
+// 	return minDate, maxDate
+// }
 
 func main() {
 	if len(os.Args) < 2 {
@@ -433,10 +444,24 @@ func parseRupiah(raw string) int {
 }
 
 func parseFlexibleDate(raw string) (string, error) {
-	formats := []string{"02/01/2006", "2006-01-02", "1/2/2006", "02-01-06", "01-02-06"}
+	formats := []string{
+		"2006-01-02", // YYYY-MM-DD
+		"01-02-06",   // MM-DD-YY ( 06-12-26 -> 12 Juni 2026)
+		"01/02/2006", // MM/DD/YYYY ( 06/12/2026 -> 12 Juni 2026)
+		"01/02/06",   // MM/DD/YY
+		"02-01-06",   // DD-MM-YY
+		"02/01/2006", // DD/MM/YYYY
+		"1/2/2006",   // D/M/YYYY
+	}
+
 	for _, layout := range formats {
 		if t, err := time.Parse(layout, raw); err == nil {
-			return t.Format("2006-01-02"), nil
+			parsedDate := t.Format("2006-01-02")
+			
+			if t.Year() == 2026 && t.Month() > 6 {
+				continue
+			}
+			return parsedDate, nil
 		}
 	}
 	return "", fmt.Errorf("format tidak dikenali")
