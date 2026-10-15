@@ -11,13 +11,15 @@ import (
 func colorForType(notifType string) string {
 	switch notifType {
 	case "stock_out":
-		return "#F44336" // Merah
+		return "#F44336"
 	case "safety_stock":
-		return "#DC2626" // Merah Darurat
+		return "#DC2626" 
 	case "reorder_point":
-		return "#F59E0B" // Kuning / Amber
+		return "#F59E0B"
 	case "stock_low":
-		return "#FFC107" // Kuning Terang
+		return "#FFC107"
+	case "reorder_needed":
+		return "#FF9800"
 	default:
 		return "" // warna default aplikasi
 	}
@@ -88,9 +90,7 @@ func formatProductList(names []string) string {
 	}
 }
 
-// CheckStockAndNotify dipanggil cron harian & setelah prediksi — cek stok habis,
 // safety stock, reorder point, dan stok menipis.
-// Mengelompokkan produk menjadi ringkasan (maksimal 1 notifikasi per kategori urgensi).
 func (s *Service) CheckStockAndNotify() {
 	alertRepo := &StockAlertRepository{}
 
@@ -143,4 +143,9 @@ func (s *Service) CheckStockAndNotify() {
 		)
 		s.Broadcast("⚠️ Stok Menipis", body, "stock_low")
 	}
+}
+
+func (s *Service) NotifyReorderNeeded(names []string) {
+	body := fmt.Sprintf("%s sudah di bawah titik pemesanan ulang, segera restok.", formatProductList(names))
+	s.Broadcast("📦 Perlu Pemesanan Ulang", body, "reorder_needed")
 }

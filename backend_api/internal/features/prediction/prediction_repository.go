@@ -7,8 +7,6 @@ type DailySales struct {
 	Y  float64 `json:"y"`
 }
 
-type PredictionRepository struct{}
-
 type summaryRawRow struct {
 	ProductID         uint
 	ProductName       string
@@ -18,46 +16,9 @@ type summaryRawRow struct {
 	BaseUnitName      string
 }
 
-func (r *PredictionRepository) GetSummaryRaw() ([]summaryRawRow, error) {
-	query := `
-		SELECT
-			p.id as product_id,
-			p.name as product_name,
-			p.stock as current_stock,
-			COALESCE(sales.avg_daily, 0) as average_daily_sales,
-			EXISTS(SELECT 1 FROM predictions pr WHERE pr.product_id = p.id) as has_prediction,
-			COALESCE(u.name, '') as base_unit_name
-		FROM products p
-		LEFT JOIN product_units pu ON pu.product_id = p.id AND pu.is_base_unit = true
-		LEFT JOIN units u ON u.id = pu.unit_id
-		LEFT JOIN (
-			SELECT product_id, AVG(y) as avg_daily FROM (
-				SELECT transaction_items.product_id,
-				       DATE_FORMAT(transactions.transaction_date, '%Y-%m-%d') as ds,
-				       SUM(transaction_items.quantity_base) as y
-				FROM transaction_items
-				JOIN transactions ON transactions.id = transaction_items.transaction_id
-				GROUP BY transaction_items.product_id, ds
+type PredictionRepository struct{}
 
-				UNION ALL
-
-				SELECT product_id, DATE_FORMAT(sale_date, '%Y-%m-%d') as ds, SUM(quantity_sold) as y
-				FROM historical_sales
-				GROUP BY product_id, ds
-			) combined
-			GROUP BY product_id
-		) sales ON sales.product_id = p.id
-		WHERE p.deleted_at IS NULL AND p.is_prediction_enabled = true
-	`
-	var rows []summaryRawRow
-	err := config.DB.Raw(query).Scan(&rows).Error
-	return rows, err
-}
-
-// GetDailySales mengagregasi transaction_items → total terjual per hari per produk.
-// DATE_FORMAT dipakai supaya hasilnya pasti string "YYYY-MM-DD", bukan time.Time
-// (MySQL DATE column otomatis jadi time.Time kalau tidak diformat manual, dan itu
-// tidak bisa langsung di-scan ke field string tanpa konversi eksplisit).
+// GetDailySales: gabungan transaksi live + riwayat Excel, dijumlah per tanggal.
 func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, error) {
 	var results []DailySales
 	query := `
@@ -101,10 +62,7 @@ func (r *PredictionRepository) IsPredictionEnabled(productID uint) (bool, error)
 	return enabled, err
 }
 
-func (r *PredictionRepository) DeleteByProductID(productID uint) error {
-	return config.DB.Where("product_id = ?", productID).Delete(&Prediction{}).Error
-}
-
+// CreateBatch menyimpan 1 run prediksi. Run lama TIDAK dihapus (dibutuhkan untuk hitung ulang T).
 func (r *PredictionRepository) CreateBatch(predictions []Prediction) error {
 	if len(predictions) == 0 {
 		return nil
@@ -112,16 +70,29 @@ func (r *PredictionRepository) CreateBatch(predictions []Prediction) error {
 	return config.DB.Create(&predictions).Error
 }
 
-func (r *PredictionRepository) FindByProductID(productID uint) ([]Prediction, error) {
-	var predictions []Prediction
-	err := config.DB.
+// LatestRunID mengembalikan run terbaru untuk produk ini ("" bila belum pernah diprediksi).
+func (r *PredictionRepository) LatestRunID(productID uint) (string, error) {
+	var runID string
+	err := config.DB.Table("predictions").
+		Select("run_id").
 		Where("product_id = ?", productID).
-		Order("prediction_date ASC").
-		Find(&predictions).Error
-	if err != nil {
+		Order("id DESC").
+		Limit(1).
+		Scan(&runID).Error
+	return runID, err
+}
+
+func (r *PredictionRepository) FindLatestRun(productID uint) ([]Prediction, error) {
+	runID, err := r.LatestRunID(productID)
+	if err != nil || runID == "" {
 		return nil, err
 	}
-	return predictions, nil
+	var predictions []Prediction
+	err = config.DB.
+		Where("product_id = ? AND run_id = ?", productID, runID).
+		Order("prediction_date ASC").
+		Find(&predictions).Error
+	return predictions, err
 }
 
 func (r *PredictionRepository) GetProductInfo(productID uint) (string, float64, string, error) {
@@ -138,4 +109,40 @@ func (r *PredictionRepository) GetProductInfo(productID uint) (string, float64, 
 		Where("products.id = ?", productID).
 		Scan(&res).Error
 	return res.Name, res.Stock, res.UnitName, err
+}
+
+func (r *PredictionRepository) GetSummaryRaw() ([]summaryRawRow, error) {
+	query := `
+		SELECT
+			p.id as product_id,
+			p.name as product_name,
+			p.stock as current_stock,
+			COALESCE(sales.avg_daily, 0) as average_daily_sales,
+			EXISTS(SELECT 1 FROM predictions pr WHERE pr.product_id = p.id) as has_prediction,
+			COALESCE(u.name, '') as base_unit_name
+		FROM products p
+		LEFT JOIN product_units pu ON pu.product_id = p.id AND pu.is_base_unit = true
+		LEFT JOIN units u ON u.id = pu.unit_id
+		LEFT JOIN (
+			SELECT product_id, AVG(y) as avg_daily FROM (
+				SELECT transaction_items.product_id,
+				       DATE_FORMAT(transactions.transaction_date, '%Y-%m-%d') as ds,
+				       SUM(transaction_items.quantity_base) as y
+				FROM transaction_items
+				JOIN transactions ON transactions.id = transaction_items.transaction_id
+				GROUP BY transaction_items.product_id, ds
+
+				UNION ALL
+
+				SELECT product_id, DATE_FORMAT(sale_date, '%Y-%m-%d') as ds, SUM(quantity_sold) as y
+				FROM historical_sales
+				GROUP BY product_id, ds
+			) combined
+			GROUP BY product_id
+		) sales ON sales.product_id = p.id
+		WHERE p.deleted_at IS NULL AND p.is_prediction_enabled = true
+	`
+	var rows []summaryRawRow
+	err := config.DB.Raw(query).Scan(&rows).Error
+	return rows, err
 }

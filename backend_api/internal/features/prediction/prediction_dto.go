@@ -1,6 +1,5 @@
 package prediction
 
-// Request dari React Native ke Go
 type PredictRequestInput struct {
 	Periods int `json:"periods" binding:"omitempty,gt=0"`
 }
@@ -24,8 +23,9 @@ type pythonPredictionPoint struct {
 }
 
 type pythonPredictResponse struct {
-	ProductID   uint                     `json:"product_id"`
-	Predictions []pythonPredictionPoint  `json:"predictions"`
+	ProductID    uint                    `json:"product_id"`
+	ModelVersion string                  `json:"model_version"`
+	Predictions  []pythonPredictionPoint `json:"predictions"`
 }
 
 type ChartPoint struct {
@@ -34,10 +34,10 @@ type ChartPoint struct {
 }
 
 type ChartPredictedPoint struct {
-	Date     string `json:"date"`
-	Quantity int    `json:"quantity"`
-	Lower    *int   `json:"lower"`
-	Upper    *int   `json:"upper"`
+	Date     string   `json:"date"`
+	Quantity float64  `json:"quantity"`
+	Lower    *float64 `json:"lower"`
+	Upper    *float64 `json:"upper"`
 }
 
 type ChartData struct {
@@ -46,22 +46,21 @@ type ChartData struct {
 }
 
 type PredictionSummaryResponse struct {
-	ProductID                  uint       `json:"product_id"`
-	ProductName                string     `json:"product_name"`
-	HasPrediction              bool       `json:"has_prediction"`
-	CurrentStock               float64    `json:"current_stock"`
-	AverageDailySales          float64    `json:"average_daily_sales"`
-	DaysRemaining              *float64   `json:"days_remaining"`
-	Urgency                    string     `json:"urgency"`
-	RecommendedRestockQuantity int        `json:"recommended_restock_quantity"`
-	ChartData                  ChartData  `json:"chart_data"`
-	Predictions                []Prediction `json:"predictions"`
+	ProductID         uint         `json:"product_id"`
+	ProductName       string       `json:"product_name"`
+	HasPrediction     bool         `json:"has_prediction"`
+	RunID             string       `json:"run_id"`
+	GeneratedAt       string       `json:"generated_at"`
+	CurrentStock      float64      `json:"current_stock"`
+	AverageDailySales float64      `json:"average_daily_sales"`
+	DaysRemaining     *float64     `json:"days_remaining"`
+	Urgency           string       `json:"urgency"`
+	ChartData         ChartData    `json:"chart_data"`
+	Predictions       []Prediction `json:"predictions"`
 
-	// konversi sesuai satuan dasar produk
-	DisplayUnit                string `json:"display_unit"`                // "Kg", "Pcs", "Liter", dst
-	CurrentStockDisplay        string `json:"current_stock_display"`       // "2.5"
-	AverageDailySalesDisplay   string `json:"average_daily_sales_display"` // "0.8"
-	RecommendedRestockDisplay  string `json:"recommended_restock_display"` // "15"
+	DisplayUnit              string `json:"display_unit"`
+	CurrentStockDisplay      string `json:"current_stock_display"`
+	AverageDailySalesDisplay string `json:"average_daily_sales_display"`
 }
 
 type PredictionSummaryItem struct {
@@ -70,10 +69,10 @@ type PredictionSummaryItem struct {
 	CurrentStock      float64  `json:"current_stock"`
 	AverageDailySales float64  `json:"average_daily_sales"`
 	DaysRemaining     *float64 `json:"days_remaining"`
-	Urgency           string   `json:"urgency"` // "tinggi" | "sedang" | "rendah"
+	Urgency           string   `json:"urgency"`
 	HasPrediction     bool     `json:"has_prediction"`
 
-	DisplayUnit            	 string `json:"display_unit"`
+	DisplayUnit              string `json:"display_unit"`
 	CurrentStockDisplay      string `json:"current_stock_display"`
 	AverageDailySalesDisplay string `json:"average_daily_sales_display"`
 }

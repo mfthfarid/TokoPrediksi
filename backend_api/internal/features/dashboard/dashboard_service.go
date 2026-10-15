@@ -1,5 +1,7 @@
 package dashboard
 
+import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/reorder"
+
 type DashboardService struct {
 	repo *DashboardRepository
 }
@@ -44,9 +46,15 @@ func (s *DashboardService) GetSummary() (*DashboardSummary, error) {
 		return nil, err
 	}
 
-	stockoutCount, err := s.repo.GetPredictedStockoutCount()
+	reorderItems, err := reorder.NewService().CalculateAll()
 	if err != nil {
 		return nil, err
+	}
+	reorderNeeded := 0
+	for _, it := range reorderItems {
+		if it.Status == "below_rop" {
+			reorderNeeded++
+		}
 	}
 
 	return &DashboardSummary{
@@ -57,6 +65,7 @@ func (s *DashboardService) GetSummary() (*DashboardSummary, error) {
 		LowStockCount:          lowStockCount,
 		LowStockProducts:       lowStock,
 		TopSellingProducts:     topSelling,
-		PredictedStockoutCount: stockoutCount,
+		PredictedStockoutCount: reorderNeeded, // sementara, agar frontend lama tidak patah
+		ReorderNeededCount:     reorderNeeded,
 	}, nil
 }

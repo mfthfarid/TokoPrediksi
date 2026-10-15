@@ -4,5 +4,8 @@ import "github.com/gin-gonic/gin"
 
 func RegisterRoutes(apiGroup *gin.RouterGroup) {
 	handler := NewHandler()
+
+	apiGroup.GET("/reorder", handler.GetAllReorderInfo)
+	apiGroup.POST("/reorder/recompute", handler.Recompute)
 	apiGroup.GET("/products/:id/reorder-info", handler.GetReorderInfo)
 }
