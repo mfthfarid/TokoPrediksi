@@ -45,7 +45,8 @@ export interface PredictionDetailApi {
   average_daily_sales: number;
   days_remaining: number | null;
   urgency: UrgencyLevel;
-  recommended_restock_quantity: number;
+  recommended_restock_quantity?: number;
+  recommended_restock_display?: string;
   chart_data: {
     actual: ChartPoint[];
     predicted: ChartPoint[];

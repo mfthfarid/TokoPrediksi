@@ -288,6 +288,15 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
+	totalPredictedDemand := 0.0
+	for _, p := range predictions {
+		totalPredictedDemand += p.PredictedQuantity
+	}
+	recommendedRestock := int(math.Ceil(totalPredictedDemand - stock))
+	if recommendedRestock < 0 {
+		recommendedRestock = 0
+	}
+
 	var runID, generatedAt string
 	if len(predictions) > 0 {
 		runID = predictions[0].RunID
@@ -295,26 +304,29 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 	}
 
 	reference := math.Max(stock, avgSales)
+	reference = math.Max(reference, float64(recommendedRestock))
 	divisor, displayUnit := DetermineDisplayUnit(baseUnitName, reference)
 
 	return &PredictionSummaryResponse{
-		ProductID:         productID,
-		ProductName:       name,
-		HasPrediction:     len(predictions) > 0,
-		RunID:             runID,
-		GeneratedAt:       generatedAt,
-		CurrentStock:      stock,
-		AverageDailySales: avgSales,
-		DaysRemaining:     daysRemaining,
-		Urgency:           urgency,
+		ProductID:                  productID,
+		ProductName:                name,
+		HasPrediction:              len(predictions) > 0,
+		RunID:                      runID,
+		GeneratedAt:                generatedAt,
+		CurrentStock:               stock,
+		AverageDailySales:          avgSales,
+		DaysRemaining:              daysRemaining,
+		Urgency:                    urgency,
+		RecommendedRestockQuantity: recommendedRestock,
 		ChartData: ChartData{
 			Actual:    actualPoints,
 			Predicted: predictedPoints,
 		},
-		Predictions:              predictions,
-		DisplayUnit:              displayUnit,
-		CurrentStockDisplay:      FormatWithDivisor(stock, divisor),
-		AverageDailySalesDisplay: FormatWithDivisor(avgSales, divisor),
+		Predictions:               predictions,
+		DisplayUnit:               displayUnit,
+		CurrentStockDisplay:       FormatWithDivisor(stock, divisor),
+		AverageDailySalesDisplay:  FormatWithDivisor(avgSales, divisor),
+		RecommendedRestockDisplay: FormatWithDivisor(float64(recommendedRestock), divisor),
 	}, nil
 }
 

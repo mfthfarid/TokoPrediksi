@@ -65,8 +65,13 @@ const FILTERS: {
 ];
 
 const parseDate = (date: string): Date => {
-  const [day, month, year] = date.split('/').map(Number);
-  return new Date(year, month - 1, day);
+  if (!date) return new Date();
+  const parts = date.split('/');
+  if (parts.length === 3) {
+    const [day, month, year] = parts.map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(date);
 };
 
 const formatFullDate = (date: string): string => {
@@ -93,10 +98,13 @@ const formatAxisDate = (timestamp: number, showYear: boolean): string => {
   });
 };
 
-const formatQuantity = (value: number): string =>
-  value.toLocaleString('id-ID');
+const formatQuantity = (value?: number | null): string => {
+  if (value == null || isNaN(value)) return '0';
+  return value.toLocaleString('id-ID');
+};
 
 const getNiceMax = (value: number): number => {
+  if (!isFinite(value) || isNaN(value) || value <= 0) return 5;
   if (value <= 5) return 5;
   if (value <= 10) return 10;
 
@@ -127,7 +135,7 @@ const PredictionChart = ({
   const [selectedPoint, setSelectedPoint] = useState<ChartItem | null>(null);
   const [chartWidth, setChartWidth] = useState(0);
   const normalizedActual = useMemo(() => {
-    return actual
+    return (actual || [])
       .map(item => ({
         ...item,
         type: 'actual' as const,
@@ -137,7 +145,7 @@ const PredictionChart = ({
   }, [actual]);
 
   const normalizedPredicted = useMemo(() => {
-    return predicted
+    return (predicted || [])
       .map(item => ({
         ...item,
         type: 'predicted' as const,
