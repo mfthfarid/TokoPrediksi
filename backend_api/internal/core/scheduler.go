@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/notification"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/prediction"
@@ -14,75 +13,56 @@ import (
 func StartScheduler() {
 	c := cron.New()
 
-	// cron mingguan: jalankan prediksi, lalu setelah selesai cek reorder & kirim notifikasi presisi
-	_, err := c.AddFunc("0 1 * * 0", func() {
-		log.Println("⏰ Menjalankan prediksi mingguan terjadwal...")
-		service := prediction.NewPredictionService()
-		if err := service.PredictAll(14); err != nil {
-			log.Println("Gagal menjalankan prediksi terjadwal:", err)
-			return
-		}
-
-		// Beri jeda supaya goroutine PredictAll (background) sempat selesai
-		// sebelum kita cek reorder — untuk skala 5 produk ini cukup aman.
-		time.Sleep(30 * time.Second)
-		checkReorderAndNotify()
-	})
+	// Mingguan: prediksi (sinkron) → hitung ulang T → notifikasi ringkasan
+	_, err := c.AddFunc("0 1 * * 0", runWeeklyPipeline)
 	if err != nil {
 		log.Println("Gagal mendaftarkan jadwal cron prediksi:", err)
 	}
 
-	// cron harian
+	// Harian: cek stok habis, safety stock, reorder point, dan stok menipis
 	_, err = c.AddFunc("0 6 * * *", func() {
 		log.Println("⏰ Menjalankan pengecekan stok harian...")
-		service := notification.NewService()
-		service.CheckStockAndNotify()
+		notification.NewService().CheckStockAndNotify()
 	})
 	if err != nil {
 		log.Println("Gagal mendaftarkan jadwal cron stok:", err)
 	}
 
 	c.Start()
-	log.Println("✅ Scheduler aktif (prediksi mingguan Minggu 01:00, cek stok harian 06:00)")
+	log.Println("✅ Scheduler aktif (prediksi + hitung ulang T: Minggu 01:00, cek stok harian 06:00)")
 }
 
-// checkReorderAndNotify dipanggil dari scheduler setelah PredictAll selesai.
-// Menggunakan needs_reorder dari reorder.Calculate (lebih presisi dari urgency=="tinggi")
-// untuk menentukan produk mana yang perlu diberitahu dalam notifikasi mingguan.
-func checkReorderAndNotify() {
-	predService := prediction.NewPredictionService()
-	reorderService := reorder.NewService()
-	notifService := notification.NewService()
+func runWeeklyPipeline() {
+	log.Println("⏰ Menjalankan prediksi mingguan terjadwal...")
 
-	summary, err := predService.GetSummary()
+	success, failed, err := prediction.NewPredictionService().PredictAllSync(14)
 	if err != nil {
-		log.Println("[checkReorderAndNotify] Gagal ambil summary prediksi:", err)
+		log.Println("Gagal menjalankan prediksi terjadwal:", err)
 		return
 	}
 
+	reorderService := reorder.NewService()
+	updatedT := reorderService.RecomputeAllT()
+	log.Printf("Prediksi selesai (berhasil %d, gagal %d). T dihitung ulang untuk %d produk.\n", success, failed, updatedT)
+
 	var needReorderNames []string
-	successCount := len(summary)
-	for _, item := range summary {
-		if !item.HasPrediction {
-			successCount--
-			continue
-		}
-		info, err := reorderService.Calculate(item.ProductID)
-		if err != nil {
-			// belum ada prediksi untuk produk ini, lewati
-			continue
-		}
-		if info.NeedsReorder {
-			needReorderNames = append(needReorderNames, item.ProductName)
+	if items, err := reorderService.CalculateAll(); err == nil {
+		for _, it := range items {
+			if it.Status == "below_rop" {
+				needReorderNames = append(needReorderNames, it.ProductName)
+			}
 		}
 	}
 
-	body := fmt.Sprintf("%d produk berhasil diprediksi.", successCount)
+	body := fmt.Sprintf("%d produk berhasil diprediksi.", success)
+	if failed > 0 {
+		body = fmt.Sprintf("%s %d produk gagal.", body, failed)
+	}
 	if len(needReorderNames) > 0 {
 		body = fmt.Sprintf("%s %s sudah melewati titik pemesanan ulang, segera restok!", body, formatNameList(needReorderNames))
 	}
 
-	notifService.Broadcast("📊 Prediksi Mingguan Selesai", body, "prediction_complete")
+	notification.NewService().Broadcast("📊 Prediksi Mingguan Selesai", body, "prediction_complete")
 }
 
 // formatNameList menggabungkan nama produk jadi ringkasan singkat.

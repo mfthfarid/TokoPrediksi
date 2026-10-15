@@ -7,6 +7,7 @@ import (
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/product"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/reorder"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/supplier"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/user"
 )
@@ -16,6 +17,9 @@ func main() {
 
 	// Auto-migrate — tambahkan model lain di sini nanti (product.Product{}, dll)
 	config.DB.AutoMigrate(&user.User{}, product.Product{}, &supplier.Supplier{})
+
+	// Pastikan parameter T awal (seed dari Colab) tersimpan di database
+	reorder.EnsureSeedParams()
 
 	r := core.SetupRouter()
 	core.StartScheduler()	

@@ -21,4 +21,5 @@ type DashboardSummary struct {
 	LowStockProducts       []LowStockProduct   `json:"low_stock_products"`
 	TopSellingProducts     []TopSellingProduct `json:"top_selling_products"`
 	PredictedStockoutCount int                 `json:"predicted_stockout_count"`
+	ReorderNeededCount     int                 `json:"reorder_needed_count"`
 }

@@ -1,13 +1,19 @@
 package prediction
 
-import "github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
+import (
+	"time"
+
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
+)
 
 type Prediction struct {
 	ID                uint            `json:"id" gorm:"primaryKey"`
+	RunID             string          `json:"run_id" gorm:"type:varchar(36);not null;index"`
 	ProductID         uint            `json:"product_id" gorm:"not null"`
 	PredictionDate    customtype.Date `json:"prediction_date" gorm:"type:date;not null"`
-	PredictedQuantity int             `json:"predicted_quantity" gorm:"not null"`
-	YhatLower         *int            `json:"yhat_lower"`
-	YhatUpper         *int            `json:"yhat_upper"`
-	ModelVersion      *string         `json:"model_version" gorm:"type:varchar(50)"`
+	PredictedQuantity float64         `json:"predicted_quantity" gorm:"type:decimal(14,2);not null"`
+	YhatLower         *float64        `json:"yhat_lower" gorm:"type:decimal(14,2)"`
+	YhatUpper         *float64        `json:"yhat_upper" gorm:"type:decimal(14,2)"`
+	ModelVersion      *string         `json:"model_version" gorm:"type:varchar(64)"`
+	CreatedAt         time.Time       `json:"created_at"`
 }

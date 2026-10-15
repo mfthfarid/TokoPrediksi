@@ -173,7 +173,7 @@ func main() {
 	fmt.Printf("\nTotal kode barang dikenali: %d\n\n", len(codeToConversion))
 
 	if !commit {
-		fmt.Println(">>> Tahap A ini baru DRY-RUN. Lanjut cek Tahap B di bawah, lalu jalankan ulang dengan '--commit' kalau sudah yakin.\n")
+		fmt.Println(">>> Tahap A ini baru DRY-RUN. Lanjut cek Tahap B di bawah, lalu jalankan ulang dengan '--commit' kalau sudah yakin.")
 	}
 
 	// ===== TAHAP B: proses semua sheet tahun =====

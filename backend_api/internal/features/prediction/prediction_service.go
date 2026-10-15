@@ -2,6 +2,8 @@ package prediction
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,13 +18,14 @@ import (
 )
 
 const (
-	minHistoryPoints   = 14
-	modelVersion       = "prophet-v1"
-	defaultPeriods     = 7
-	urgencyHighDays    = 3
-	urgencyMediumDays  = 7
-	maxPeriodsRatio    = 0.3 // maksimal 30% dari panjang data historis
-	absoluteMaxPeriods = 90  // batas atas mutlak, berapa pun panjang datanya
+	minHistoryPoints     = 14
+	fallbackModelVersion = "prophet-v1"
+	defaultPeriods       = 7
+	urgencyHighDays      = 3
+	urgencyMediumDays    = 7
+	maxPeriodsRatio      = 0.3
+	absoluteMaxPeriods   = 90
+	gapThresholdDays     = 30
 )
 
 type PredictionService struct {
@@ -33,29 +36,14 @@ func NewPredictionService() *PredictionService {
 	return &PredictionService{repo: &PredictionRepository{}}
 }
 
-// fillMissingDates mengisi celah tanggal dengan y=0, TANPA menyimpan apa pun
-// ke database — murni diproses di memori, cuma untuk 1 produk yang sedang diminta.
-func fillMissingDates(sparse []DailySales) []DailySales {
-	if len(sparse) == 0 {
-		return sparse
-	}
+func newRunID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
+}
 
-	existing := make(map[string]float64, len(sparse))
-	for _, d := range sparse {
-		existing[d.DS] = d.Y
-	}
-
-	startDate, _ := time.Parse("2006-01-02", sparse[0].DS)
-	endDate, _ := time.Parse("2006-01-02", sparse[len(sparse)-1].DS)
-
-	var filled []DailySales
-	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
-		dateStr := d.Format("2006-01-02")
-		y := existing[dateStr] // otomatis 0 kalau tidak ketemu di map
-		filled = append(filled, DailySales{DS: dateStr, Y: y})
-	}
-
-	return filled
+func round2(v float64) float64 {
+	return math.Round(v*100) / 100
 }
 
 func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
@@ -89,10 +77,11 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 		}
 
 		reference := math.Max(row.CurrentStock, row.AverageDailySales)
-		divisor, displayUnit := determineDisplayUnit(row.BaseUnitName, reference)
+		divisor, displayUnit := DetermineDisplayUnit(row.BaseUnitName, reference)
 		item.DisplayUnit = displayUnit
-		item.CurrentStockDisplay = formatWithDivisor(row.CurrentStock, divisor)
-		item.AverageDailySalesDisplay = formatWithDivisor(row.AverageDailySales, divisor)
+		item.CurrentStockDisplay = FormatWithDivisor(row.CurrentStock, divisor)
+		item.AverageDailySalesDisplay = FormatWithDivisor(row.AverageDailySales, divisor)
+
 		items[i] = item
 	}
 
@@ -110,18 +99,8 @@ func (s *PredictionService) GetSummary() ([]PredictionSummaryItem, error) {
 		}
 		return *items[i].DaysRemaining < *items[j].DaysRemaining
 	})
-	return items, nil
-}
 
-func calculateMaxPeriods(historyLength int) int {
-	max := int(float64(historyLength) * maxPeriodsRatio)
-	if max < defaultPeriods {
-		max = defaultPeriods // minimal tetap boleh prediksi 7 hari walau data historis pendek
-	}
-	if max > absoluteMaxPeriods {
-		max = absoluteMaxPeriods
-	}
-	return max
+	return items, nil
 }
 
 func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSummaryResponse, error) {
@@ -141,8 +120,8 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	if err != nil {
 		return nil, err
 	}
-
 	dailySales = fillMissingDates(dailySales)
+
 	if len(dailySales) < minHistoryPoints {
 		return nil, fmt.Errorf(
 			"data histori penjualan belum cukup untuk prediksi (minimal %d hari ada transaksi, saat ini baru %d)",
@@ -150,11 +129,11 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 		)
 	}
 
-	maxAllowedPeriods := calculateMaxPeriods(len(dailySales))
-	if periods > maxAllowedPeriods {
+	maxAllowed := calculateMaxPeriods(len(dailySales))
+	if periods > maxAllowed {
 		return nil, fmt.Errorf(
-			"periode prediksi maksimal %d hari untuk data historis sepanjang ini (diminta %d hari). Data historis yang lebih panjang memungkinkan prediksi jangka lebih jauh",
-			maxAllowedPeriods, periods,
+			"periode prediksi maksimal %d hari untuk data historis sepanjang ini (diminta %d hari)",
+			maxAllowed, periods,
 		)
 	}
 
@@ -163,7 +142,7 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 		history[i] = pythonHistoryPoint{DS: d.DS, Y: d.Y}
 	}
 
-	points, err := callPythonPredict(pythonPredictRequest{
+	points, modelVersion, err := callPythonPredict(pythonPredictRequest{
 		ProductID: productID,
 		History:   history,
 		Periods:   periods,
@@ -171,11 +150,11 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	if err != nil {
 		return nil, err
 	}
-
-	if err := s.repo.DeleteByProductID(productID); err != nil {
-		return nil, err
+	if modelVersion == "" {
+		modelVersion = fallbackModelVersion
 	}
 
+	runID := newRunID()
 	toSave := make([]Prediction, 0, len(points))
 	for _, p := range points {
 		date, err := time.Parse("2006-01-02", p.DS)
@@ -183,12 +162,13 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 			continue
 		}
 
-		yhat := int(p.Yhat)
-		lower := int(p.YhatLower)
-		upper := int(p.YhatUpper)
+		yhat := round2(p.Yhat)
+		lower := round2(p.YhatLower)
+		upper := round2(p.YhatUpper)
 		version := modelVersion
 
 		toSave = append(toSave, Prediction{
+			RunID:             runID,
 			ProductID:         productID,
 			PredictionDate:    customtype.Date{Time: date},
 			PredictedQuantity: yhat,
@@ -196,6 +176,9 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 			YhatUpper:         &upper,
 			ModelVersion:      &version,
 		})
+	}
+	if len(toSave) == 0 {
+		return nil, errors.New("service prediksi tidak mengembalikan hasil yang valid")
 	}
 
 	if err := s.repo.CreateBatch(toSave); err != nil {
@@ -205,42 +188,47 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	return s.buildSummary(productID, toSave, dailySales)
 }
 
-func (s *PredictionService) PredictAll(periods int) error {
+// PredictAllSync berjalan sinkron (dipakai cron). Mengembalikan jumlah sukses & gagal.
+func (s *PredictionService) PredictAllSync(periods int) (success int, failed int, err error) {
 	if periods <= 0 {
 		periods = defaultPeriods
 	}
 
-	productIDs, err := s.repo.GetAllProductIDs()
+	ids, err := s.repo.GetAllProductIDs()
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 
-	go func() {
-		fmt.Println("Memulai prediksi massal untuk", len(productIDs), "produk...")
-		successCount := 0
-		failCount := 0
-
-		for _, id := range productIDs {
-			_, err := s.Predict(id, periods)
-			if err != nil {
-				fmt.Printf("❌ [Produk ID: %d] Gagal: %v\n", id, err)
-				failCount++
-				continue
-			}
-			fmt.Printf("✅ [Produk ID: %d] Berhasil diprediksi\n", id)
-			successCount++
+	for _, id := range ids {
+		if _, perr := s.Predict(id, periods); perr != nil {
+			log.Printf("❌ [Produk ID: %d] Gagal: %v\n", id, perr)
+			failed++
+			continue
 		}
+		log.Printf("✅ [Produk ID: %d] Berhasil diprediksi\n", id)
+		success++
+	}
+	return success, failed, nil
+}
 
-		fmt.Printf("🏁 Prediksi massal selesai! Berhasil: %d, Gagal: %d\n", successCount, failCount)
-		// Notifikasi & cek reorder ditangani oleh checkReorderAndNotify() di scheduler.go
-		// setelah goroutine ini selesai, agar bisa memakai needs_reorder yang lebih presisi.
+// PredictAll dipakai endpoint bulk: langsung membalas, proses jalan di background.
+func (s *PredictionService) PredictAll(periods int) error {
+	if _, err := s.repo.GetAllProductIDs(); err != nil {
+		return err
+	}
+	go func() {
+		success, failed, err := s.PredictAllSync(periods)
+		if err != nil {
+			log.Println("Prediksi massal gagal:", err)
+			return
+		}
+		log.Printf("🏁 Prediksi massal selesai. Berhasil: %d, Gagal: %d\n", success, failed)
 	}()
-
 	return nil
 }
 
 func (s *PredictionService) GetByProductID(productID uint) (*PredictionSummaryResponse, error) {
-	predictions, err := s.repo.FindByProductID(productID)
+	predictions, err := s.repo.FindLatestRun(productID) // hanya run terbaru
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +244,7 @@ func (s *PredictionService) GetByProductID(productID uint) (*PredictionSummaryRe
 
 func (s *PredictionService) buildSummary(productID uint, predictions []Prediction, dailySales []DailySales) (*PredictionSummaryResponse, error) {
 	name, stock, baseUnitName, err := s.repo.GetProductInfo(productID)
-	if err != nil {
+	if err != nil || name == "" {
 		return nil, errors.New("produk tidak ditemukan")
 	}
 
@@ -284,15 +272,6 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
-	var totalPredictedDemand int
-	for _, p := range predictions {
-		totalPredictedDemand += p.PredictedQuantity
-	}
-	recommendedRestock := totalPredictedDemand - int(stock)
-	if recommendedRestock < 0 {
-		recommendedRestock = 0
-	}
-
 	actualPoints := make([]ChartPoint, len(dailySales))
 	for i, d := range dailySales {
 		t, _ := time.Parse("2006-01-02", d.DS)
@@ -309,72 +288,45 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
-		// Tentukan 1 satuan tampilan konsisten, berdasarkan angka terbesar
-	// (supaya stok, rata-rata, dan rekomendasi restock selalu 1 satuan yang sama)
-	reference := math.Max(stock, avgSales)
-	reference = math.Max(reference, float64(recommendedRestock))
-	divisor, displayUnit := determineDisplayUnit(baseUnitName, reference)
+	var runID, generatedAt string
+	if len(predictions) > 0 {
+		runID = predictions[0].RunID
+		generatedAt = predictions[0].CreatedAt.Format("02/01/2006 15:04")
+	}
 
-	stockDisplay := formatWithDivisor(stock, divisor)
-	avgSalesDisplay := formatWithDivisor(avgSales, divisor)
-	restockDisplay := formatWithDivisor(float64(recommendedRestock), divisor)
+	reference := math.Max(stock, avgSales)
+	divisor, displayUnit := DetermineDisplayUnit(baseUnitName, reference)
 
 	return &PredictionSummaryResponse{
-		ProductID:                  productID,
-		ProductName:                name,
-		HasPrediction:              len(predictions) > 0,
-		CurrentStock:               stock,
-		AverageDailySales:          avgSales,
-		DaysRemaining:              daysRemaining,
-		Urgency:                    urgency,
-		RecommendedRestockQuantity: recommendedRestock,
+		ProductID:         productID,
+		ProductName:       name,
+		HasPrediction:     len(predictions) > 0,
+		RunID:             runID,
+		GeneratedAt:       generatedAt,
+		CurrentStock:      stock,
+		AverageDailySales: avgSales,
+		DaysRemaining:     daysRemaining,
+		Urgency:           urgency,
 		ChartData: ChartData{
 			Actual:    actualPoints,
 			Predicted: predictedPoints,
 		},
-		Predictions:               predictions,
-		DisplayUnit:               displayUnit,
-		CurrentStockDisplay:       stockDisplay,
-		AverageDailySalesDisplay:  avgSalesDisplay,
-		RecommendedRestockDisplay: restockDisplay,
+		Predictions:              predictions,
+		DisplayUnit:              displayUnit,
+		CurrentStockDisplay:      FormatWithDivisor(stock, divisor),
+		AverageDailySalesDisplay: FormatWithDivisor(avgSales, divisor),
 	}, nil
 }
 
-func callPythonPredict(reqBody pythonPredictRequest) ([]pythonPredictionPoint, error) {
-    url := os.Getenv("PREDICTION_SERVICE_URL")
-    if url == "" {
-        url = "http://localhost:8000/predict"
-    }
-
-    // [TAMBAHAN] Cetak URL yang dipanggil di log Railway
-    log.Println("[ML Predict] Memanggil URL ML:", url)
-
-    jsonData, err := json.Marshal(reqBody)
-    if err != nil {
-        return nil, err
-    }
-
-    client := &http.Client{Timeout: 30 * time.Second}
-    resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
-    if err != nil {
-        // [TAMBAHAN] Cetak error detail ke log Railway untuk debugging
-        log.Println("[ML Predict Error] Gagal connect ke ML:", err)
-        return nil, fmt.Errorf("gagal menghubungi service prediksi (%s): %v", url, err)
-    }
-    defer resp.Body.Close()
-
-    if resp.StatusCode != http.StatusOK {
-        log.Printf("[ML Predict Error] Service ML mengembalikan HTTP Status %d\n", resp.StatusCode)
-        return nil, fmt.Errorf("service prediksi mengembalikan error (status %d)", resp.StatusCode)
-    }
-
-    var result pythonPredictResponse
-    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-        log.Println("[ML Predict Error] Gagal decode JSON dari ML:", err)
-        return nil, errors.New("gagal membaca respons dari service prediksi")
-    }
-    
-    return result.Predictions, nil
+func calculateMaxPeriods(historyLength int) int {
+	max := int(float64(historyLength) * maxPeriodsRatio)
+	if max < defaultPeriods {
+		max = defaultPeriods
+	}
+	if max > absoluteMaxPeriods {
+		max = absoluteMaxPeriods
+	}
+	return max
 }
 
 type FilledPoint struct {
@@ -383,24 +335,71 @@ type FilledPoint struct {
 	IsFilled bool
 }
 
-// FillMissingDatesDetailed sama logikanya dengan fillMissingDates, tapi menandai
-// mana titik hasil pengisian otomatis. Dipakai KHUSUS untuk ekspor dokumentasi
-// before/after ke database, terpisah dari alur prediksi live yang tidak menyimpan apa pun.
-func FillMissingDatesDetailed(sparse []DailySales) []FilledPoint {
-	if len(sparse) == 0 {
-		return nil
-	}
+type parsedPoint struct {
+	Date time.Time
+	Y    float64
+}
 
+// FillDateRange mengisi semua tanggal antara start dan end, menandai IsFilled=true jika tidak ada di data asli.
+func FillDateRange(sparse []DailySales, start, end time.Time) []FilledPoint {
 	existing := make(map[string]float64, len(sparse))
 	for _, d := range sparse {
 		existing[d.DS] = d.Y
 	}
+	var result []FilledPoint
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
+		ds := d.Format("2006-01-02")
+		y, exists := existing[ds]
+		result = append(result, FilledPoint{DS: ds, Y: y, IsFilled: !exists})
+	}
+	return result
+}
 
-	startDate, _ := time.Parse("2006-01-02", sparse[0].DS)
-	endDate, _ := time.Parse("2006-01-02", sparse[len(sparse)-1].DS)
+func fillMissingDates(sparse []DailySales) []DailySales {
+	filled := fillMissingDatesClustered(sparse)
+	result := make([]DailySales, len(filled))
+	for i, f := range filled {
+		result[i] = DailySales{DS: f.DS, Y: f.Y}
+	}
+	return result
+}
+
+// Isi 0 hanya DI DALAM klaster data; celah > gapThresholdDays dianggap jeda pencatatan.
+func fillMissingDatesClustered(sparse []DailySales) []FilledPoint {
+	if len(sparse) == 0 {
+		return nil
+	}
+
+	parsed := make([]parsedPoint, len(sparse))
+	for i, d := range sparse {
+		t, _ := time.Parse("2006-01-02", d.DS)
+		parsed[i] = parsedPoint{Date: t, Y: d.Y}
+	}
+
+	var result []FilledPoint
+	clusterStart := 0
+	for i := 1; i <= len(parsed); i++ {
+		isBoundary := i == len(parsed) ||
+			parsed[i].Date.Sub(parsed[i-1].Date).Hours()/24 > gapThresholdDays
+		if isBoundary {
+			result = append(result, fillCluster(parsed[clusterStart:i])...)
+			clusterStart = i
+		}
+	}
+	return result
+}
+
+func fillCluster(cluster []parsedPoint) []FilledPoint {
+	existing := make(map[string]float64, len(cluster))
+	for _, p := range cluster {
+		existing[p.Date.Format("2006-01-02")] = p.Y
+	}
+
+	start := cluster[0].Date
+	end := cluster[len(cluster)-1].Date
 
 	var filled []FilledPoint
-	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
 		dateStr := d.Format("2006-01-02")
 		y, exists := existing[dateStr]
 		filled = append(filled, FilledPoint{DS: dateStr, Y: y, IsFilled: !exists})
@@ -408,20 +407,31 @@ func FillMissingDatesDetailed(sparse []DailySales) []FilledPoint {
 	return filled
 }
 
-// FillDateRange sama seperti FillMissingDatesDetailed, tapi rentang tanggalnya
-// DITENTUKAN DARI LUAR (startDate, endDate), bukan diambil dari data itu sendiri.
-// Dipakai supaya beberapa produk bisa dibandingkan dalam 1 rentang tanggal yang SAMA.
-func FillDateRange(sparse []DailySales, startDate, endDate time.Time) []FilledPoint {
-	existing := make(map[string]float64, len(sparse))
-	for _, d := range sparse {
-		existing[d.DS] = d.Y
+func callPythonPredict(reqBody pythonPredictRequest) ([]pythonPredictionPoint, string, error) {
+	url := os.Getenv("PREDICTION_SERVICE_URL")
+	if url == "" {
+		url = "http://localhost:8000/predict"
 	}
 
-	var filled []FilledPoint
-	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
-		dateStr := d.Format("2006-01-02")
-		y, exists := existing[dateStr]
-		filled = append(filled, FilledPoint{DS: dateStr, Y: y, IsFilled: !exists})
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, "", err
 	}
-	return filled
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, "", errors.New("gagal menghubungi service prediksi, pastikan service Python sedang berjalan")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("service prediksi mengembalikan error (status %d)", resp.StatusCode)
+	}
+
+	var result pythonPredictResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, "", errors.New("gagal membaca respons dari service prediksi")
+	}
+	return result.Predictions, result.ModelVersion, nil
 }

@@ -1,0 +1,83 @@
+{
+  "defaults": {
+    "cps": 0.05,
+    "sps": 10.0,
+    "mode": "additive",
+    "hps": 10.0
+  },
+  "holidays": [
+    {
+      "holiday": "idul_fitri",
+      "ds": "2024-04-10",
+      "lower_window": -4,
+      "upper_window": 3
+    },
+    {
+      "holiday": "idul_fitri",
+      "ds": "2025-03-31",
+      "lower_window": -4,
+      "upper_window": 3
+    },
+    {
+      "holiday": "idul_fitri",
+      "ds": "2026-03-21",
+      "lower_window": -4,
+      "upper_window": 3
+    },
+    {
+      "holiday": "idul_adha",
+      "ds": "2024-06-17",
+      "lower_window": -2,
+      "upper_window": 2
+    },
+    {
+      "holiday": "idul_adha",
+      "ds": "2025-06-06",
+      "lower_window": -2,
+      "upper_window": 2
+    },
+    {
+      "holiday": "idul_adha",
+      "ds": "2026-05-27",
+      "lower_window": -2,
+      "upper_window": 2
+    }
+  ],
+  "products": {
+    "13": {
+      "name": "Beras",
+      "cps": 0.01,
+      "sps": 0.1,
+      "mode": "additive",
+      "hps": 1.0
+    },
+    "129": {
+      "name": "Kopi Hitam",
+      "cps": 0.5,
+      "sps": 0.1,
+      "mode": "additive",
+      "hps": 0.1
+    },
+    "158": {
+      "name": "Mie Goreng",
+      "cps": 0.5,
+      "sps": 0.1,
+      "mode": "additive",
+      "hps": 1.0
+    },
+    "259": {
+      "name": "Telur",
+      "cps": 0.01,
+      "sps": 1.0,
+      "mode": "multiplicative",
+      "hps": 10.0
+    },
+    "292": {
+      "name": "Yupi 500",
+      "cps": 0.05,
+      "sps": 0.1,
+      "mode": "multiplicative",
+      "hps": 1.0
+    }
+  }
+}
