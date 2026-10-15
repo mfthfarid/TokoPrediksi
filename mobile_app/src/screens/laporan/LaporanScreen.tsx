@@ -36,18 +36,24 @@ const INDO_MONTHS = [
   'Desember',
 ];
 
-const formatRupiah = (value: number): string =>
-  `Rp ${value.toLocaleString('id-ID')}`;
+const formatRupiah = (value?: number | null): string => {
+  if (value == null || isNaN(value)) return 'Rp 0';
+  return `Rp ${value.toLocaleString('id-ID')}`;
+};
 
-const formatNumber = (value: number): string =>
-  value.toLocaleString('id-ID', {
+const formatNumber = (value?: number | null): string => {
+  if (value == null || isNaN(value)) return '0';
+  return value.toLocaleString('id-ID', {
     maximumFractionDigits: 2,
   });
+};
 
-const formatPercent = (value: number): string =>
-  `${Math.abs(value).toLocaleString('id-ID', {
+const formatPercent = (value?: number | null): string => {
+  if (value == null || isNaN(value)) return '0%';
+  return `${Math.abs(value).toLocaleString('id-ID', {
     maximumFractionDigits: 1,
   })}%`;
+};
 
 const getDateNDaysAgo = (n: number): string => {
   const date = new Date();

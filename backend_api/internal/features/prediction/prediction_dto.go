@@ -54,13 +54,15 @@ type PredictionSummaryResponse struct {
 	CurrentStock      float64      `json:"current_stock"`
 	AverageDailySales float64      `json:"average_daily_sales"`
 	DaysRemaining     *float64     `json:"days_remaining"`
-	Urgency           string       `json:"urgency"`
-	ChartData         ChartData    `json:"chart_data"`
-	Predictions       []Prediction `json:"predictions"`
+	Urgency                    string       `json:"urgency"`
+	RecommendedRestockQuantity int          `json:"recommended_restock_quantity"`
+	ChartData                  ChartData    `json:"chart_data"`
+	Predictions                []Prediction `json:"predictions"`
 
-	DisplayUnit              string `json:"display_unit"`
-	CurrentStockDisplay      string `json:"current_stock_display"`
-	AverageDailySalesDisplay string `json:"average_daily_sales_display"`
+	DisplayUnit               string `json:"display_unit"`
+	CurrentStockDisplay       string `json:"current_stock_display"`
+	AverageDailySalesDisplay  string `json:"average_daily_sales_display"`
+	RecommendedRestockDisplay string `json:"recommended_restock_display"`
 }
 
 type PredictionSummaryItem struct {

@@ -52,8 +52,10 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 const screenWidth = Dimensions.get('window').width;
-const formatNumber = (value: number): string =>
-  value.toLocaleString('id-ID');
+const formatNumber = (value?: number | null): string => {
+  if (value == null || isNaN(value)) return '0';
+  return value.toLocaleString('id-ID');
+};
 
 const predictionPeriods = [
   { label: '7 Hari', value: 7 },
@@ -154,7 +156,7 @@ const DetailPrediksiScreen = () => {
       reorderInfo?.recommended_purchase_quantity != null &&
       reorderInfo.recommended_purchase_quantity > 0
         ? Math.ceil(reorderInfo.recommended_purchase_quantity)
-        : Math.ceil(data.recommended_restock_quantity);
+        : Math.ceil(data.recommended_restock_quantity ?? 0);
 
     navigation
       .getParent<BottomTabNavigationProp<BottomTabParamList>>()
@@ -318,7 +320,7 @@ const DetailPrediksiScreen = () => {
                 <ShieldAlert size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Safety Stock</Text>
                 <Text style={styles.reorderStatValue}>
-                  {reorderInfo.safety_stock_display ?? formatNumber(Math.round(reorderInfo.safety_stock))}
+                  {reorderInfo.safety_stock_display ?? formatNumber(reorderInfo.safety_stock != null ? Math.round(reorderInfo.safety_stock) : 0)}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -326,7 +328,7 @@ const DetailPrediksiScreen = () => {
                 <PackageSearch size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Reorder Point</Text>
                 <Text style={styles.reorderStatValue}>
-                  {reorderInfo.reorder_point_display ?? formatNumber(Math.round(reorderInfo.reorder_point))}
+                  {reorderInfo.reorder_point_display ?? formatNumber(reorderInfo.reorder_point != null ? Math.round(reorderInfo.reorder_point) : 0)}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -353,8 +355,8 @@ const DetailPrediksiScreen = () => {
         <View style={styles.chartCard}>
           <Text style={styles.sectionTitle}>Aktual vs Prediksi</Text>
           <PredictionChart
-            actual={data.chart_data.actual}
-            predicted={data.chart_data.predicted}
+            actual={data.chart_data?.actual ?? []}
+            predicted={data.chart_data?.predicted ?? []}
             // width={screenWidth - 64}
           />
         </View>
@@ -364,7 +366,8 @@ const DetailPrediksiScreen = () => {
             <Text style={styles.restockLabel}>Rekomendasi Restock</Text>
             <Text style={styles.restockValue}>
               {reorderInfo?.recommended_purchase_display ??
-                `${formatNumber(reorderInfo?.recommended_purchase_quantity ?? data.recommended_restock_quantity)} ${reorderInfo?.display_unit ?? data.display_unit ?? 'unit'}`}
+                data.recommended_restock_display ??
+                `${formatNumber(reorderInfo?.recommended_purchase_quantity ?? data.recommended_restock_quantity ?? 0)} ${reorderInfo?.display_unit ?? data.display_unit ?? 'unit'}`}
             </Text>
           </View>
           <TouchableOpacity
