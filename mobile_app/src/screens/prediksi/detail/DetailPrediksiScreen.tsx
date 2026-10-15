@@ -150,13 +150,19 @@ const DetailPrediksiScreen = () => {
   const handleRestock = () => {
     if (!data) return;
 
+    const qty =
+      reorderInfo?.recommended_purchase_quantity != null &&
+      reorderInfo.recommended_purchase_quantity > 0
+        ? Math.ceil(reorderInfo.recommended_purchase_quantity)
+        : Math.ceil(data.recommended_restock_quantity);
+
     navigation
       .getParent<BottomTabNavigationProp<BottomTabParamList>>()
       ?.navigate('DashboardTab', {
         screen: 'TambahPembelian',
         params: {
           prefillProductId: data.product_id,
-          prefillQuantity: Math.ceil(data.recommended_restock_quantity),
+          prefillQuantity: qty,
         },
       });
   };
@@ -260,13 +266,13 @@ const DetailPrediksiScreen = () => {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Stok Saat Ini</Text>
             <Text style={styles.statValue}>
-              {formatNumber(data.current_stock)}
+              {data.current_stock_display ?? formatNumber(data.current_stock)}
             </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Rata-rata Terjual</Text>
             <Text style={styles.statValue}>
-              {formatNumber(data.average_daily_sales)}/hari
+              {data.average_daily_sales_display ?? `${formatNumber(data.average_daily_sales)}/hari`}
             </Text>
           </View>
         </View>
@@ -275,16 +281,34 @@ const DetailPrediksiScreen = () => {
         {reorderInfo && (
           <View style={[
             styles.reorderCard,
-            reorderInfo.needs_reorder && styles.reorderCardAlert,
+            (reorderInfo.needs_reorder || reorderInfo.status === 'below_rop') && styles.reorderCardAlert,
           ]}>
             <View style={styles.reorderCardHeader}>
-              <PackageSearch size={16} color={reorderInfo.needs_reorder ? '#dc2626' : '#f59e0b'} />
+              <PackageSearch
+                size={16}
+                color={
+                  reorderInfo.needs_reorder || reorderInfo.status === 'below_rop'
+                    ? '#dc2626'
+                    : reorderInfo.status === 'near'
+                    ? '#f59e0b'
+                    : '#16a34a'
+                }
+              />
               <Text style={[
                 styles.reorderCardTitle,
-                { color: reorderInfo.needs_reorder ? '#dc2626' : '#f59e0b' },
+                {
+                  color:
+                    reorderInfo.needs_reorder || reorderInfo.status === 'below_rop'
+                      ? '#dc2626'
+                      : reorderInfo.status === 'near'
+                      ? '#f59e0b'
+                      : '#16a34a',
+                },
               ]}>
-                {reorderInfo.needs_reorder
+                {reorderInfo.needs_reorder || reorderInfo.status === 'below_rop'
                   ? '⚠️ Sudah Melewati Titik Reorder!'
+                  : reorderInfo.status === 'near'
+                  ? '⏳ Mendekati Titik Reorder'
                   : 'Titik Pemesanan Ulang (ROP)'}
               </Text>
             </View>
@@ -294,7 +318,7 @@ const DetailPrediksiScreen = () => {
                 <ShieldAlert size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Safety Stock</Text>
                 <Text style={styles.reorderStatValue}>
-                  {formatNumber(Math.round(reorderInfo.safety_stock))}
+                  {reorderInfo.safety_stock_display ?? formatNumber(Math.round(reorderInfo.safety_stock))}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -302,7 +326,7 @@ const DetailPrediksiScreen = () => {
                 <PackageSearch size={14} color="#6b7280" />
                 <Text style={styles.reorderStatLabel}>Reorder Point</Text>
                 <Text style={styles.reorderStatValue}>
-                  {formatNumber(Math.round(reorderInfo.reorder_point))}
+                  {reorderInfo.reorder_point_display ?? formatNumber(Math.round(reorderInfo.reorder_point))}
                 </Text>
               </View>
               <View style={styles.reorderStatDivider} />
@@ -320,7 +344,7 @@ const DetailPrediksiScreen = () => {
 
             {reorderInfo.lead_time_source === 'default' && (
               <Text style={styles.reorderCardHint}>
-                * Lead time menggunakan nilai default (7 hari). Atur di master Supplier untuk hasil lebih akurat.
+                * Lead time menggunakan nilai default (3 hari). Atur di master Supplier untuk hasil lebih akurat.
               </Text>
             )}
           </View>
@@ -339,7 +363,8 @@ const DetailPrediksiScreen = () => {
           <View style={styles.restockInfo}>
             <Text style={styles.restockLabel}>Rekomendasi Restock</Text>
             <Text style={styles.restockValue}>
-              {formatNumber(data.recommended_restock_quantity)} unit
+              {reorderInfo?.recommended_purchase_display ??
+                `${formatNumber(reorderInfo?.recommended_purchase_quantity ?? data.recommended_restock_quantity)} ${reorderInfo?.display_unit ?? data.display_unit ?? 'unit'}`}
             </Text>
           </View>
           <TouchableOpacity

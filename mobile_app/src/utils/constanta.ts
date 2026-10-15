@@ -20,11 +20,11 @@ export const TRANSACTIONS: Transaction[] = [
 ];
 
 export const INVENTORY_ITEMS: InventoryItem[] = [
-  { name: 'Mie Instan', stok: 150, harga: 'Rp 8.000', status: 'normal' },
-  { name: 'Gula Pasir 1kg', stok: 12, harga: 'Rp 22.500', status: 'low' },
-  { name: 'Telur Ayam', stok: 45, harga: 'Rp 32.000', status: 'normal' },
-  { name: 'Minyak Goreng 2L', stok: 3, harga: 'Rp 48.000', status: 'low' },
-  { name: 'Beras Premium', stok: 200, harga: 'Rp 15.000', status: 'normal' },
+  { id: 1, nama: 'Mie Instan', stok: 150, harga: 'Rp 8.000', hargaAngka: 8000, kategori: 'Makanan', photoThumbnailUrl: null, status: 'normal' },
+  { id: 2, nama: 'Gula Pasir 1kg', stok: 12, harga: 'Rp 22.500', hargaAngka: 22500, kategori: 'Bahan Pokok', photoThumbnailUrl: null, status: 'low' },
+  { id: 3, nama: 'Telur Ayam', stok: 45, harga: 'Rp 32.000', hargaAngka: 32000, kategori: 'Bahan Pokok', photoThumbnailUrl: null, status: 'normal' },
+  { id: 4, nama: 'Minyak Goreng 2L', stok: 3, harga: 'Rp 48.000', hargaAngka: 48000, kategori: 'Bahan Pokok', photoThumbnailUrl: null, status: 'low' },
+  { id: 5, nama: 'Beras Premium', stok: 200, harga: 'Rp 15.000', hargaAngka: 15000, kategori: 'Bahan Pokok', photoThumbnailUrl: null, status: 'normal' },
 ];
 
 export const PREDICTIONS: Prediction[] = [
