@@ -36,23 +36,55 @@ func (r *Repository) GetLeadTime(productID uint) (int, string) {
 	return DefaultLeadTimeDays, "default"
 }
 
-// FindRunWithMinRows: run terbaru yang masih punya >= minRows hari prediksi setelah hari ini.
+// referenceDate mengembalikan tanggal acuan untuk filter prediksi masa depan.
+// Menggunakan tanggal penjualan terakhir + 1 hari agar prediksi yang dimulai
+// tepat setelah data historis tetap terhitung sebagai "masa depan".
+// Data penjualan diambil dari gabungan transaksi live dan historical sales.
+// Jika tidak ada data penjualan sama sekali, fallback ke CURDATE().
+func (r *Repository) referenceDate(productID uint) string {
+	var lastTxn *time.Time
+	err := config.DB.Table("transactions").
+		Select("MAX(DATE(transaction_date))").
+		Joins("JOIN transaction_items ON transaction_items.transaction_id = transactions.id").
+		Where("transaction_items.product_id = ?", productID).
+		Row().Scan(&lastTxn)
+	if err == nil && lastTxn != nil {
+		ref := lastTxn.AddDate(0, 0, 1)
+		return ref.Format("2006-01-02")
+	}
+
+	var lastHist *time.Time
+	err = config.DB.Table("historical_sales").
+		Select("MAX(DATE(sale_date))").
+		Where("product_id = ?", productID).
+		Row().Scan(&lastHist)
+	if err == nil && lastHist != nil {
+		ref := lastHist.AddDate(0, 0, 1)
+		return ref.Format("2006-01-02")
+	}
+
+	return time.Now().Format("2006-01-02")
+}
+
+// FindRunWithMinRows: run terbaru yang masih punya >= minRows hari prediksi setelah tanggal referensi.
 func (r *Repository) FindRunWithMinRows(productID uint, minRows int) (string, error) {
+	refDate := r.referenceDate(productID)
 	var runID string
 	err := config.DB.Raw(`
 		SELECT run_id FROM predictions
-		WHERE product_id = ? AND prediction_date > CURDATE()
+		WHERE product_id = ? AND prediction_date >= ?
 		GROUP BY run_id
 		HAVING COUNT(*) >= ?
 		ORDER BY MAX(id) DESC
-		LIMIT 1`, productID, minRows).Scan(&runID).Error
+		LIMIT 1`, productID, refDate, minRows).Scan(&runID).Error
 	return runID, err
 }
 
 func (r *Repository) FutureDemand(productID uint, runID string, limit int) ([]float64, error) {
+	refDate := r.referenceDate(productID)
 	var vals []float64
 	err := config.DB.Table("predictions").
-		Where("product_id = ? AND run_id = ? AND prediction_date > CURDATE()", productID, runID).
+		Where("product_id = ? AND run_id = ? AND prediction_date >= ?", productID, runID, refDate).
 		Order("prediction_date ASC").
 		Limit(limit).
 		Pluck("predicted_quantity", &vals).Error
