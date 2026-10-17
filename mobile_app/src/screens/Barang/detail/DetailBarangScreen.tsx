@@ -282,6 +282,10 @@ const DetailBarangScreen = () => {
   const getUnitName = (unitId: number | null) =>
     unitOptions.find(o => o.value === unitId)?.label || 'Satuan';
 
+  const baseUnitLabel = getUnitName(
+    unitRows.find(r => r.isBaseUnit)?.unitId ?? null,
+  );
+
   const validate = (): string | null => {
     if (!name.trim()) return 'Nama barang wajib diisi';
     if (!categoryId) return 'Kategori wajib dipilih';
@@ -638,11 +642,13 @@ const DetailBarangScreen = () => {
               Harga:{' '}
               {row.sellPrice
                 ? `Rp ${Number(row.sellPrice).toLocaleString('id-ID')}`
-                : 'Belum diatur'}
+                : row.isActive
+                  ? 'Belum diatur'
+                  : 'Tidak dijual'}
             </Text>
             {!row.isBaseUnit && (
               <Text style={styles.unitViewDetail}>
-                Isi: {row.conversionToBase} pcs
+                Isi: {row.conversionToBase} {baseUnitLabel}
               </Text>
             )}
             {row.barcode ? (

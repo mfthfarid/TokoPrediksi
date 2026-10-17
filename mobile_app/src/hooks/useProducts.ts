@@ -10,6 +10,10 @@ const formatRupiah = (value: number): string =>
 const mapProductToInventoryItem = (product: ProductApi): InventoryItem => {
   const baseUnit = product.units.find(u => u.is_base_unit) ?? product.units[0];
 
+  const pricedUnits = product.units.filter(u => u.sell_price != null);
+  const displayUnit =
+    pricedUnits.find(u => u.is_active) ?? pricedUnits[0] ?? baseUnit;
+
   const stock = parseFloat(product.stock) || 0;
   const hargaAngka = baseUnit?.sell_price ?? 0;
 
@@ -18,8 +22,8 @@ const mapProductToInventoryItem = (product: ProductApi): InventoryItem => {
     nama: product.name,
     stok: stock,
     harga:
-      baseUnit?.sell_price != null
-        ? `${formatRupiah(hargaAngka)} / ${baseUnit.unit.name}`
+      displayUnit?.sell_price != null
+        ? `${formatRupiah(displayUnit.sell_price)} / ${displayUnit.unit.name}`
         : 'Harga belum diatur',
     hargaAngka,
     kategori: product.kategori?.name ?? 'Tanpa Kategori',
