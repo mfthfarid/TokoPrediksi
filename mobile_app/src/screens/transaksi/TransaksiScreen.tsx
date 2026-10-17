@@ -178,7 +178,9 @@ const TransaksiScreen = () => {
     barcode: string,
   ): { product: ProductApi; unit: ProductUnitApi } | null => {
     for (const product of products) {
-      const unit = product.units.find(u => u.barcode === barcode);
+      const unit = product.units.find(
+        u => u.barcode === barcode && u.is_active,
+      );
       if (unit) return { product, unit };
     }
     return null;
@@ -197,12 +199,14 @@ const TransaksiScreen = () => {
     try {
       const response = await getProductByBarcode(barcode);
       const product = response.data;
-      const unit = product.units.find(u => u.barcode === barcode);
+      const unit = product.units.find(
+        u => u.barcode === barcode && u.is_active,
+      );
       if (unit) {
         addToCart(product, unit);
         toast.success(`${product.name} ditambahkan`);
       } else {
-        toast.error('Barcode ditemukan tapi satuan tidak cocok');
+        toast.error('Barcode ditemukan tapi satuan tidak aktif atau tidak cocok');
       }
     } catch (error) {
       toast.error('Produk dengan barcode ini tidak ditemukan');
