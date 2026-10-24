@@ -151,6 +151,43 @@ export const Styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
+  expenseCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+  },
+  expenseIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
+    backgroundColor: '#FEF2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 9,
+  },
+  expenseInfo: {
+    flex: 1,
+  },
+  expenseLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  expenseDescription: {
+    marginTop: 2,
+    fontSize: 11,
+    color: '#9CA3AF',
+  },
+  expenseValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#DC2626',
+  },
+
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',

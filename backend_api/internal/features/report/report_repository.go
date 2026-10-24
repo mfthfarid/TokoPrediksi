@@ -82,3 +82,24 @@ func (r *ReportRepository) GetOverallTotals(startDate, endDate string) (revenue,
 
 	return res.Revenue, res.Cost, res.Profit, res.Transactions, res.Items, err
 }
+
+// GetPurchaseTotals menghitung total pengeluaran pembelian/restok dalam periode.
+func (r *ReportRepository) GetPurchaseTotals(startDate, endDate string) (totalAmount int, count int, err error) {
+	start, end := normalizeDateRange(startDate, endDate)
+
+	type result struct {
+		TotalAmount int
+		Count       int
+	}
+	var res result
+
+	err = config.DB.Table("purchases").
+		Select(`
+			CAST(COALESCE(SUM(purchases.total_amount), 0) AS SIGNED) as total_amount,
+			COUNT(*) as count
+		`).
+		Where("purchases.purchase_date BETWEEN ? AND ?", start, end).
+		Scan(&res).Error
+
+	return res.TotalAmount, res.Count, err
+}

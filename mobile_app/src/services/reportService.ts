@@ -17,6 +17,8 @@ export interface GrandTotal {
   profit_margin: number;
   total_transactions: number;
   total_items_sold: number;
+  total_purchase_amount: number;
+  total_purchase_count: number;
 }
 
 export interface Comparison {
