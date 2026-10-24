@@ -353,6 +353,22 @@ const LaporanScreen = () => {
           </View>
         </View>
 
+        {/* PENGELUARAN RESTOK */}
+        <View style={Styles.expenseCard}>
+          <View style={Styles.expenseIcon}>
+            <Icon name="cart-arrow-down" size={20} color="#DC2626" />
+          </View>
+          <View style={Styles.expenseInfo}>
+            <Text style={Styles.expenseLabel}>Pengeluaran Restok</Text>
+            <Text style={Styles.expenseDescription}>
+              {formatNumber(total.total_purchase_count)} transaksi pembelian
+            </Text>
+          </View>
+          <Text style={Styles.expenseValue}>
+            {formatRupiah(total.total_purchase_amount)}
+          </Text>
+        </View>
+
         {/* AKTIVITAS */}
         <View style={Styles.activityCard}>
           <View style={Styles.activityItem}>

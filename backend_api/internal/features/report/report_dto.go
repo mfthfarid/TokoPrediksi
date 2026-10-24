@@ -17,12 +17,14 @@ type ProductProfitRow struct {
 }
 
 type GrandTotal struct {
-	TotalRevenue      int     `json:"total_revenue"`
-	TotalCost         int     `json:"total_cost"`
-	TotalProfit       int     `json:"total_profit"`
-	ProfitMargin      float64 `json:"profit_margin"`
-	TotalTransactions int     `json:"total_transactions"`
-	TotalItemsSold    int     `json:"total_items_sold"`
+	TotalRevenue         int     `json:"total_revenue"`
+	TotalCost            int     `json:"total_cost"`
+	TotalProfit          int     `json:"total_profit"`
+	ProfitMargin         float64 `json:"profit_margin"`
+	TotalTransactions    int     `json:"total_transactions"`
+	TotalItemsSold       int     `json:"total_items_sold"`
+	TotalPurchaseAmount  int     `json:"total_purchase_amount"`
+	TotalPurchaseCount   int     `json:"total_purchase_count"`
 }
 
 type PeriodComparison struct {

@@ -44,7 +44,7 @@ func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, er
 		`).
 		Joins("JOIN products ON products.id = purchase_items.product_id").
 		Where("purchase_items.quantity_remaining > 0 AND purchase_items.tanggal_kadaluwarsa IS NOT NULL").
-		Where("purchase_items.tanggal_kadaluwarsa <= DATE_ADD(CURDATE(), INTERVAL 5 MONTH)")
+		Where("purchase_items.tanggal_kadaluwarsa <= DATE_ADD(CURDATE(), INTERVAL 2 WEEK)")
 
 	if search != "" {
 		query = query.Where("products.name LIKE ?", "%"+search+"%")

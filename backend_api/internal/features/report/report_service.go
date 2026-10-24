@@ -21,6 +21,11 @@ func (s *ReportService) GetProfitReport(query ProfitReportQuery) (*ProfitReportR
 		return nil, err
 	}
 
+	purchaseAmount, purchaseCount, err := s.repo.GetPurchaseTotals(query.StartDate, query.EndDate)
+	if err != nil {
+		return nil, err
+	}
+
 	var margin float64
 	if revenue > 0 {
 		margin = float64(profit) / float64(revenue) * 100
@@ -33,12 +38,14 @@ func (s *ReportService) GetProfitReport(query ProfitReportQuery) (*ProfitReportR
 	}
 
 	grandTotal := GrandTotal{
-		TotalRevenue:      revenue,
-		TotalCost:         cost,
-		TotalProfit:       profit,
-		ProfitMargin:      margin,
-		TotalTransactions: transactions,
-		TotalItemsSold:    items,
+		TotalRevenue:        revenue,
+		TotalCost:           cost,
+		TotalProfit:         profit,
+		ProfitMargin:        margin,
+		TotalTransactions:   transactions,
+		TotalItemsSold:      items,
+		TotalPurchaseAmount: purchaseAmount,
+		TotalPurchaseCount:  purchaseCount,
 	}
 
 	comparison, err := s.calculateComparison(query.StartDate, query.EndDate, revenue, profit)
