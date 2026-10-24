@@ -39,12 +39,11 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	}
 
 	if err := h.authService.ForgotPassword(input.Email); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Pesan sengaja generik, tidak membocorkan apakah email terdaftar atau tidak
-	c.JSON(http.StatusOK, gin.H{"message": "Jika email terdaftar, kode OTP telah dikirim"})
+	c.JSON(http.StatusOK, gin.H{"message": "Kode OTP telah dikirim ke email Anda"})
 }
 
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
