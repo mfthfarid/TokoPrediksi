@@ -2,6 +2,7 @@ package mailer
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -14,6 +15,16 @@ func SendOTPEmail(toEmail, otpCode string) error {
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
 	from := os.Getenv("SMTP_FROM")
+
+	// Log konfigurasi SMTP (tanpa password) untuk debugging
+	log.Printf("SMTP Config -> Host: %s, Port: %s, Username: %s, From: %s, To: %s",
+		host, portStr, username, from, toEmail)
+
+	// Validasi: pastikan semua variabel SMTP terisi
+	if host == "" || username == "" || password == "" || from == "" {
+		log.Println("ERROR: Konfigurasi SMTP tidak lengkap. Periksa environment variables SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM")
+		return fmt.Errorf("konfigurasi SMTP tidak lengkap")
+	}
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -31,5 +42,12 @@ func SendOTPEmail(toEmail, otpCode string) error {
 	`, otpCode))
 
 	d := gomail.NewDialer(host, port, username, password)
-	return d.DialAndSend(m)
+
+	if err := d.DialAndSend(m); err != nil {
+		log.Printf("ERROR kirim email ke %s: %v", toEmail, err)
+		return err
+	}
+
+	log.Printf("Email OTP berhasil dikirim ke %s", toEmail)
+	return nil
 }
