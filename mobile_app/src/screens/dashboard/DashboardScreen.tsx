@@ -34,6 +34,7 @@ import { getCurrentUser } from '../../services/userService';
 import { useDoubleBackExit } from '../../hooks/useDoubleBackExit';
 import { DashboardStackParamList } from '../../navigation/types';
 import { useToast } from '../../contexts/ToastContext';
+import { useNotification } from '../../contexts/NotificationContext';
 import styles from './styles';
 
 type NavigationProp = NativeStackNavigationProp<
@@ -57,6 +58,7 @@ const formatPercentage = (value: number): string =>
 
 const DashboardScreen = () => {
   const toast = useToast();
+  const { refreshUnreadCount } = useNotification();
   const navigation = useNavigation<NavigationProp>();
   useDoubleBackExit();
 
@@ -86,7 +88,8 @@ const DashboardScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [fetchData]),
+      refreshUnreadCount();
+    }, [fetchData, refreshUnreadCount]),
   );
 
   const handleGoToBarang = () => {

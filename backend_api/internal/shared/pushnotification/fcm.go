@@ -2,6 +2,8 @@ package pushnotification
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"os"
 
 	firebase "firebase.google.com/go/v4"
@@ -11,11 +13,25 @@ import (
 
 func getClient() (*messaging.Client, error) {
 	ctx := context.Background()
-	credPath := os.Getenv("FIREBASE_CREDENTIALS_PATH")
-	opt := option.WithCredentialsFile(credPath)
+
+	var opt option.ClientOption
+
+	// 1. Cek apakah ada kredensial JSON langsung dari Environment Variable (biasanya di Railway)
+	credJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
+	if credJSON != "" {
+		opt = option.WithCredentialsJSON([]byte(credJSON))
+	} else {
+		// 2. Fallback: baca dari file path (biasanya di komputer lokal)
+		credPath := os.Getenv("FIREBASE_CREDENTIALS_PATH")
+		if credPath == "" {
+			return nil, fmt.Errorf("FIREBASE_CREDENTIALS_JSON atau FIREBASE_CREDENTIALS_PATH belum diset")
+		}
+		opt = option.WithCredentialsFile(credPath)
+	}
 
 	app, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
+		log.Printf("ERROR inisialisasi Firebase App: %v", err)
 		return nil, err
 	}
 	return app.Messaging(ctx)
@@ -42,5 +58,10 @@ func SendToToken(token, title, body, color string) error {
 	}
 
 	_, err = client.Send(context.Background(), message)
-	return err
+	if err != nil {
+		log.Printf("ERROR kirim FCM ke token %s: %v", token, err)
+		return err
+	}
+	log.Printf("FCM berhasil dikirim ke token: %s", token)
+	return nil
 }

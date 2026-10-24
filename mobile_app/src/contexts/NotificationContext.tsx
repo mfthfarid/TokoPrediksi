@@ -32,25 +32,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const [isNotificationLoading, setIsNotificationLoading] = useState(true);
 
-  // Bootstrap preference saat aplikasi dibuka
-  useEffect(() => {
-    const bootstrap = async () => {
-      const enabled = await getNotificationPreference();
-      setIsNotificationEnabled(enabled);
-      setIsNotificationLoading(false);
-    };
-    bootstrap();
-  }, []);
-
   const refreshUnreadCount = useCallback(async () => {
     try {
       const response = await getNotifications();
       setUnreadCount(response.data.unread_count);
     } catch (error) {
-      // Gagal ambil unread count bukan hal fatal
-      console.error('[Notification] Gagal refresh unread count:', error);
+      // Gagal ambil unread count bukan hal fatal (misal belum login)
+      console.log('[Notification] Info unread count belum tersedia');
     }
   }, []);
+
+  // Bootstrap preference & langsung load unread count saat aplikasi dibuka
+  useEffect(() => {
+    const bootstrap = async () => {
+      const enabled = await getNotificationPreference();
+      setIsNotificationEnabled(enabled);
+      setIsNotificationLoading(false);
+      await refreshUnreadCount();
+    };
+    bootstrap();
+  }, [refreshUnreadCount]);
 
   const enableNotifications = useCallback(async (): Promise<boolean> => {
     const success = await enablePushNotifications();
