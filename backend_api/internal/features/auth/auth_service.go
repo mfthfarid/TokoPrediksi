@@ -53,9 +53,10 @@ func (s *AuthService) Login(email, password string) (string, error) {
 func (s *AuthService) ForgotPassword(email string) error {
 	u, err := s.userRepo.FindByEmail(email)
 	if err != nil {
-		// Sengaja tidak kasih tahu "email tidak ditemukan" secara eksplisit,
-		// supaya orang tidak bisa dipakai untuk menebak-nebak email mana yang terdaftar.
-		return nil
+		// Email tidak ditemukan di database.
+		// Return error agar frontend tahu bahwa email tidak terdaftar,
+		// sehingga tidak membiarkan user lanjut ke halaman input OTP.
+		return errors.New("email tidak terdaftar")
 	}
 
 	otp := generateOTP()
