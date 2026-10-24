@@ -1,53 +1,93 @@
 package mailer
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
-	"strconv"
-
-	"gopkg.in/gomail.v2"
 )
 
+type brevoEmail struct {
+	Email string `json:"email"`
+	Name  string `json:"name,omitempty"`
+}
+
+type brevoRequest struct {
+	Sender      brevoEmail   `json:"sender"`
+	To          []brevoEmail `json:"to"`
+	Subject     string       `json:"subject"`
+	HTMLContent string       `json:"htmlContent"`
+}
+
 func SendOTPEmail(toEmail, otpCode string) error {
-	host := os.Getenv("SMTP_HOST")
-	portStr := os.Getenv("SMTP_PORT")
-	username := os.Getenv("SMTP_USERNAME")
-	password := os.Getenv("SMTP_PASSWORD")
-	from := os.Getenv("SMTP_FROM")
+	apiKey := os.Getenv("BREVO_API_KEY")
+	senderEmail := os.Getenv("SMTP_FROM")
+	senderName := os.Getenv("SMTP_SENDER_NAME")
 
-	// Log konfigurasi SMTP (tanpa password) untuk debugging
-	log.Printf("SMTP Config -> Host: %s, Port: %s, Username: %s, From: %s, To: %s",
-		host, portStr, username, from, toEmail)
-
-	// Validasi: pastikan semua variabel SMTP terisi
-	if host == "" || username == "" || password == "" || from == "" {
-		log.Println("ERROR: Konfigurasi SMTP tidak lengkap. Periksa environment variables SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM")
-		return fmt.Errorf("konfigurasi SMTP tidak lengkap")
+	if senderName == "" {
+		senderName = "TokoPrediksi"
 	}
 
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		port = 587
+	// Log untuk debugging (tanpa API key)
+	log.Printf("Brevo API -> From: %s, To: %s", senderEmail, toEmail)
+
+	if apiKey == "" {
+		log.Println("ERROR: BREVO_API_KEY tidak diset. Periksa environment variables.")
+		return fmt.Errorf("konfigurasi email tidak lengkap")
 	}
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", from)
-	m.SetHeader("To", toEmail)
-	m.SetHeader("Subject", "Kode Reset Password - TokoPrediksi")
-	m.SetBody("text/html", fmt.Sprintf(`
+	if senderEmail == "" {
+		log.Println("ERROR: SMTP_FROM tidak diset. Periksa environment variables.")
+		return fmt.Errorf("konfigurasi email tidak lengkap")
+	}
+
+	htmlContent := fmt.Sprintf(`
 		<p>Kode OTP untuk reset password akun TokoPrediksi kamu:</p>
 		<h2>%s</h2>
 		<p>Kode ini berlaku selama 10 menit. Jangan berikan kode ini ke siapa pun.</p>
-	`, otpCode))
+	`, otpCode)
 
-	d := gomail.NewDialer(host, port, username, password)
-
-	if err := d.DialAndSend(m); err != nil {
-		log.Printf("ERROR kirim email ke %s: %v", toEmail, err)
-		return err
+	reqBody := brevoRequest{
+		Sender:      brevoEmail{Email: senderEmail, Name: senderName},
+		To:          []brevoEmail{{Email: toEmail}},
+		Subject:     "Kode Reset Password - TokoPrediksi",
+		HTMLContent: htmlContent,
 	}
 
-	log.Printf("Email OTP berhasil dikirim ke %s", toEmail)
+	jsonBody, err := json.Marshal(reqBody)
+	if err != nil {
+		return fmt.Errorf("gagal membuat request: %v", err)
+	}
+
+	req, err := http.NewRequest("POST", "https://api.brevo.com/v3/smtp/email", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return fmt.Errorf("gagal membuat HTTP request: %v", err)
+	}
+
+	req.Header.Set("accept", "application/json")
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("api-key", apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("ERROR kirim email ke %s: %v", toEmail, err)
+		return fmt.Errorf("gagal mengirim email: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+
+	if resp.StatusCode >= 400 {
+		log.Printf("ERROR Brevo API (status %d): %s", resp.StatusCode, string(body))
+		return fmt.Errorf("gagal mengirim email (status %d)", resp.StatusCode)
+	}
+
+	log.Printf("Email OTP berhasil dikirim ke %s (status %d)", toEmail, resp.StatusCode)
 	return nil
 }
+
+
