@@ -27,6 +27,7 @@ import {
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import TextField from '../../../components/ui/TextField';
 import CurrencyField from '../../../components/ui/CurrencyField/CurrencyField';
+import QuantityField from '../../../components/ui/QuantityField/QuantityField';
 import SelectField, { SelectOption } from '../../../components/ui/SelectField';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
 import BarcodeScannerModal from '../../../components/common/BarcodeScannerModal';
@@ -93,6 +94,12 @@ const mapUnitApiToRow = (u: ProductUnitApi): UnitRow => ({
   isBaseUnit: u.is_base_unit,
   isActive: u.is_active,
 });
+
+const formatQuantity = (value: string | number): string => {
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+  return num.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+};
 
 const DetailBarangScreen = () => {
   const route = useRoute<DetailRouteProp>();
@@ -556,7 +563,7 @@ const DetailBarangScreen = () => {
 
             <View style={styles.rowInline}>
               <View style={styles.rowInlineItem}>
-                <TextField
+                <QuantityField
                   label={
                     row.isBaseUnit
                       ? 'Satuan Dasar'
@@ -564,10 +571,9 @@ const DetailBarangScreen = () => {
                   }
                   placeholder={row.isBaseUnit ? '1' : 'Contoh: 12'}
                   value={row.conversionToBase}
-                  onChangeText={v =>
+                  onChangeValue={v =>
                     updateRow(row.key, { conversionToBase: v })
                   }
-                  keyboardType="numeric"
                   editable={!row.isBaseUnit}
                 />
               </View>
@@ -648,7 +654,7 @@ const DetailBarangScreen = () => {
             </Text>
             {!row.isBaseUnit && (
               <Text style={styles.unitViewDetail}>
-                Isi: {row.conversionToBase} {baseUnitLabel}
+                Isi: {formatQuantity(row.conversionToBase)} {baseUnitLabel}
               </Text>
             )}
             {row.barcode ? (

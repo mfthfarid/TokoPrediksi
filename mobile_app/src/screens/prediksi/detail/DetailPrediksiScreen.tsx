@@ -268,13 +268,13 @@ const DetailPrediksiScreen = () => {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Stok Saat Ini</Text>
             <Text style={styles.statValue}>
-              {data.current_stock_display ?? formatNumber(data.current_stock)}
+              {data.current_stock_display ?? formatNumber(data.current_stock)} {data.display_unit ?? 'unit'}
             </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Rata-rata Terjual</Text>
             <Text style={styles.statValue}>
-              {data.average_daily_sales_display ?? `${formatNumber(data.average_daily_sales)}/hari`}
+              {data.average_daily_sales_display ?? formatNumber(data.average_daily_sales)} {data.display_unit ?? 'unit'}/hari
             </Text>
           </View>
         </View>

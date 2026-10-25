@@ -261,7 +261,7 @@ const PrediksiScreen = () => {
                   {item.product_name}
                 </Text>
                 <Text style={styles.stockText}>
-                  Stok: {item.current_stock_display ?? item.current_stock} • Terjual {item.average_daily_sales_display ?? item.average_daily_sales}/hari
+                  Stok: {item.current_stock_display ?? item.current_stock} {item.display_unit ?? 'unit'} • Terjual {item.average_daily_sales_display ?? item.average_daily_sales} {item.display_unit ?? 'unit'}/hari
                 </Text>
               </View>
 

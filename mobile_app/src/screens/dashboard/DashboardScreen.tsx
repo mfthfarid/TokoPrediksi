@@ -56,6 +56,9 @@ const formatRupiah = (value: number): string =>
 const formatPercentage = (value: number): string =>
   `${value.toLocaleString('id-ID', { maximumFractionDigits: 1 })}%`;
 
+const formatQuantity = (value: number): string =>
+  value.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+
 const DashboardScreen = () => {
   const toast = useToast();
   const { refreshUnreadCount } = useNotification();
@@ -221,7 +224,7 @@ const DashboardScreen = () => {
                     {item.name}
                   </Text>
                   <Text style={styles.listRowWarning}>
-                    Tersisa {item.stock}
+                    Tersisa {formatQuantity(item.stock)}
                   </Text>
                 </View>
               ),
@@ -262,7 +265,7 @@ const DashboardScreen = () => {
                   <Text style={styles.listRowText} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={styles.listRowBold}>{item.total_sold}x</Text>
+                  <Text style={styles.listRowBold}>{formatQuantity(item.total_sold)}x</Text>
                 </View>
               ),
             )}

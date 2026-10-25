@@ -22,6 +22,7 @@ import {
 import ScreenLayout from '../../../layouts/ScreenLayout';
 import TextField from '../../../components/ui/TextField';
 import CurrencyField from '../../../components/ui/CurrencyField/CurrencyField';
+import QuantityField from '../../../components/ui/QuantityField/QuantityField';
 import SelectField, { SelectOption } from '../../../components/ui/SelectField';
 import PrimaryButton from '../../../components/ui/PrimaryButton';
 import BarcodeScannerModal from '../../../components/common/BarcodeScannerModal';
@@ -338,7 +339,7 @@ const TambahBarangScreen = () => {
 
             <View style={styles.rowInline}>
               <View style={styles.rowInlineItem}>
-                <TextField
+                <QuantityField
                   label={
                     row.isBaseUnit
                       ? 'Satuan Dasar'
@@ -346,10 +347,9 @@ const TambahBarangScreen = () => {
                   }
                   placeholder={row.isBaseUnit ? '1' : 'Contoh: 12'}
                   value={row.conversionToBase}
-                  onChangeText={v =>
+                  onChangeValue={v =>
                     updateRow(row.key, { conversionToBase: v })
                   }
-                  keyboardType="numeric"
                   editable={!row.isBaseUnit}
                 />
               </View>

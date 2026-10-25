@@ -224,7 +224,7 @@ const BarangScreen = () => {
                     item.status === 'low' && styles.stockBadgeTextLow,
                   ]}
                 >
-                  Stok {item.stok}
+                  Stok {item.stok.toLocaleString('id-ID', { maximumFractionDigits: 2 })}
                 </Text>
               </View>
               <Text style={styles.categoryLabel} numberOfLines={1}>
