@@ -374,7 +374,9 @@ const TransaksiScreen = () => {
                     <Text style={styles.productName} numberOfLines={1}>
                       {item.name}
                     </Text>
-                    <Text style={styles.stockText}>Stok {stock}</Text>
+                    <Text style={styles.stockText}>
+                      Stok {stock.toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                    </Text>
 
                     <View style={styles.unitButtonsRow}>
                       {activeUnits.length === 0 && (

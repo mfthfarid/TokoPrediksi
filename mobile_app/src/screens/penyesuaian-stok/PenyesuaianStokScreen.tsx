@@ -107,7 +107,7 @@ const PenyesuaianStokScreen = () => {
               </Text>
               <View style={styles.countBadge}>
                 <Text style={styles.countBadgeText}>
-                  Sisa {item.total_remaining}
+                  Sisa {item.total_remaining.toLocaleString('id-ID', { maximumFractionDigits: 2 })}
                 </Text>
               </View>
             </View>

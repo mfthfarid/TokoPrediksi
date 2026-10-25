@@ -44,6 +44,31 @@ const formatDateToday = (): string => {
   return `${day}/${month}/${now.getFullYear()}`;
 };
 
+const formatQuantity = (value: number): string =>
+  value.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+
+// Pemisah ribuan untuk input jumlah (bukan rupiah)
+const formatThousandsInput = (raw: string): string => {
+  if (!raw) return '';
+  const sepIndex = raw.search(/[,\.]/);
+  const intPart = sepIndex === -1 ? raw : raw.slice(0, sepIndex);
+  const decPart = sepIndex === -1 ? '' : raw.slice(sepIndex);
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + decPart;
+};
+
+const sanitizeQuantityInput = (text: string): string => {
+  // Buang semua karakter selain digit dan pemisah desimal
+  let cleaned = text.replace(/[^\d,.]/g, '');
+  // Izinkan hanya satu pemisah desimal (pertahankan yang pertama)
+  const firstSep = cleaned.search(/[,\.]/);
+  if (firstSep !== -1) {
+    cleaned =
+      cleaned.slice(0, firstSep + 1) +
+      cleaned.slice(firstSep + 1).replace(/[,\.]/g, '');
+  }
+  return cleaned;
+};
+
 const TambahPenyesuaianScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RoutePropType>();
@@ -112,7 +137,7 @@ const TambahPenyesuaianScreen = () => {
 
           // Format option untuk dropdown
           const options = data.map(b => ({
-            label: `Exp: ${b.tanggal_kadaluwarsa} (Sisa: ${b.quantity_remaining})`,
+            label: `Exp: ${b.tanggal_kadaluwarsa} (Sisa: ${formatQuantity(b.quantity_remaining)})`,
             value: b.purchase_item_id,
           }));
           setBatchOptions(options);
@@ -182,7 +207,7 @@ const TambahPenyesuaianScreen = () => {
     if (qtyNumber <= 0 || qtyNumber > activeBatch.quantity_remaining) {
       Alert.alert(
         'Periksa Kembali',
-        `Jumlah harus antara 0,1 - ${activeBatch.quantity_remaining}`,
+        `Jumlah harus antara 0,1 - ${formatQuantity(activeBatch.quantity_remaining)}`,
       );
       return;
     }
@@ -326,7 +351,7 @@ const TambahPenyesuaianScreen = () => {
           {activeBatch && (
             <TouchableOpacity onPress={handleUseAllStock}>
               <Text style={styles.useAllText}>
-                Pakai Semua ({activeBatch.quantity_remaining})
+                Pakai Semua ({formatQuantity(activeBatch.quantity_remaining)})
               </Text>
             </TouchableOpacity>
           )}
@@ -334,8 +359,8 @@ const TambahPenyesuaianScreen = () => {
         <TextInput
           style={styles.quantityInput}
           placeholder="0"
-          value={quantity}
-          onChangeText={setQuantity}
+          value={formatThousandsInput(quantity)}
+          onChangeText={text => setQuantity(sanitizeQuantityInput(text))}
           keyboardType="numeric"
           editable={!!activeBatch}
         />

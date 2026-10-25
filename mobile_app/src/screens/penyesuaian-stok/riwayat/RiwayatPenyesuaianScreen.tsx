@@ -26,6 +26,9 @@ type FilterType = 'semua' | AdjustmentType;
 const formatRupiah = (value: number): string =>
   `Rp ${value.toLocaleString('id-ID')}`;
 
+const formatQuantity = (value: number): string =>
+  value.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+
 const RiwayatPenyesuaianScreen = () => {
   const route = useRoute<RoutePropType>();
   const productId = route.params?.productId;
@@ -130,7 +133,7 @@ const RiwayatPenyesuaianScreen = () => {
                   {item.product_name}
                 </Text>
                 <Text style={styles.cardDetail}>
-                  {item.quantity_adjusted} unit - Exp {item.tanggal_kadaluwarsa}
+                  {formatQuantity(item.quantity_adjusted)} unit - Exp {item.tanggal_kadaluwarsa}
                 </Text>
                 {item.note ? (
                   <Text style={styles.cardNote} numberOfLines={2}>
