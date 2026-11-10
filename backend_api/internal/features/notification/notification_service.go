@@ -49,9 +49,7 @@ func (s *Service) CountUnread() (int64, error) {
 	return s.repo.CountUnread()
 }
 
-// Broadcast mengirim notifikasi ke SEMUA device terdaftar (karena aplikasi ini
-// single-owner, semua token dianggap milik owner yang sama), sekaligus
-// menyimpan riwayatnya di tabel notifications untuk ditampilkan di in-app history.
+// Broadcast mengirim notifikasi ke SEMUA device terdaftar
 func (s *Service) Broadcast(title, body, notifType string) {
 	if err := s.repo.CreateNotification(&Notification{
 		Title: title,

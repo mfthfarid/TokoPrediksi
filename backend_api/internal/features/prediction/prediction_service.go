@@ -188,7 +188,7 @@ func (s *PredictionService) Predict(productID uint, periods int) (*PredictionSum
 	return s.buildSummary(productID, toSave, dailySales)
 }
 
-// PredictAllSync berjalan sinkron (dipakai cron). Mengembalikan jumlah sukses & gagal.
+// PredictAllSync berjalan sinkron (dipakai cron)
 func (s *PredictionService) PredictAllSync(periods int) (success int, failed int, err error) {
 	if periods <= 0 {
 		periods = defaultPeriods
@@ -211,7 +211,7 @@ func (s *PredictionService) PredictAllSync(periods int) (success int, failed int
 	return success, failed, nil
 }
 
-// PredictAll dipakai endpoint bulk: langsung membalas, proses jalan di background.
+// PredictAll dipakai endpoint bulk
 func (s *PredictionService) PredictAll(periods int) error {
 	if _, err := s.repo.GetAllProductIDs(); err != nil {
 		return err

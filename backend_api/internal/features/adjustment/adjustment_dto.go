@@ -23,9 +23,11 @@ type CreateAdjustmentInput struct {
 }
 
 type ExpiringBatchGroup struct {
+	PurchaseItemID     uint    `json:"purchase_item_id"`
 	ProductID          uint    `json:"product_id"`
 	ProductName        string  `json:"product_name"`
 	TanggalKadaluwarsa string  `json:"tanggal_kadaluwarsa"`
+	QuantityRemaining  float64 `json:"quantity_remaining"`
 	TotalRemaining     float64 `json:"total_remaining"`
 }
 

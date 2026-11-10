@@ -3,9 +3,11 @@ import api from './api';
 export type AdjustmentType = 'retur' | 'rugi';
 
 export interface ExpiringProductApi {
+  purchase_item_id: number;
   product_id: number;
   product_name: string;
   tanggal_kadaluwarsa: string; // DD/MM/YYYY
+  quantity_remaining: number;
   total_remaining: number;
 }
 

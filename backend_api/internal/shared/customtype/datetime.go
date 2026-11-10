@@ -9,8 +9,6 @@ import (
 const dateTimeLayout = "02/01/2006 15:04"
 const dbDateTimeLayout = "2006-01-02 15:04:05"
 
-// DateTime pembungkus time.Time yang JSON-nya format "DD/MM/YYYY HH:mm",
-// beda dengan Date yang cuma simpan tanggal tanpa jam.
 type DateTime struct {
 	time.Time
 }
@@ -36,7 +34,6 @@ func (d DateTime) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%q", d.Time.Format(dateTimeLayout))), nil
 }
 
-// Value simpan waktu LENGKAP (bukan cuma tanggal) ke kolom DATETIME
 func (d DateTime) Value() (driver.Value, error) {
 	if d.Time.IsZero() {
 		return nil, nil

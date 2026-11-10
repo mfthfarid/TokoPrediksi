@@ -10,7 +10,7 @@ func (r *DashboardRepository) GetTotalSalesToday() (uint, error) {
 	var total uint
 	err := config.DB.Table("transactions").
 		Select("COALESCE(SUM(final_amount), 0)").
-		Where("DATE(transaction_date) = CURDATE()"). // sebelumnya: transaction_date = CURDATE()
+		Where("DATE(transaction_date) = CURDATE()").
 		Scan(&total).Error
 	return total, err
 }
@@ -64,8 +64,7 @@ func (r *DashboardRepository) GetTopSellingProducts(limit int) ([]TopSellingProd
 	return results, err
 }
 
-// GetPredictedStockoutCount menghitung berapa produk yang total prediksi permintaannya
-// (ke depan) melebihi stok yang tersedia saat ini — sinyal butuh restok.
+// menghitung berapa produk yang butuh restok.
 func (r *DashboardRepository) GetPredictedStockoutCount() (int, error) {
 	var count int64
 	err := config.DB.Raw(`

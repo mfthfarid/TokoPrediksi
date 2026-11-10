@@ -24,7 +24,6 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
-	// r.Static("/uploads", "./uploads")
 
 	auth.RegisterRoutes(r)
 
@@ -36,9 +35,6 @@ func SetupRouter() *gin.Engine {
 
 		prediction.RegisterRoutes(protected)
 		reorder.RegisterRoutes(protected)
-		// predictionHandler := prediction.NewPredictionHandler()
-		// productGroup.POST("/:id/predict", predictionHandler.Predict)
-		// productGroup.GET("/:id/predictions", predictionHandler.GetPredictions)
 
 		stockHistoryHandler := stockhistory.NewHandler()
 		productGroup.GET("/:id/stock-history", stockHistoryHandler.GetHistory)

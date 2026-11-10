@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-const MaxImageSize = 5 * 1024 * 1024 // 5MB, jaga-jaga walau RN sudah compress duluan
+const MaxImageSize = 5 * 1024 * 1024 // 5MB
 
 var allowedImageTypes = map[string]bool{
 	"image/jpeg": true,
 	"image/png":  true,
 }
 
-// ValidateImageFile cek ukuran DAN isi file sebenarnya (bukan cuma percaya ekstensi nama file)
+// cek ukuran dan isi file sebenarnya bukan cuma ekstensi
 func ValidateImageFile(fileHeader *multipart.FileHeader) error {
 	if fileHeader.Size > MaxImageSize {
 		return errors.New("ukuran file maksimal 5MB")

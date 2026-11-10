@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// DetermineDisplayUnit menentukan 1 satuan tampilan konsisten untuk 1 produk.
 func DetermineDisplayUnit(baseUnitName string, referenceValue float64) (divisor float64, unit string) {
 	lower := strings.ToLower(strings.TrimSpace(baseUnitName))
 

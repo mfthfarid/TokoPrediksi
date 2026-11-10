@@ -6,6 +6,7 @@ import (
 
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/core/config"
 	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/features/product"
+	"github.com/mfthfarid/TokoPrediksi/backend_api/internal/shared/customtype"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -53,10 +54,11 @@ func (s *Service) Create(input CreateAdjustmentInput, createdBy *uint) (*StockAd
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		// 1. Ambil & Kunci baris purchase_items yang dipilih
 		type PurchaseItemSimple struct {
-			ID                uint            `gorm:"primaryKey"`
-			ProductID         uint            `gorm:"product_id"`
-			QuantityRemaining decimal.Decimal `gorm:"quantity_remaining"`
-			CostPerBase       int             `gorm:"cost_per_base"`
+			ID                 uint               `gorm:"primaryKey"`
+			ProductID          uint               `gorm:"product_id"`
+			QuantityRemaining  decimal.Decimal    `gorm:"quantity_remaining"`
+			CostPerBase        int                `gorm:"cost_per_base"`
+			TanggalKadaluwarsa *customtype.Date   `gorm:"tanggal_kadaluwarsa"`
 		}
 
 		var pItem PurchaseItemSimple
@@ -94,11 +96,17 @@ func (s *Service) Create(input CreateAdjustmentInput, createdBy *uint) (*StockAd
 		costDecimal := decimal.NewFromInt(int64(pItem.CostPerBase))
 		estimatedLoss := uint(input.Quantity.Mul(costDecimal).IntPart())
 
+		// Ambil tanggal kadaluwarsa langsung dari database purchase_items
+		var expDate customtype.Date
+		if pItem.TanggalKadaluwarsa != nil {
+			expDate = *pItem.TanggalKadaluwarsa
+		}
+
 		// 6. Simpan transaksi ke tabel stock_adjustments
 		adj := &StockAdjustment{
 			ProductID:          input.ProductID,
-			PurchaseItemID:     input.PurchaseItemID, // <-- Ditambahkan di sini
-			TanggalKadaluwarsa: input.TanggalKadaluwarsa,
+			PurchaseItemID:     input.PurchaseItemID,
+			TanggalKadaluwarsa: expDate,
 			QuantityAdjusted:   input.Quantity,
 			AdjustmentType:     AdjustmentType(input.AdjustmentType),
 			EstimatedLoss:      estimatedLoss,

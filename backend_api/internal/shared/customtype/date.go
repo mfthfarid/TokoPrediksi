@@ -8,7 +8,6 @@ import (
 
 const dateLayout = "02/01/2006" // DD/MM/YYYY
 
-// Date adalah pembungkus time.Time yang JSON-nya format Indonesia "DD/MM/YYYY"
 type Date struct {
 	time.Time
 }
@@ -34,8 +33,6 @@ func (d Date) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%q", d.Time.Format(dateLayout))), nil
 }
 
-// Value & Scan tetap simpan ke MySQL pakai format standar (YYYY-MM-DD),
-// supaya kolom DATE di database tetap valid — konversi tampilan hanya terjadi di JSON
 func (d Date) Value() (driver.Value, error) {
 	if d.Time.IsZero() {
 		return nil, nil

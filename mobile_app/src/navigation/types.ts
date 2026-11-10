@@ -35,6 +35,7 @@ export type DashboardStackParamList = {
   PenyesuaianStok: undefined;
   TambahPenyesuaian: {
     productId?: number;
+    purchaseItemId?: number;
     productName?: string;
     tanggalKadaluwarsa?: string;
     maxQuantity?: number;

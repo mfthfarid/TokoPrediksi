@@ -500,7 +500,7 @@ const DetailBarangScreen = () => {
         <View style={styles.viewField}>
           <Text style={styles.viewLabel}>Stok</Text>
           <Text style={styles.viewValue}>
-            {product?.stock ?? '0'} (diperbarui lewat fitur Restock)
+            {formatQuantity(product?.stock ?? 0)} (diperbarui lewat fitur Restock)
           </Text>
         </View>
       </View>
