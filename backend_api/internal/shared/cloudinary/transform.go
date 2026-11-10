@@ -2,9 +2,6 @@ package cloudinary
 
 import "strings"
 
-// TransformURL menyisipkan parameter transformasi Cloudinary (resize/kompres/format)
-// ke URL asli hasil upload. Format URL Cloudinary selalu punya segmen "/upload/"
-// tempat parameter transformasi disisipkan.
 func TransformURL(originalURL, transformation string) string {
 	return strings.Replace(originalURL, "/upload/", "/upload/"+transformation+"/", 1)
 }

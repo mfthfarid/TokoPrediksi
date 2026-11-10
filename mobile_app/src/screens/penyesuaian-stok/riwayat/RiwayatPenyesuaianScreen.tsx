@@ -133,7 +133,7 @@ const RiwayatPenyesuaianScreen = () => {
                   {item.product_name}
                 </Text>
                 <Text style={styles.cardDetail}>
-                  {formatQuantity(item.quantity_adjusted)} unit - Exp {item.tanggal_kadaluwarsa}
+                  {formatQuantity(item.quantity_adjusted)} unit • {item.tanggal_kadaluwarsa ? `Exp: ${item.tanggal_kadaluwarsa}` : 'Exp: -'}
                 </Text>
                 {item.note ? (
                   <Text style={styles.cardNote} numberOfLines={2}>

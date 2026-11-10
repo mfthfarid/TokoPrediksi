@@ -42,12 +42,12 @@ func (h *PredictionHandler) Predict(c *gin.Context) {
 	c.JSON(http.StatusOK, predictions)
 }
 
-// PredictAll menjalankan algoritma prediksi untuk SELURUH produk yang ada
+// PredictAll menjalankan algoritma prediksi untuk semua produk yang terdaftar
 func (h *PredictionHandler) PredictAll(c *gin.Context) {
 	var input PredictRequestInput
-	_ = c.ShouldBindJSON(&input) // Boleh kosong, body tidak wajib. Jika kosong nanti di service di-set default periods=7
+	_ = c.ShouldBindJSON(&input)
 
-	// Memanggil fungsi PredictAll di Service (seperti yang kita bahas sebelumnya)
+	// Memanggil fungsi PredictAll di Service
 	err := h.service.PredictAll(input.Periods) 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

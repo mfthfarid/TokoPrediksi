@@ -31,7 +31,7 @@ func SendOTPEmail(toEmail, otpCode string) error {
 		senderName = "TokoPrediksi"
 	}
 
-	// Log untuk debugging (tanpa API key)
+	// Log debug
 	log.Printf("Brevo API -> From: %s, To: %s", senderEmail, toEmail)
 
 	if apiKey == "" {

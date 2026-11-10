@@ -136,15 +136,26 @@ const TambahPenyesuaianScreen = () => {
           setBatches(data);
 
           // Format option untuk dropdown
-          const options = data.map(b => ({
-            label: `Exp: ${b.tanggal_kadaluwarsa} (Sisa: ${formatQuantity(b.quantity_remaining)})`,
-            value: b.purchase_item_id,
-          }));
+          const options = data.map((b, index) => {
+            const expLabel = b.tanggal_kadaluwarsa ? `Exp: ${b.tanggal_kadaluwarsa}` : 'Exp: -';
+            return {
+              label: `Batch #${b.purchase_item_id} (Ke-${index + 1}) • ${expLabel} (Sisa: ${formatQuantity(b.quantity_remaining)})`,
+              value: b.purchase_item_id,
+            };
+          });
           setBatchOptions(options);
 
           // AUTO-SELECT LOGIC
-          if (hasPrefill && route.params?.tanggalKadaluwarsa) {
-            // Jika datang dari halaman Expiring, coba pilih batch dengan tanggal yang sama
+          if (hasPrefill && route.params?.purchaseItemId) {
+            // Jika datang dari halaman Expiring dengan batch spesifik
+            const matchedById = data.find(
+              b => b.purchase_item_id === route.params.purchaseItemId,
+            );
+            setSelectedBatchId(
+              matchedById ? matchedById.purchase_item_id : data[0].purchase_item_id,
+            );
+          } else if (hasPrefill && route.params?.tanggalKadaluwarsa) {
+            // Fallback jika hanya membawa tanggal kadaluwarsa
             const matched = data.find(
               b => b.tanggal_kadaluwarsa === route.params.tanggalKadaluwarsa,
             );
@@ -152,7 +163,7 @@ const TambahPenyesuaianScreen = () => {
               matched ? matched.purchase_item_id : data[0].purchase_item_id,
             );
           } else {
-            // Default: Pilih batch terlama (paling atas)
+            // Default: Pilih batch terlama (paling atas / FIFO)
             setSelectedBatchId(data[0].purchase_item_id);
           }
         } else {
@@ -181,6 +192,10 @@ const TambahPenyesuaianScreen = () => {
     setSelectedProductId(pid);
     const pName = productOptions.find(o => o.value === pid)?.label ?? '';
     setProductName(pName);
+    // Segera bersihkan state batch lama agar tidak terpilih
+    setBatches([]);
+    setBatchOptions([]);
+    setSelectedBatchId(null);
     setQuantity(''); // Reset qty saat produk ganti
   };
 
@@ -204,7 +219,7 @@ const TambahPenyesuaianScreen = () => {
     }
 
     const qtyNumber = parseFloat(quantity.replace(',', '.'));
-    if (qtyNumber <= 0 || qtyNumber > activeBatch.quantity_remaining) {
+    if (isNaN(qtyNumber) || qtyNumber <= 0 || qtyNumber > activeBatch.quantity_remaining) {
       Alert.alert(
         'Periksa Kembali',
         `Jumlah harus antara 0,1 - ${formatQuantity(activeBatch.quantity_remaining)}`,
@@ -263,6 +278,19 @@ const TambahPenyesuaianScreen = () => {
       ) : (
         <View style={styles.infoCard}>
           <Text style={styles.infoProductName}>{productName}</Text>
+          {activeBatch && (
+            <View style={styles.infoRow}>
+              <Calendar size={14} color={Colors.textSecondary} />
+              <Text style={styles.infoText}>
+                Batch #{activeBatch.purchase_item_id} • {activeBatch.tanggal_kadaluwarsa ? `Exp: ${activeBatch.tanggal_kadaluwarsa}` : 'Exp: -'}
+              </Text>
+            </View>
+          )}
+          {activeBatch && (
+            <Text style={styles.infoStock}>
+              Sisa Stok Batch: {formatQuantity(activeBatch.quantity_remaining)} unit
+            </Text>
+          )}
         </View>
       )}
 
@@ -278,7 +306,7 @@ const TambahPenyesuaianScreen = () => {
       {!hasPrefill && !resolvingBatch && batches.length > 0 && (
         <>
           <SelectField
-            label="Pilih Batch / Kadaluwarsa"
+            label="Pilih Batch"
             placeholder="Pilih batch..."
             value={selectedBatchId}
             options={batchOptions}
@@ -286,15 +314,15 @@ const TambahPenyesuaianScreen = () => {
             leftIcon={<Calendar size={18} color={Colors.textSecondary} />}
           />
 
-          {/* Banner Ide 2 */}
+          {/* Banner Tips FIFO */}
           <View style={styles.infoBanner}>
             <View style={styles.bannerHeaderRow}>
               <Info size={16} color="#137333" />
               <Text style={styles.infoBannerTitle}>Tips Pemilihan Batch</Text>
             </View>
             <Text style={styles.infoBannerText}>
-              Sistem otomatis memilih barang dengan kadaluwarsa paling dekat.
-              Biarkan pilihan ini jika tanggal pada kemasan rusak tidak terbaca.
+              Sistem otomatis memilih batch pembelian terlama (FIFO).
+              Anda juga dapat memilih batch lain dari daftar jika diperlukan.
             </Text>
           </View>
         </>

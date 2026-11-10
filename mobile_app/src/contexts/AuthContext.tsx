@@ -25,7 +25,7 @@ import {
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isLoading: boolean; // true saat bootstrap pertama (dipakai splash screen)
+  isLoading: boolean;
   isLocked: boolean; // true kalau biometric aktif & app baru dibuka/kembali dari background
   isBiometricEnabled: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -44,22 +44,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isBiometricEnabled, setIsBiometricEnabledState] = useState(false);
   const appState = useRef(AppState.currentState);
   const backgroundedAtRef = useRef<number | null>(null);
-
-  // Jeda sebelum app dianggap "ditinggal" dan perlu dikunci ulang.
-  // Mencegah re-lock instan gara-gara buka kamera/galeri, dialog izin,
-  // atau notifikasi shade ke-tarik sebentar - itu semua teknisnya
-  // juga bikin app ke-background sesaat, padahal user tidak beneran pergi.
   const LOCK_GRACE_PERIOD_MS = 2 * 60 * 1000; // 2 menit
 
-  // Bootstrap: cek token & preferensi biometric saat app pertama kali dibuka
+  // cek token & preferensi biometric saat app pertama kali dibuka
   useEffect(() => {
     const bootstrap = async () => {
       const token = await getToken();
       const biometricEnabled = await getBiometricPreference();
 
+      // Kalau ada token DAN biometric aktif -> app harus dibuka pakai fingerprint dulu
       setIsAuthenticated(!!token);
       setIsBiometricEnabledState(biometricEnabled);
-      // Kalau ada token DAN biometric aktif -> app harus dibuka pakai fingerprint dulu
       setIsLocked(!!token && biometricEnabled);
       setIsLoading(false);
     };
@@ -125,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const enableBiometric = useCallback(async (): Promise<boolean> => {
     const { available } = await isBiometricSensorAvailable();
     if (!available) {
-      return false; // panggil ini di UI untuk tampilkan pesan "sensor tidak tersedia"
+      return false;
     }
     const success = await promptBiometric(
       'Konfirmasi sidik jari untuk mengaktifkan login fingerprint',
@@ -144,9 +139,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Dipanggil dari lock screen saat app dibuka / kembali dari background
   const unlockWithBiometric = useCallback(async (): Promise<boolean> => {
-    const success = await promptBiometric(
-      'Buka TokoPrediksi dengan sidik jari',
-    );
+    const success = await promptBiometric('Buka Aplikasi dengan sidik jari');
     if (success) {
       setIsLocked(false);
     }

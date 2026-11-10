@@ -8,7 +8,7 @@ func (r *Repository) SaveToken(userID uint, token string) error {
 	var existing FCMToken
 	err := config.DB.Where("token = ?", token).First(&existing).Error
 	if err == nil {
-		return nil // token sudah terdaftar, tidak perlu duplikat
+		return nil
 	}
 	return config.DB.Create(&FCMToken{UserID: userID, Token: token}).Error
 }

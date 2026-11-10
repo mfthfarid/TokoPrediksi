@@ -65,7 +65,7 @@ func (s *DashboardService) GetSummary() (*DashboardSummary, error) {
 		LowStockCount:          lowStockCount,
 		LowStockProducts:       lowStock,
 		TopSellingProducts:     topSelling,
-		PredictedStockoutCount: reorderNeeded, // sementara, agar frontend lama tidak patah
+		PredictedStockoutCount: reorderNeeded,
 		ReorderNeededCount:     reorderNeeded,
 	}, nil
 }

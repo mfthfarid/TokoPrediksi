@@ -13,15 +13,14 @@ import (
 
 func getClient() (*messaging.Client, error) {
 	ctx := context.Background()
-
 	var opt option.ClientOption
 
-	// 1. Cek apakah ada kredensial JSON langsung dari Environment Variable (biasanya di Railway)
+	// 1. cek kredensial JSON langsung dari Environment Variable
 	credJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
 	if credJSON != "" {
 		opt = option.WithCredentialsJSON([]byte(credJSON))
 	} else {
-		// 2. Fallback: baca dari file path (biasanya di komputer lokal)
+		// 2. Fallback: baca dari file path
 		credPath := os.Getenv("FIREBASE_CREDENTIALS_PATH")
 		if credPath == "" {
 			return nil, fmt.Errorf("FIREBASE_CREDENTIALS_JSON atau FIREBASE_CREDENTIALS_PATH belum diset")
@@ -37,7 +36,7 @@ func getClient() (*messaging.Client, error) {
 	return app.Messaging(ctx)
 }
 
-// SendToToken mengirim push notification ke 1 device tertentu.
+// mengirim push notification
 func SendToToken(token, title, body, color string) error {
 	client, err := getClient()
 	if err != nil {

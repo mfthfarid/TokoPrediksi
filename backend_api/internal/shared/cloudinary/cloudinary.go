@@ -17,8 +17,7 @@ func getClient() (*cloudinary.Cloudinary, error) {
 	)
 }
 
-// UploadImage meneruskan file ke Cloudinary. Resize/compress final
-// diatur lewat Upload Preset di dashboard Cloudinary, bukan di sini.
+// Resize/compress diatur di dashboard Cloudinary
 func UploadImage(file multipart.File, folder string) (string, error) {
 	cld, err := getClient()
 	if err != nil {

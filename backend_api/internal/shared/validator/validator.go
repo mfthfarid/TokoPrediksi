@@ -7,13 +7,12 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// FormatValidationError mengubah error dari ShouldBindJSON jadi pesan yang rapi & berbahasa Indonesia
+// mengubah error dari ShouldBindJSON jadi pesan
 func FormatValidationError(err error) map[string]string {
 	errors := make(map[string]string)
 
 	validationErrors, ok := err.(validator.ValidationErrors)
 	if !ok {
-		// bukan error validasi (misal JSON-nya rusak/malformed)
 		errors["error"] = "Format data tidak valid"
 		return errors
 	}

@@ -37,6 +37,26 @@ export const enablePushNotifications = async (): Promise<boolean> => {
   }
 };
 
+// Re-registrasi token FCM ke backend TANPA meminta izin notifikasi ulang setelah login
+export const reRegisterFcmToken = async (): Promise<boolean> => {
+  try {
+    const messagingInstance = getMessaging();
+    console.log('[FCM] Re-registrasi: mengambil token...');
+    const token = await getToken(messagingInstance);
+    console.log('[FCM] Re-registrasi token:', token);
+    if (!token) {
+      return false;
+    }
+
+    await registerFcmToken(token);
+    console.log('[FCM] Token berhasil dikirim ke backend (re-registrasi)');
+    return true;
+  } catch (error) {
+    console.error('[FCM] Gagal re-registrasi token:', error);
+    return false;
+  }
+};
+
 export const listenTokenRefresh = (): (() => void) => {
   return onTokenRefresh(getMessaging(), async token => {
     try {

@@ -54,9 +54,10 @@ const PenyesuaianStokScreen = () => {
   const handleSelectItem = (item: ExpiringProductApi) => {
     navigation.navigate('TambahPenyesuaian', {
       productId: item.product_id,
+      purchaseItemId: item.purchase_item_id,
       productName: item.product_name,
       tanggalKadaluwarsa: item.tanggal_kadaluwarsa,
-      maxQuantity: item.total_remaining,
+      maxQuantity: item.quantity_remaining ?? item.total_remaining,
     });
   };
 
@@ -92,9 +93,7 @@ const PenyesuaianStokScreen = () => {
 
       <FlatList
         data={items}
-        keyExtractor={(item, index) =>
-          `${item.product_id}-${item.tanggal_kadaluwarsa}-${index}`
-        }
+        keyExtractor={item => String(item.purchase_item_id ?? `${item.product_id}-${item.tanggal_kadaluwarsa}`)}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -103,11 +102,11 @@ const PenyesuaianStokScreen = () => {
                 {item.product_name}
               </Text>
               <Text style={styles.expiryText}>
-                Kadaluwarsa: {item.tanggal_kadaluwarsa}
+                Batch #{item.purchase_item_id} • Kadaluwarsa: {item.tanggal_kadaluwarsa || '-'}
               </Text>
               <View style={styles.countBadge}>
                 <Text style={styles.countBadgeText}>
-                  Sisa {item.total_remaining.toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                  Sisa {(item.quantity_remaining ?? item.total_remaining).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
                 </Text>
               </View>
             </View>

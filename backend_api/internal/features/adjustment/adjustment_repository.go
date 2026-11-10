@@ -19,12 +19,12 @@ func (r *Repository) GetAvailableBatches(productID uint) ([]BatchOptionDTO, erro
 	err := config.DB.Table("purchase_items").
 		Select(`
 			id as purchase_item_id,
-			DATE_FORMAT(tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
+			IFNULL(DATE_FORMAT(tanggal_kadaluwarsa, '%d/%m/%Y'), '') as tanggal_kadaluwarsa,
 			quantity_remaining,
 			cost_per_base
 		`).
 		Where("product_id = ? AND quantity_remaining > 0", productID).
-		Order("tanggal_kadaluwarsa ASC").
+		Order("id ASC").
 		Scan(&batches).Error
 
 	if err != nil {
@@ -37,10 +37,12 @@ func (r *Repository) GetAvailableBatches(productID uint) ([]BatchOptionDTO, erro
 func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, error) {
 	query := config.DB.Table("purchase_items").
 		Select(`
+			purchase_items.id as purchase_item_id,
 			products.id as product_id,
 			products.name as product_name,
 			DATE_FORMAT(purchase_items.tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
-			SUM(purchase_items.quantity_remaining) as total_remaining
+			purchase_items.quantity_remaining as quantity_remaining,
+			purchase_items.quantity_remaining as total_remaining
 		`).
 		Joins("JOIN products ON products.id = purchase_items.product_id").
 		Where("purchase_items.quantity_remaining > 0 AND purchase_items.tanggal_kadaluwarsa IS NOT NULL").
@@ -52,8 +54,7 @@ func (r *Repository) GetExpiringBatches(search string) ([]ExpiringBatchGroup, er
 
 	var results []ExpiringBatchGroup
 	err := query.
-		Group("products.id, products.name, purchase_items.tanggal_kadaluwarsa").
-		Order("purchase_items.tanggal_kadaluwarsa ASC").
+		Order("purchase_items.tanggal_kadaluwarsa ASC, purchase_items.id ASC").
 		Scan(&results).Error
 	return results, err
 }
@@ -68,7 +69,7 @@ func (r *Repository) FindHistory(query HistoryQuery) ([]AdjustmentHistoryRow, er
 			stock_adjustments.id,
 			stock_adjustments.product_id,
 			products.name as product_name,
-			DATE_FORMAT(stock_adjustments.tanggal_kadaluwarsa, '%d/%m/%Y') as tanggal_kadaluwarsa,
+			IFNULL(DATE_FORMAT(stock_adjustments.tanggal_kadaluwarsa, '%d/%m/%Y'), '') as tanggal_kadaluwarsa,
 			stock_adjustments.quantity_adjusted,
 			stock_adjustments.adjustment_type,
 			stock_adjustments.estimated_loss,
