@@ -1,6 +1,5 @@
 import unittest
 from datetime import datetime, timedelta
-
 from main import (
     app,
     CONFIG,
@@ -13,9 +12,7 @@ from main import (
     get_holidays_df,
 )
 
-
 class TestMLService(unittest.TestCase):
-
     def test_config_loaded(self):
         self.assertIn("products", CONFIG)
         self.assertIn("13", CONFIG["products"])
@@ -75,7 +72,6 @@ class TestMLService(unittest.TestCase):
         )
 
         resp = predict(req)
-
         self.assertEqual(resp.product_id, 158)
         self.assertEqual(len(resp.predictions), 7)
         self.assertEqual(resp.model_version, MODEL_VERSION)
@@ -84,7 +80,6 @@ class TestMLService(unittest.TestCase):
             self.assertGreaterEqual(p.yhat, 0.0)
             self.assertGreaterEqual(p.yhat_lower, 0.0)
             self.assertGreaterEqual(p.yhat_upper, 0.0)
-
 
 if __name__ == "__main__":
     unittest.main()

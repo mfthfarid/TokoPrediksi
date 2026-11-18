@@ -54,8 +54,7 @@ func (r *ReportRepository) GetProfitByProduct(startDate, endDate string, product
 	return rows, nil
 }
 
-// GetOverallTotals menghitung total keseluruhan tanpa peduli beda satuan produk —
-// aman dijumlah karena berbasis Rupiah & hitungan transaksi/baris, bukan quantity fisik.
+// menghitung total keseluruhan pembelian/restok dalam periode
 func (r *ReportRepository) GetOverallTotals(startDate, endDate string) (revenue, cost, profit, transactions, items int, err error) {
 	start, end := normalizeDateRange(startDate, endDate)
 
@@ -83,7 +82,7 @@ func (r *ReportRepository) GetOverallTotals(startDate, endDate string) (revenue,
 	return res.Revenue, res.Cost, res.Profit, res.Transactions, res.Items, err
 }
 
-// GetPurchaseTotals menghitung total pengeluaran pembelian/restok dalam periode.
+// menghitung total pengeluaran pembelian/restok dalam periode.
 func (r *ReportRepository) GetPurchaseTotals(startDate, endDate string) (totalAmount int, count int, err error) {
 	start, end := normalizeDateRange(startDate, endDate)
 

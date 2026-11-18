@@ -22,33 +22,6 @@ func NewTransactionService() *TransactionService {
 }
 
 func (s *TransactionService) GetAll(startDate, endDate *string) ([]Transaction, error) {
-	// var startDate string
-	// var endDate string
-
-	// if query.StartDate != "" {
-	// 	start, err := time.Parse("2006-01-02", query.StartDate)
-	// 	if err != nil {
-	// 		return nil, errors.New("format start_date harus YYYY-MM-DD")
-	// 	}
-
-	// 	startDate = start.Format("2006-01-02 00:00:00")
-	// }
-
-	// if query.EndDate != "" {
-	// 	end, err := time.Parse("2006-01-02", query.EndDate)
-	// 	if err != nil {
-	// 		return nil, errors.New("format end_date harus YYYY-MM-DD")
-	// 	}
-
-	// 	// Tambahkan 1 hari agar seluruh tanggal end_date ikut masuk.
-	// 	end = end.AddDate(0, 0, 1)
-	// 	endDate = end.Format("2006-01-02 00:00:00")
-	// }
-
-	// if startDate != "" && endDate != "" && startDate >= endDate {
-	// 	return nil, errors.New("start_date harus sebelum end_date")
-	// }
-
 	return s.repo.FindAll(startDate, endDate)
 }
 

@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	ServiceLevelPct     = 95 // 0,95. Dokumen bilang belum final; kalau diubah, semua T harus dihitung ulang.
-	SeedLeadTimeDays    = 3  // seed T hanya valid untuk L=3 dan service level 95%
+	ServiceLevelPct     = 95
+	SeedLeadTimeDays    = 3 
 	DefaultLeadTimeDays = 3
 	ReviewIntervalDays  = 7 // jarak antar prediksi (cron mingguan)
 	MinRunsForComputedT = 12

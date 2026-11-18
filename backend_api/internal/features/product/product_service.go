@@ -45,7 +45,7 @@ func (s *ProductService) Create(input CreateProductInput) (*Product, error) {
 
 	var created Product
 
-	// Pakai DB transaction: kalau salah satu unit gagal disimpan, produk yang baru dibuat ikut dibatalkan (rollback)
+	// jika salah satu unit gagal disimpan, produk yang baru dibuat ikut dibatalkan (rollback)
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		p := &Product{Name: input.Name, IDKategori: input.IDKategori}
 		if err := tx.Create(p).Error; err != nil {
@@ -117,34 +117,7 @@ func (s *ProductService) FindByBarcode(barcode string) (*ProductUnit, error) {
 	return pu, nil
 }
 
-// func (s *ProductUnitService) GetPriceInfo(unitID uint) (*PriceInfoResponse, error) {
-// 	pu, err := s.repo.FindByID(unitID)
-// 	if err != nil {
-// 		return nil, errors.New("satuan produk tidak ditemukan")
-// 	}
-
-// 	productRepo := &ProductRepository{}
-// 	costPerBase, err := productRepo.GetLatestCostPerBase(pu.ProductID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	response := &PriceInfoResponse{
-// 		UnitName:         pu.Unit.Name,
-// 		CostPerBase:       costPerBase,
-// 		CurrentSellPrice:  pu.SellPrice,
-// 	}
-
-// 	if costPerBase != nil {
-// 		costDecimal := decimal.NewFromInt(int64(*costPerBase)).Mul(pu.ConversionToBase).Round(0)
-// 		costPerUnit := uint(costDecimal.IntPart())
-// 		response.CostPerUnit = &costPerUnit
-// 	}
-
-// 	return response, nil
-// }
-
-// ganti method Delete yang lama
+// delete
 func (s *ProductService) Delete(id uint) error {
 	p, err := s.repo.FindByID(id)
 	if err != nil {

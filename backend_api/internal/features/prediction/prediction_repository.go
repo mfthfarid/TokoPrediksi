@@ -18,7 +18,7 @@ type summaryRawRow struct {
 
 type PredictionRepository struct{}
 
-// GetDailySales: gabungan transaksi live + riwayat Excel, dijumlah per tanggal.
+// gabungan transaksi live + riwayat Excel, dijumlah per tanggal
 func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, error) {
 	var results []DailySales
 	query := `
@@ -62,7 +62,7 @@ func (r *PredictionRepository) IsPredictionEnabled(productID uint) (bool, error)
 	return enabled, err
 }
 
-// CreateBatch menyimpan 1 run prediksi. Run lama TIDAK dihapus (dibutuhkan untuk hitung ulang T).
+// menyimpan 1 run prediksi. Run lama TIDAK dihapus, dibutuhkan untuk hitung ulang T
 func (r *PredictionRepository) CreateBatch(predictions []Prediction) error {
 	if len(predictions) == 0 {
 		return nil
@@ -70,7 +70,7 @@ func (r *PredictionRepository) CreateBatch(predictions []Prediction) error {
 	return config.DB.Create(&predictions).Error
 }
 
-// LatestRunID mengembalikan run terbaru untuk produk ini ("" bila belum pernah diprediksi).
+// mengembalikan run terbaru untuk produk jika belum pernah diprediksi
 func (r *PredictionRepository) LatestRunID(productID uint) (string, error) {
 	var runID string
 	err := config.DB.Table("predictions").

@@ -15,7 +15,7 @@ func NewUserHandler() *UserHandler {
 	return &UserHandler{service: NewUserService()}
 }
 
-// getCurrentUserID mengambil user_id yang disimpan AuthMiddleware ke context
+// mengambil user_id yang disimpan AuthMiddleware ke context
 func getCurrentUserID(c *gin.Context) (uint, bool) {
 	val, exists := c.Get("user_id")
 	if !exists {
