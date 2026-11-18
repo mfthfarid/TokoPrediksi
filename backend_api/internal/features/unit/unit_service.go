@@ -55,7 +55,6 @@ func (s *UnitService) Delete(id uint) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return errors.New("satuan tidak ditemukan")
 	}
-	// Catatan: kalau satuan ini masih dipakai product_units,
-	// penghapusan akan otomatis gagal karena FK ON DELETE RESTRICT di database.
+	
 	return s.repo.Delete(id)
 }

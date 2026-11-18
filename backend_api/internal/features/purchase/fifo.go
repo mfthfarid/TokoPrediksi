@@ -8,11 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// ConsumeStock mengurangi quantity_remaining dari purchase_items secara FIFO
-// (paling lama masuk duluan). Kalau expiryDate diisi, cuma konsumsi dari batch
-// dengan tanggal kadaluwarsa itu (dipakai fitur penyesuaian stok). Kalau nil,
-// konsumsi dari batch mana saja (dipakai penjualan biasa).
-// Return: total modal (cost) dari quantity yang dikonsumsi.
+// mengurangi quantity_remaining dari purchase_items id paling lama (FIFO) sampai quantity_needed habis
 func ConsumeStock(tx *gorm.DB, productID uint, expiryDate *customtype.Date, quantityNeeded decimal.Decimal) (uint, error) {
 	query := tx.Where("product_id = ? AND quantity_remaining > 0", productID)
 	if expiryDate != nil {

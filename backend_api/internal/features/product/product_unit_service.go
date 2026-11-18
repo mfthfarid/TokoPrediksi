@@ -77,10 +77,10 @@ func (s *ProductUnitService) UpdateUnit(id uint, input UpdateProductUnitInput) (
 		pu.IsActive = *input.IsActive
 	}
 
-	// Kasus IsBaseUnit butuh penanganan khusus, karena cuma boleh 1 satuan dasar per produk
+	// IsBaseUnit cuma boleh 1 satuan dasar per produk
 	if input.IsBaseUnit != nil {
 		if *input.IsBaseUnit {
-			// Jadikan satuan dasar: unset semua yang lain dulu, baru set ini
+			// Jadikan satuan dasar baru, unset satuan dasar lain
 			err := config.DB.Transaction(func(tx *gorm.DB) error {
 				if err := s.repo.UnsetOtherBaseUnits(tx, pu.ProductID, pu.ID); err != nil {
 					return err
@@ -94,7 +94,7 @@ func (s *ProductUnitService) UpdateUnit(id uint, input UpdateProductUnitInput) (
 			return pu, nil
 		}
 
-		// Mau melepas status satuan dasar — pastikan ada satuan dasar lain sebagai gantinya
+		// melepas status satuan dasar, memastikan ada satuan dasar lain sebagai gantinya
 		otherBaseCount, err := s.repo.CountOtherBaseUnits(pu.ProductID, pu.ID)
 		if err != nil {
 			return nil, err

@@ -50,7 +50,6 @@ func (s *ReportService) GetProfitReport(query ProfitReportQuery) (*ProfitReportR
 
 	comparison, err := s.calculateComparison(query.StartDate, query.EndDate, revenue, profit)
 	if err != nil {
-		// kalau gagal hitung pembanding, tetap tampilkan laporan utama tanpa perbandingan
 		comparison = PeriodComparison{}
 	}
 
@@ -63,9 +62,7 @@ func (s *ReportService) GetProfitReport(query ProfitReportQuery) (*ProfitReportR
 	}, nil
 }
 
-// calculateComparison menghitung periode sebelumnya dengan PANJANG YANG SAMA,
-// tepat sebelum periode yang diminta. Contoh: kalau user pilih 1-11 Sep (11 hari),
-// pembandingnya otomatis 21-31 Agustus (11 hari sebelumnya).
+// calculateComparison menghitung periode sebelumnya
 func (s *ReportService) calculateComparison(startDate, endDate string, currentRevenue, currentProfit int) (PeriodComparison, error) {
 	start, err := time.Parse("2006-01-02", startDate)
 	if err != nil {

@@ -26,7 +26,7 @@ type barangRow struct {
 	Varian     string
 	Konversi   float64
 }
-
+ 
 type unitConversion struct {
 	ProductID        uint
 	ConversionToBase float64

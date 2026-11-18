@@ -83,7 +83,7 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 				return err
 			}
 
-			// Tambah stok produk (SELALU dalam satuan dasar/pcs, konsisten dgn purchase_items.quantity_remaining)
+			// Tambah stok produk, selalu dalam satuan dasar, konsisten dgn purchase_items.quantity_remaining
 			if err := tx.Model(&product.Product{}).
 				Where("id = ?", item.ProductID).
 				UpdateColumn("stock", gorm.Expr("stock + ?", quantityBase)).Error; err != nil {
@@ -108,6 +108,7 @@ func (s *PurchaseService) Create(input CreatePurchaseInput) (*Purchase, error) {
 	return s.repo.FindByID(created.ID)
 }
 
+// Delete pembelian
 func (s *PurchaseService) Delete(id uint) error {
 	purchase, err := s.repo.FindByID(id)
 	if err != nil {
@@ -122,7 +123,7 @@ func (s *PurchaseService) Delete(id uint) error {
 	}
 
 	return config.DB.Transaction(func(tx *gorm.DB) error {
-		// Kembalikan (kurangi) stok produk yang sempat ditambahkan saat pembelian ini dibuat
+		// kurangi stok produk yang telah ditambahkan saat pembelian
 		for _, item := range purchase.Items {
 			if err := tx.Model(&product.Product{}).
 				Where("id = ?", item.ProductID).

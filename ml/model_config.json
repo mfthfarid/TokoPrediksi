@@ -5,6 +5,7 @@
     "mode": "additive",
     "hps": 10.0
   },
+
   "holidays": [
     {
       "holiday": "idul_fitri",
@@ -43,6 +44,7 @@
       "upper_window": 2
     }
   ],
+
   "products": {
     "13": {
       "name": "Beras",

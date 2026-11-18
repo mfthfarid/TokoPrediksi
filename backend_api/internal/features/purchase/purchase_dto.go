@@ -8,7 +8,7 @@ import (
 type CreatePurchaseItemInput struct {
 	ProductID          uint             `json:"product_id" binding:"required"`
 	ProductUnitID      uint             `json:"product_unit_id" binding:"required"`
-	Quantity           decimal.Decimal  `json:"quantity"` // divalidasi manual di service (decimal tidak reliable dgn tag required)
+	Quantity           decimal.Decimal  `json:"quantity"`
 	PurchasePrice      uint             `json:"purchase_price" binding:"required,gt=0"`
 	TanggalKadaluwarsa *customtype.Date `json:"tanggal_kadaluwarsa"`
 }

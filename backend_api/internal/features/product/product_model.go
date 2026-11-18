@@ -20,8 +20,7 @@ type Product struct {
 	DeletedAt         gorm.DeletedAt     `json:"-" gorm:"index"`
 }
 
-// PopulatePhotoURLs mengisi PhotoThumbnailURL & PhotoDetailURL dari PhotoURL asli.
-// Dipanggil manual setelah data diambil dari database (karena field ini bukan kolom asli).
+// mengisi PhotoThumbnailURL & PhotoDetailURL dari PhotoURL asli
 func (p *Product) PopulatePhotoURLs() {
 	if p.PhotoURL == nil {
 		return

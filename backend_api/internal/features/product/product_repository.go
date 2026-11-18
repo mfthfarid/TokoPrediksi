@@ -56,9 +56,7 @@ func (r *ProductRepository) FindByBarcode(barcode string) (*ProductUnit, error) 
 	return &pu, nil
 }
 
-// GetLatestCostPerBase ambil cost_per_base dari purchase_items PALING BARU untuk produk ini.
-// Sengaja query tabel purchase_items langsung (bukan import package purchase),
-// supaya tidak terjadi circular import (purchase sudah import product duluan).
+// mengambil cost_per_base dari purchase_items paling baru untuk produk
 func (r *ProductRepository) GetLatestCostPerBase(productID uint) (*uint, error) {
 	var costPerBase uint
 	err := config.DB.Table("purchase_items").

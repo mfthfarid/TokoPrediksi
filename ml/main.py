@@ -2,7 +2,6 @@ import hashlib
 import json
 from pathlib import Path
 from typing import List, Optional
-
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from prophet import Prophet
@@ -10,11 +9,8 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="TokoPrediksi - Prediction Service", version="1.0.0")
 
-# Prophet butuh histori yang cukup biar hasilnya akurat.
-# 14 hari adalah batas bawah wajar untuk seasonality mingguan.
 MIN_HISTORY_POINTS = 14
 CONFIG_PATH = Path(__file__).parent / "model_config.json"
-
 
 def load_config() -> dict:
     if not CONFIG_PATH.exists():
@@ -31,9 +27,7 @@ def load_config() -> dict:
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
 CONFIG = load_config()
-
 
 def get_config_hash() -> str:
     if not CONFIG_PATH.exists():
@@ -41,9 +35,7 @@ def get_config_hash() -> str:
     with open(CONFIG_PATH, "rb") as f:
         return f"prophet-v4-{hashlib.sha256(f.read()).hexdigest()[:8]}"
 
-
 MODEL_VERSION = get_config_hash()
-
 
 def get_product_params(product_id: int):
     defaults = CONFIG.get("defaults", {})
@@ -56,7 +48,6 @@ def get_product_params(product_id: int):
     mode = str(p_config.get("mode", defaults.get("mode", "additive")))
     return cps, sps, hps, mode
 
-
 def get_holidays_df() -> Optional[pd.DataFrame]:
     holidays = CONFIG.get("holidays", [])
     if not holidays:
@@ -65,17 +56,14 @@ def get_holidays_df() -> Optional[pd.DataFrame]:
     df["ds"] = pd.to_datetime(df["ds"])
     return df
 
-
 class HistoryPoint(BaseModel):
     ds: str  # tanggal, format YYYY-MM-DD
     y: float = Field(ge=0, description="Jumlah unit terjual pada tanggal ds")
-
 
 class PredictRequest(BaseModel):
     product_id: int
     history: List[HistoryPoint]
     periods: int = Field(gt=0, le=90, description="Berapa hari ke depan yang diprediksi")
-
 
 class PredictionPoint(BaseModel):
     ds: str
@@ -83,12 +71,10 @@ class PredictionPoint(BaseModel):
     yhat_lower: float
     yhat_upper: float
 
-
 class PredictResponse(BaseModel):
     product_id: int
     predictions: List[PredictionPoint]
     model_version: Optional[str] = None
-
 
 @app.get("/health")
 def health():
@@ -97,7 +83,6 @@ def health():
         "model_version": MODEL_VERSION,
         "configured_products": list(CONFIG.get("products", {}).keys()),
     }
-
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest):
@@ -111,14 +96,12 @@ def predict(req: PredictRequest):
         )
 
     df = pd.DataFrame([{"ds": h.ds, "y": h.y} for h in req.history])
-
     try:
         df["ds"] = pd.to_datetime(df["ds"])
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Format tanggal tidak valid: {e}")
 
     df = df.sort_values("ds").reset_index(drop=True)
-
     if df["ds"].duplicated().any():
         raise HTTPException(status_code=400, detail="Ada tanggal (ds) yang duplikat di data historis")
 

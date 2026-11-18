@@ -17,18 +17,18 @@ type ProductProfitRow struct {
 }
 
 type GrandTotal struct {
-	TotalRevenue         int     `json:"total_revenue"`
-	TotalCost            int     `json:"total_cost"`
-	TotalProfit          int     `json:"total_profit"`
-	ProfitMargin         float64 `json:"profit_margin"`
-	TotalTransactions    int     `json:"total_transactions"`
-	TotalItemsSold       int     `json:"total_items_sold"`
-	TotalPurchaseAmount  int     `json:"total_purchase_amount"`
-	TotalPurchaseCount   int     `json:"total_purchase_count"`
+	TotalRevenue        int     `json:"total_revenue"`
+	TotalCost           int     `json:"total_cost"`
+	TotalProfit         int     `json:"total_profit"`
+	ProfitMargin        float64 `json:"profit_margin"`
+	TotalTransactions   int     `json:"total_transactions"`
+	TotalItemsSold      int     `json:"total_items_sold"`
+	TotalPurchaseAmount int     `json:"total_purchase_amount"`
+	TotalPurchaseCount  int     `json:"total_purchase_count"`
 }
 
 type PeriodComparison struct {
-	RevenueChangePercent *float64 `json:"revenue_change_percent"` // null kalau periode sebelumnya 0 (tidak bisa hitung %)
+	RevenueChangePercent *float64 `json:"revenue_change_percent"`
 	ProfitChangePercent  *float64 `json:"profit_change_percent"`
 }
 
