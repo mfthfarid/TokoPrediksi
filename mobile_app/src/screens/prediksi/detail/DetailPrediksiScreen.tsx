@@ -357,6 +357,8 @@ const DetailPrediksiScreen = () => {
           <PredictionChart
             actual={data.chart_data?.actual ?? []}
             predicted={data.chart_data?.predicted ?? []}
+            previousPredicted={data.chart_data?.previous_predicted ?? []}
+            unit={data.display_unit ?? 'unit'}
             // width={screenWidth - 64}
           />
         </View>

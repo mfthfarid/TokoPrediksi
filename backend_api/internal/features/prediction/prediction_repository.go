@@ -31,7 +31,8 @@ func (r *PredictionRepository) GetDailySales(productID uint) ([]DailySales, erro
 
 			UNION ALL
 
-			SELECT DATE_FORMAT(sale_date, '%Y-%m-%d') as ds, quantity_sold as y
+			SELECT DATE_FORMAT(sale_date, '%Y-%m-%d') as ds, 
+					quantity_sold as y
 			FROM historical_sales
 			WHERE product_id = ?
 		) combined
@@ -90,6 +91,32 @@ func (r *PredictionRepository) FindLatestRun(productID uint) ([]Prediction, erro
 	var predictions []Prediction
 	err = config.DB.
 		Where("product_id = ? AND run_id = ?", productID, runID).
+		Order("prediction_date ASC").
+		Find(&predictions).Error
+	return predictions, err
+}
+
+// FindPreviousRun mengambil prediksi dari run tepat sebelum run terbaru.
+// Digunakan untuk menampilkan jejak prediksi sebelumnya di grafik.
+func (r *PredictionRepository) FindPreviousRun(productID uint) ([]Prediction, error) {
+	// Ambil 2 run_id terakhir (berdasarkan id terbesar / run terbaru)
+	var runIDs []string
+	err := config.DB.Table("predictions").
+		Select("run_id").
+		Where("product_id = ?", productID).
+		Group("run_id").
+		Order("MAX(id) DESC").
+		Limit(2).
+		Pluck("run_id", &runIDs).Error
+	if err != nil || len(runIDs) < 2 {
+		// Belum pernah re-predict, hanya ada 0 atau 1 run
+		return nil, err
+	}
+
+	// runIDs[0] = terbaru, runIDs[1] = sebelumnya
+	var predictions []Prediction
+	err = config.DB.
+		Where("product_id = ? AND run_id = ?", productID, runIDs[1]).
 		Order("prediction_date ASC").
 		Find(&predictions).Error
 	return predictions, err

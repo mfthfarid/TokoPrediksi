@@ -50,6 +50,7 @@ export interface PredictionDetailApi {
   chart_data: {
     actual: ChartPoint[];
     predicted: ChartPoint[];
+    previous_predicted: ChartPoint[];
   };
   predictions: PredictionRecordApi[];
   display_unit?: string;
