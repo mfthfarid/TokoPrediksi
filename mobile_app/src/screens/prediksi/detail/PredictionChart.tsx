@@ -102,7 +102,15 @@ const formatAxisDate = (timestamp: number, showYear: boolean): string => {
 
 const formatQuantity = (value?: number | null): string => {
   if (value == null || isNaN(value)) return '0';
-  return value.toLocaleString('id-ID');
+  return value.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+};
+
+const formatAxisQuantity = (val: number): string => {
+  if (val % 1 === 0) return formatQuantity(val);
+  return val.toLocaleString('id-ID', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 };
 
 const getNiceMax = (value: number): number => {
@@ -541,7 +549,7 @@ const PredictionChart = ({
                     fill={Colors.textSecondary}
                     textAnchor="end"
                   >
-                    {formatQuantity(Math.round(value))}
+                    {formatAxisQuantity(value)}
                   </SvgText>
                 </React.Fragment>
               );
