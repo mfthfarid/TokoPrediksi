@@ -272,34 +272,6 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
-	actualPoints := make([]ChartPoint, len(dailySales))
-	for i, d := range dailySales {
-		t, _ := time.Parse("2006-01-02", d.DS)
-		actualPoints[i] = ChartPoint{Date: t.Format("02/01/2006"), Quantity: d.Y}
-	}
-
-	predictedPoints := make([]ChartPredictedPoint, len(predictions))
-	for i, p := range predictions {
-		predictedPoints[i] = ChartPredictedPoint{
-			Date:     p.PredictionDate.Time.Format("02/01/2006"),
-			Quantity: p.PredictedQuantity,
-			Lower:    p.YhatLower,
-			Upper:    p.YhatUpper,
-		}
-	}
-
-	// Ambil prediksi dari run sebelumnya untuk jejak di grafik.
-	prevPredictions, _ := s.repo.FindPreviousRun(productID)
-	prevPredictedPoints := make([]ChartPredictedPoint, len(prevPredictions))
-	for i, p := range prevPredictions {
-		prevPredictedPoints[i] = ChartPredictedPoint{
-			Date:     p.PredictionDate.Time.Format("02/01/2006"),
-			Quantity: p.PredictedQuantity,
-			Lower:    p.YhatLower,
-			Upper:    p.YhatUpper,
-		}
-	}
-
 	totalPredictedDemand := 0.0
 	for _, p := range predictions {
 		totalPredictedDemand += p.PredictedQuantity
@@ -318,6 +290,55 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 	reference := math.Max(stock, avgSales)
 	reference = math.Max(reference, float64(recommendedRestock))
 	divisor, displayUnit := DetermineDisplayUnit(baseUnitName, reference)
+
+	actualPoints := make([]ChartPoint, len(dailySales))
+	for i, d := range dailySales {
+		t, _ := time.Parse("2006-01-02", d.DS)
+		actualPoints[i] = ChartPoint{
+			Date:     t.Format("02/01/2006"),
+			Quantity: round2(d.Y / divisor),
+		}
+	}
+
+	predictedPoints := make([]ChartPredictedPoint, len(predictions))
+	for i, p := range predictions {
+		var lower, upper *float64
+		if p.YhatLower != nil {
+			l := round2(*p.YhatLower / divisor)
+			lower = &l
+		}
+		if p.YhatUpper != nil {
+			u := round2(*p.YhatUpper / divisor)
+			upper = &u
+		}
+		predictedPoints[i] = ChartPredictedPoint{
+			Date:     p.PredictionDate.Time.Format("02/01/2006"),
+			Quantity: round2(p.PredictedQuantity / divisor),
+			Lower:    lower,
+			Upper:    upper,
+		}
+	}
+
+	// Ambil prediksi dari run sebelumnya untuk jejak di grafik.
+	prevPredictions, _ := s.repo.FindPreviousRun(productID)
+	prevPredictedPoints := make([]ChartPredictedPoint, len(prevPredictions))
+	for i, p := range prevPredictions {
+		var lower, upper *float64
+		if p.YhatLower != nil {
+			l := round2(*p.YhatLower / divisor)
+			lower = &l
+		}
+		if p.YhatUpper != nil {
+			u := round2(*p.YhatUpper / divisor)
+			upper = &u
+		}
+		prevPredictedPoints[i] = ChartPredictedPoint{
+			Date:     p.PredictionDate.Time.Format("02/01/2006"),
+			Quantity: round2(p.PredictedQuantity / divisor),
+			Lower:    lower,
+			Upper:    upper,
+		}
+	}
 
 	return &PredictionSummaryResponse{
 		ProductID:                  productID,
