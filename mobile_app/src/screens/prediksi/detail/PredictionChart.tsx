@@ -24,12 +24,14 @@ type ChartMode = 'overview' | 'prediction';
 interface PredictionChartProps {
   actual: ChartPoint[];
   predicted: ChartPoint[];
+  previousPredicted?: ChartPoint[];
   height?: number;
+  unit?: string;
   // width?: number;
 }
 
 interface ChartItem extends ChartPoint {
-  type: 'actual' | 'predicted';
+  type: 'actual' | 'predicted' | 'previous';
   timestamp: number;
 }
 
@@ -128,7 +130,9 @@ const getNiceMax = (value: number): number => {
 const PredictionChart = ({
   actual,
   predicted,
+  previousPredicted,
   height = CHART_HEIGHT,
+  unit = 'unit',
 }: PredictionChartProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>('1year');
   const [chartMode, setChartMode] = useState<ChartMode>('overview');
@@ -154,6 +158,18 @@ const PredictionChart = ({
       .sort((a, b) => a.timestamp - b.timestamp);
   }, [predicted]);
 
+  // Normalisasi data prediksi sebelumnya (jejak).
+  const normalizedPrevious = useMemo(() => {
+    return (previousPredicted || [])
+      .map(item => ({
+        ...item,
+        type: 'previous' as const,
+        timestamp: parseDate(item.date).getTime(),
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }, [previousPredicted]);
+  const hasPreviousPrediction = normalizedPrevious.length > 0;
+
   // Data overview berdasarkan periode.
   const overviewData = useMemo(() => {
     if (normalizedActual.length === 0 && normalizedPredicted.length === 0) {
@@ -162,11 +178,11 @@ const PredictionChart = ({
 
     const latestActual = normalizedActual[normalizedActual.length - 1];
     if (!latestActual) {
-      return normalizedPredicted;
+      return [...normalizedPredicted, ...normalizedPrevious];
     }
 
     if (selectedPeriod === 'all') {
-      return [...normalizedActual, ...normalizedPredicted];
+      return [...normalizedActual, ...normalizedPredicted, ...normalizedPrevious];
     }
 
     const startDate = new Date(latestActual.timestamp);
@@ -187,14 +203,14 @@ const PredictionChart = ({
       point => point.timestamp >= startTimestamp,
     );
 
-    return [...filteredActual, ...normalizedPredicted];
-  }, [normalizedActual, normalizedPredicted, selectedPeriod]);
+    return [...filteredActual, ...normalizedPredicted, ...normalizedPrevious];
+  }, [normalizedActual, normalizedPredicted, normalizedPrevious, selectedPeriod]);
 
   // Data khusus Fokus Prediksi. Mengambil maksimal 5 data aktual terakhir
   const predictionFocusData = useMemo(() => {
     const recentActual = normalizedActual.slice(-5);
-    return [...recentActual, ...normalizedPredicted];
-  }, [normalizedActual, normalizedPredicted]);
+    return [...recentActual, ...normalizedPredicted, ...normalizedPrevious];
+  }, [normalizedActual, normalizedPredicted, normalizedPrevious]);
 
   // Menentukan dataset aktif.
   const activeData =
@@ -202,6 +218,9 @@ const PredictionChart = ({
   const activeActual = activeData.filter(point => point.type === 'actual');
   const activePredicted = activeData.filter(
     point => point.type === 'predicted',
+  );
+  const activePrevious = activeData.filter(
+    point => point.type === 'previous',
   );
 
   // Reset selected point ketika mode/filter berubah.
@@ -267,6 +286,11 @@ const PredictionChart = ({
     ...(activeActual.length > 0 ? [activeActual[activeActual.length - 1]] : []),
     ...activePredicted,
   ]
+    .map(point => `${getX(point.timestamp)},${getY(point.quantity)}`)
+    .join(' ');
+
+  // Garis prediksi sebelumnya (jejak).
+  const previousLinePoints = activePrevious
     .map(point => `${getX(point.timestamp)},${getY(point.quantity)}`)
     .join(' ');
 
@@ -455,18 +479,22 @@ const PredictionChart = ({
             </Text>
             {selectedPoint.type === 'actual' ? (
               <Text style={styles.tooltipValue}>
-                Aktual: {formatQuantity(selectedPoint.quantity)} unit
+                Aktual: {formatQuantity(selectedPoint.quantity)} {unit}
+              </Text>
+            ) : selectedPoint.type === 'previous' ? (
+              <Text style={[styles.tooltipValue, styles.tooltipPreviousValue]}>
+                Prediksi Sebelumnya: {formatQuantity(selectedPoint.quantity)} {unit}
               </Text>
             ) : (
               <>
                 <Text style={styles.tooltipValue}>
-                  Prediksi: {formatQuantity(selectedPoint.quantity)} unit{' '}
+                  Prediksi: {formatQuantity(selectedPoint.quantity)} {unit}
                 </Text>
                 {selectedPoint.lower !== undefined &&
                   selectedPoint.upper !== undefined && (
                     <Text style={styles.tooltipRange}>
                       Rentang: {formatQuantity(selectedPoint.lower)}–
-                      {formatQuantity(selectedPoint.upper)} unit
+                      {formatQuantity(selectedPoint.upper)} {unit}
                     </Text>
                   )}
               </>
@@ -548,6 +576,32 @@ const PredictionChart = ({
               />
             )}
 
+            {/* Garis Prediksi Sebelumnya (Jejak) */}
+            {activePrevious.length > 1 && (
+              <Polyline
+                points={previousLinePoints}
+                fill="none"
+                stroke="#94A3B8"
+                strokeWidth={2}
+                strokeDasharray="6,4"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                opacity={0.5}
+              />
+            )}
+
+            {/* Titik Prediksi Sebelumnya */}
+            {activePrevious.map(point => (
+              <Circle
+                key={`previous-${point.date}`}
+                cx={getX(point.timestamp)}
+                cy={getY(point.quantity)}
+                r={2.5}
+                fill="#94A3B8"
+                opacity={0.5}
+              />
+            ))}
+
             {/* Garis Aktual */}
             {activeActual.length > 1 && (
               <Polyline
@@ -615,7 +669,11 @@ const PredictionChart = ({
                   r={6}
                   fill="#FFFFFF"
                   stroke={
-                    selectedPoint.type === 'actual' ? Colors.primary : '#F59E0B'
+                    selectedPoint.type === 'actual'
+                      ? Colors.primary
+                      : selectedPoint.type === 'previous'
+                      ? '#94A3B8'
+                      : '#F59E0B'
                   }
                   strokeWidth={2.5}
                 />
@@ -663,6 +721,15 @@ const PredictionChart = ({
           <View style={styles.legendItem}>
             <View style={styles.rangeLegend} />
             <Text style={styles.legendText}>Rentang Prediksi</Text>
+          </View>
+        )}
+        {hasPreviousPrediction && (
+          <View style={styles.legendItem}>
+            <View style={styles.legendDashed}>
+              <View style={[styles.legendDash, styles.legendDashPrevious]} />
+              <View style={[styles.legendDash, styles.legendDashPrevious]} />
+            </View>
+            <Text style={styles.legendText}>Prediksi Sebelumnya</Text>
           </View>
         )}
       </View>
@@ -776,6 +843,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.text,
   },
+  tooltipPreviousValue: {
+    color: '#94A3B8',
+  },
   tooltipRange: {
     marginTop: 2,
     fontSize: 11,
@@ -828,6 +898,10 @@ const styles = StyleSheet.create({
     height: 3,
     borderRadius: 2,
     backgroundColor: '#F59E0B',
+  },
+  legendDashPrevious: {
+    backgroundColor: '#94A3B8',
+    opacity: 0.5,
   },
 
   rangeLegend: {

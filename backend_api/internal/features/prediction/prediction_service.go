@@ -288,6 +288,18 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		}
 	}
 
+	// Ambil prediksi dari run sebelumnya untuk jejak di grafik.
+	prevPredictions, _ := s.repo.FindPreviousRun(productID)
+	prevPredictedPoints := make([]ChartPredictedPoint, len(prevPredictions))
+	for i, p := range prevPredictions {
+		prevPredictedPoints[i] = ChartPredictedPoint{
+			Date:     p.PredictionDate.Time.Format("02/01/2006"),
+			Quantity: p.PredictedQuantity,
+			Lower:    p.YhatLower,
+			Upper:    p.YhatUpper,
+		}
+	}
+
 	totalPredictedDemand := 0.0
 	for _, p := range predictions {
 		totalPredictedDemand += p.PredictedQuantity
@@ -319,8 +331,9 @@ func (s *PredictionService) buildSummary(productID uint, predictions []Predictio
 		Urgency:                    urgency,
 		RecommendedRestockQuantity: recommendedRestock,
 		ChartData: ChartData{
-			Actual:    actualPoints,
-			Predicted: predictedPoints,
+			Actual:            actualPoints,
+			Predicted:         predictedPoints,
+			PreviousPredicted: prevPredictedPoints,
 		},
 		Predictions:               predictions,
 		DisplayUnit:               displayUnit,

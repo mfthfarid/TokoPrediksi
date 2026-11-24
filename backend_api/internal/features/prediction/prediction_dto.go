@@ -41,8 +41,9 @@ type ChartPredictedPoint struct {
 }
 
 type ChartData struct {
-	Actual    []ChartPoint          `json:"actual"`
-	Predicted []ChartPredictedPoint `json:"predicted"`
+	Actual            []ChartPoint          `json:"actual"`
+	Predicted         []ChartPredictedPoint `json:"predicted"`
+	PreviousPredicted []ChartPredictedPoint `json:"previous_predicted"`
 }
 
 type PredictionSummaryResponse struct {
